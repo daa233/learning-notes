@@ -1,7 +1,7 @@
 /**
  * @file: SortNumbers.cpp
  * @description: 从键盘输入10个整数，按照从大到小的顺序排列，并输出。
- * @solution: 这里采用冒泡法
+ * @solution: 这里采用选择排序算法
  *
  * @author: Du Ang
  * @date: Apr. 3rd, 2017
