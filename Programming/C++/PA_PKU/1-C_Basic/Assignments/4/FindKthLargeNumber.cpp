@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
     // 循环结束后，max[]存放着num[]中最大的k个数，其中最小的即为第k大的数
     int min = max[0];   // 用于存储此时max[]中的最小值
-    int minIndex = max[0];  // 用于存储此时max[]中最小值的索引
+    int minIndex = 0;   // 用于存储此时max[]中最小值的索引
     // 找到max[]此时最小值的索引
     for (int i = 1; i < k; i++) {
         // 如果tempMin小于max[i]，更新tempMin和tempMinIndex为max[i]和i
