@@ -87,7 +87,6 @@ int f(char str[], int start, int state)
     } else {    // 当前start处之前的字符含有多余')'，一定无法匹配
         return 1;
     }
-
 }
 
 int main(int argc, char *argv[])
