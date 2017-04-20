@@ -64,27 +64,27 @@ int main(int argc, char *argv[])
 */
 
 /* 我的思路
-    设 M 为任一括号匹配的字符串，分情况讨论：
-    1. 匹配的情况: (M)M  返回 0
-    2. 不匹配的情况:  a. M)M  返回 -1
-                    b. M(M  返回  1
+    设 M 为任一括号匹配的字符串，利用state变量记录查验字符串的状态值，分情况讨论：
+    1. 匹配的情况: (M)M  状态值保持0
+    2. 不匹配的情况:  a. M(M  状态值-1
+                    b. M)M  状态值+1
+    可以允许字符串的状态值暂时小于0，然后继续查验后面的字符串，查验完成后整个字符串的状态值为0则匹配，否则不匹配；
+    如果字符串的状态值出现了大于0的情况，则一定无法匹配括号，立即返回1。
 */
-int f(char str[], int start, int state);
-// start表示查验字符串的起点;
-// state表示start之前的字符串的查验结果状态值,匹配为0;多一个左括号为-1; 多一个右括号为1,此时肯定无法匹配.
+int f(char str[], int start, int state);    // start表示查验字符串的起点k
 int f(char str[], int start, int state)
 {
-    if (state <= 0) {
+    if (state <= 0) {   // 当前start处之前的字符为匹配的字符或者含有多余的‘(’
         if (strlen(str) == start) {
             return state;   // 已经查验完整个字符串,返回最后的状态值. 如果为0,表示匹配; 如果非0,表示不匹配.
         } else {            // 字符串还没有查验完成
             if (str[start] == '(') {    // 从start开始的字符串以'('开头
                 return f(str, start + 1, state - 1);    // 返回查验start+1开始的字符串结果,其初始状态值-1.
             } else {
-                return f(str, start + 1, state + 1);
+                return f(str, start + 1, state + 1);    // 返回查验start+1开始的字符串结果,其初始状态值+1.
             }
         }
-    } else {
+    } else {    // 当前start处之前的字符含有多余')'，一定无法匹配
         return 1;
     }
 
