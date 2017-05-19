@@ -1,13 +1,13 @@
 # lshort
-Learn LaTex with [_The Not So Short Introduction to LATEX 2ε_](http://mirrors.opencas.org/ctan/info/lshort/english/lshort.pdf)
+Learn LaTeX with [_The Not So Short Introduction to LATEX 2ε_](http://mirrors.opencas.org/ctan/info/lshort/english/lshort.pdf)  
+中文版：[《一份不太简短的 LATEX 2ε 介绍》](http://mirrors.opencas.org/ctan/info/lshort/chinese/lshort-zh-cn.pdf)
 
 > **LATEX** is a typesetting system that is very suitable for producing scientific
 and mathematical documents of high typographical quality. It is also suitable
 for producing all sorts of other documents, from simple letters to complete
 books. LATEX uses TEX as its formatting engine.
 This short introduction describes LATEX 2ε and should be sufficient for
-most applications of LATEX. Refer to [1, 3] for a complete description of the
-LATEX system.
+most applications of LATEX.
 
 > This introduction is split into 6 chapters:  
 **Chapter 1** tells you about the basic structure of LATEX 2ε documents. You
