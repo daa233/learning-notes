@@ -4,20 +4,20 @@ LaTeX作者： Donald E. Knuth(高德纳)
 LaTeX读音：“Lay-tech”或者“Lah-tech”
 LaTeX2e读作： “Lay-tech two e”
 
-WYSIWYG：What you see is what you get. 当前大多数文字处理软件的理念，如 MS Word，LibreOffice。
+WYSIWYG：*What you see is what you get.* 当前大多数文字处理软件的理念，如 MS Word，LibreOffice。
 
 ## LaTeX的优缺点
-> When people from the WYSIWYG world meet people who use LATEX, they
+> *When people from the WYSIWYG world meet people who use LATEX, they
 often discuss “the advantages of LATEX over a normal word processor” or the
 opposite. The best thing to do when such a discussion starts is to keep a low
 profile(保持低调), since such discussions often get out of hand. But sometimes there is
-no escaping . . .
+no escaping...*
 
 ### 优点
 - 可以获得专业的布局，让文档宛如印刷品一般精美
 - 方便地排版数学公式
 - 只需学几个简单的命令就能明确文档的逻辑结构，几乎不用对文档的布局修修补补
-- 可以方便地生成脚注（footnotes）、引用（references）、目录（table of contents）、参考文献（bibliographies）等。（ p.s. [Difference Between Bibliography and References](http://www.differencebetween.net/language/difference-between-bibliography-and-references/) ）
+- 可以方便地生成脚注（footnotes）、引用（references）、目录（table of contents）、参考文献（bibliographies）等。（ p.s. [*Difference Between Bibliography and References*](http://www.differencebetween.net/language/difference-between-bibliography-and-references/) ）
 - 拥有许多针对各种排版设计任务的免费附加宏包
 - 促使用户写出结构良好的文档——而这也是LaTeX存在的初衷
 - 跨平台，完全免费，容易获得
@@ -27,12 +27,12 @@ no escaping . . .
 - 排查错误困难。LaTeX作为一个依靠编写代码工作的排版工具，其使用的宏语言比 C++ 或 Python 等程序设计语言在错误排查方面困难得多。它虽然能够提示错误，但不提供调试的机制，有时错误提示还很难理解
 - 在一个提前设计好的文档布局里改参数很容易，但设计一个新的布局比较困难，需要花费较多的时间
 - 相比“所见即所得”的模式有一些不便，为了查看生成的文档，用户总要不停地编译
-- 若是浅尝辄止，终不能领悟“逻辑标记”的真谛（ Your hamster might, despite some encouraging first steps, never be able to fully grasp the concept of Logical Markup ）
+- 若是浅尝辄止，终不能领悟“逻辑标记”的真谛（*Your hamster might, despite some encouraging first steps, never be able to fully grasp the concept of Logical Markup*）
 
 ## LaTeX输入文件
 LaTeX的输入文件是纯文本文件。
 ### 空格
-- “Whitespace”字符，如空白、tab 等都会被 LaTeX 认为是空格
+- “Whitespace”字符，如空白、Tab符等都会被 LaTeX 认为是空格
 - 几个连续的空格会被LaTeX当作一个空格
 - 每一行开头的空格会被忽略，末尾的断行符`\\`会被当作空格
 - 一个空行是一个段落结束的标志
@@ -48,11 +48,12 @@ LaTeX的输入文件是纯文本文件。
 LaTeX 命令是区分大小写的。
 LaTeX 命令以反斜线 \ 开头，为以下两种形式之一：
 - 反斜线和后面的一串字母，如 `\LaTeX`。它们以任意非字母符号（空格、数字、标点等）作为分隔符。如`\textsl{}`、`\newline`命令。
-- 反斜线和后面的一个非字母符号，如 `\$`。它们无需分隔符。
+- 反斜线和后面的一个非字母符号，如 `\$`，它们之间无需分隔符。
+
+LaTeX会忽略掉命令后的空白符。如果想在命令后添加空格，可以在命令后添加一个空的 `{}`，如 `\TeX{}`；或者是添加一个空格命令或特殊字符，如 `~`。
 
 大多数的 LaTeX 命令是带一个或多个参数，每个参数用花括号 `{` 和 `}` 包裹。有些命令带一个或多个可选参数，以方括号 `[` 和 `]` 包裹，用法为 `\command[optional parameter]{parameter}`。  
-还有些命令在命令名称后可以带一个星号 `*`，带星
-号和不带星号的命令效果有一定差异。
+还有些命令在命令名称后可以带一个星号 `*`，带星号和不带星号的命令效果有一定差异。
 LaTeX 还引入了环境的用法，用以令一些效果在局部生效，或是生成特定的文档元素。LaTeX 环境的用法为一对命令 `\begin` 和 `\end`。  
 
 ### LaTeX注释
@@ -84,16 +85,16 @@ LaTeX 还引入了环境的用法，用以令一些效果在局部生效，或�
 
 LaTeX 的三个标准文档类可指定的选项：
 - `10pt`, `11pt`, `12pt` 指定文档的基本字号。缺省为 `10pt`
-- `a4paper`, `letterpaper`, ... 指定纸张大小，默认为美式纸张 letterpaper。可指定选项还包括 `a5paper`,`b5paper`, `executivepaper` 和 `legalpaper`
+- `a4paper`, `letterpaper`, ... 指定纸张大小，默认为美式纸张 letterpaper。可指定选项还包括 `a5paper`、`b5paper`、 `executivepaper` 和 `legalpaper`
 - `fleqn` 令行间公式左对齐(缺省为居中)
 - `leqno` 将公式编号放在左边(缺省为右边)
 - `titlepage`, `notitlepage` 指定标题命令。 `\maketitle` 是否生成单独的标题页。`article` 缺省为
-`notitlepage`, `report` 和 `book` 缺省为 `titlepage`
+`notitlepage`、 `report` 和 `book` 缺省为 `titlepage`
 - `onecolumn`, `twocolumn` 指定单栏/双栏排版
 - `twoside`, `oneside` 指定单面/双面排版。双面排版时，奇偶页的页眉页脚、页边距不同。 `article`和 `report` 缺省为单面排版， `book` 缺省为双面。
 - `landscape` 指定横向排版。缺省为纵向。
 - `openright`, `openany` 指定新的一章 `\chapter` 是在奇数页(右侧)开头，还是直接紧跟着上
-一页开头。`report` 缺省为 `openany`, `book` 缺省为 `openright`。【对 article 无效】
+一页开头。`report` 缺省为 `openany`， `book` 缺省为 `openright`。（对 `article` 无效）
 
 LaTeX支持使用 `\pagestyle{style}`来定义页眉页脚的风格，有三种预定义的选项可以选择：
 - `plain` 默认为此选项，在每一页的页脚中间打印当前页码
@@ -111,7 +112,7 @@ LaTeX支持使用 `\pagestyle{style}`来定义页眉页脚的风格，有三种�
 
 LaTeX 在编译过程中生成相当多的辅助文件和日志。一些功能如交叉引用、参考文献、目录、
 索引等，需要先编译生成辅助文件，然后再次编译时读入辅助文件得到正确的结果，所以复杂的
-LaTeX 源代码可能要编译多次:
+LaTeX 源代码可能要编译多次。在使用`TeX`的过程中可能遇到以下扩展名的文件：
 - `.log` 排版引擎生成的日志文件，供排查错误使用
 - `.aux` LaTeX 生成的主辅助文件，记录交叉引用、目录、参考文献的引用等
 - `.toc` LaTeX生成的目录记录文件
@@ -133,7 +134,7 @@ LaTeX 源代码可能要编译多次:
 另外 LaTeX 提供了一个 `\includeonly` 命令来组织文件，用于导言区（ preamble ），指定只载入某些文
 件: `\includeonly{⟨filename1 ⟩,⟨filename2 ⟩,...}`。导言区使用了 `\includeonly` 后，正文中不在其列表范围的 `\include` 命令不会起效。
 
-注意：参考[_TEX and controlled access to information_](TEX and controlled access to information)，LaTeX中没有`\inputonly`命令，但是可以自己定义一个：
+注意：参考[_TEX and controlled access to information_](https://www.tug.org/TUGboat/tb36-2/tb113veytsman-access.pdf)，LaTeX中没有`\inputonly`命令，但是可以自己定义一个：
 ```
 \newif\iffinancial
 ...
