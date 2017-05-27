@@ -1,0 +1,167 @@
+%-*- coding: UTF-8 -*-
+% TypesettingText.tex
+%
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{a4paper, centering, scale=0.8}
+\usepackage{minted}
+\usepackage{textcomp}
+\usepackage[gen]{eurosym}
+
+\title{\heiti Chapter 2 Typesetting Text}
+\author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{文章和语言的结构}
+写文章最重要的一点是要把想法、信息、知识传达给读者，而好的文章结构能够帮助读者更好地查看、感受和理解我们想传达的东西。
+
+\LaTeX 中最重要的文本单位是段（paragraph）。一段文字应该只包含一个思想或一种想法。写文章时什么时候分段？应该怎么分段呢？如果要写一个新的想法了，
+那就另起一段，对应在源码中空一行）；否则，可以用换行符（line breaking）来继续写原来的想法，对应在源码中使用
+\mintinline{LaTeX}{\\} 或 \mintinline{LaTeX}{\newline}。
+
+很多人都低估了合理分段的重要性。在\LaTeX 中，很多人甚至都不知道什么是分段，自己已经新起了一段都不知道。按照我的理解，一般情况下是不需要使用换
+行符的，在该分段的时候在代码里空一行另起一段就行了。但是在使用公式（equation）的时候需要考虑好该使用什么，这时候很容易犯上述的错误。下面是说明
+该换行还是该另起一段的三个正确示例：
+\begin{minted}{LaTeX}
+    % Example 1
+    \ldots when Einstein introduced his formula
+    \begin{equation}
+        e = m \cdot c^2 \; ,
+    \end{equation}
+    which is at the same time the most widely known
+    and the least well understood physical formula.
+
+    % Example 2
+    \ldots from which follows Kirchhoff’s current law:
+    \begin{equation}
+        \sum_{k=1}^{n} I_k = 0 \; .
+    \end{equation}
+
+    Kirchhoff’s voltage law can be derived \ldots
+
+    % Example 3
+    \ldots which has several advantages.
+    \begin{equation}
+        I_D = I_F - I_R
+    \end{equation}
+    is the core of a very different transistor model. \ldots
+\end{minted}
+
+\section{断行和断页}
+\subsection{合理分段}
+\begin{itemize}
+    \item \mintinline{LaTeX}{\\} 或 \mintinline{LaTeX}{\newline}：断行、不另起一段。
+    \mintinline{LaTeX}{\\} 也在表格、公式等地方用于分行,而 \mintinline{LaTeX}{\newline} 只用于文本段落中。
+    \item \mintinline{LaTeX}{\\*}：断行、不另起一段、不断页。
+    \item \mintinline{LaTeX}{\newpage} 或 \mintinline{LaTeX}{\clearpage}：断页。二者有些细微的区别：一是在双栏排版
+    中 \mintinline{LaTeX}{\newpage} 只起到另起一栏的作用；二是涉及到浮动体的排版上行为不同。
+    \item \mintinline{LaTeX}{\linebreak[n]}、\mintinline{LaTeX}{\nolinebreak[n]}、\mintinline{LaTeX}{\pagebreak[n]}、
+    \mintinline{LaTeX}{\nopagebreak[n]}：向 \LaTeX 建议哪些地方适合断行、断页，
+    哪些地方不适合断行、断页。n是数字，代表适合/不适合的程度，取值范围为0到4，默认为4。数字越大代表程度越高。
+\end{itemize}
+
+一般\LaTeX 都会努力找到最适合断行的地方。但是有些时候——比如它不知道该如何用连字符分割单词的时候，它可能会让这一行文字从右边伸出这一段，然后
+报出\texttt{overfull hbox}的警告。这时使用 \mintinline{LaTeX}{\sloppy} 命令可以使单词之间的间距增大来避免这个问题，但是这时会报出
+\texttt{underfull hbox}的警告。大多数情况下这样排版出来的都不太好看。可以使用 \mintinline{LaTeX}{\fussy} 命令恢复 \LaTeX 的默认方式。
+
+\section{连字符（Hyphenation）}
+对于绝大部分单词，\LaTeX 都能够找到合适的断词位置，在断开的行尾加上连字符 \texttt{-}。如果一些单词没能自动断词，我们可以在单词内手动使用
+\mintinline{LaTeX}{\-} 命令指定断词的位置。另外，也可以使用 \mintinline{LaTeX}{\hyphenation{word list}} 命令来指定使用连字符
+的位置，例如 \mintinline{LaTeX}|\hyphenation{FORTRAN Hy-phen-a-tion}|，其中的 \texttt{word list}是不区分大小写的。
+
+\mintinline{LaTeX}|\mbox{text}| 或 \mintinline{LaTeX}|\fbox{text}|：会避免 \texttt{text}被连字符分开。
+\mintinline{LaTeX}|\fbox| 比 \mintinline{LaTeX}|\mbox| 多了个可见的框。
+
+\section{预定义好的字符串}
+\begin{itemize}
+    \item \mintinline{LaTeX}{\today}：\today（打印当天日期）
+    \item \mintinline{LaTeX}{\TeX}：\TeX
+    \item \mintinline{LaTeX}{\LaTeX}：\LaTeX
+    \item \mintinline{LaTeX}{\LaTeXe}：\LaTeXe
+\end{itemize}
+
+\section{特殊符号}
+\subsection{引号（Quotation Marks）}
+\begin{itemize}
+    \item 双引号：\mintinline{LaTeX}{``...text...''}
+    \item 单引号：\mintinline{LaTeX}{`...text...'}
+\end{itemize}
+
+\subsection{短划线（Dashes）和连字符（Hyphens）}
+在 \LaTeX 中有下面四种横杠：
+\begin{itemize}
+    \item \mintinline{LaTeX}{-}：-，连字符（hyphen），用于连接词语
+    \item \mintinline{LaTeX}{--}：--，短破折号（en-dash），常用于连接数字表示起止范围
+    \item \mintinline{LaTeX}{---}：---，长破折号（em-dash），常用于表示意思的转换
+    \item \mintinline{LaTeX}{$-$}：$-$，减号（minus sign）
+\end{itemize}
+
+\subsection{波浪线（Tilde）}
+\begin{itemize}
+    \item \mintinline{LaTeX}{\~{}}：\~{}
+    \item \mintinline{LaTeX}{$\sim$}：$\sim$
+\end{itemize}
+
+\subsection{斜杠（Slash）}
+\begin{itemize}
+    \item \mintinline{LaTeX}{read/write}：read/write（不允许用连字符拆分）
+    \item \mintinline{LaTeX}{read\slash write}：read\slash write（允许用连字符拆分）
+\end{itemize}
+
+\subsection{度（Degree Symbol）}
+\begin{itemize}
+    \item \mintinline{LaTeX}{$30\,^{\circ}\mathrm{C}$}\footnote{这里的 \mintinline{LaTeX}{\,} 会输出空格}
+    ：$30\,^{\circ}\mathrm{C}$
+    \item \mintinline{LaTeX}{30 \textcelsius{}}：30 \textcelsius{}
+    \item \mintinline{LaTeX}{86 \textdegree{}F}：86 \textdegree{}F
+\end{itemize}
+
+\subsection{欧元符号}
+要想使用欧元符号，需要先在导言区通过 \mintinline{LaTeX}{\usepackage{textcomp}} 命令导入宏包，然后再使用\\
+\mintinline{LaTeX}{\texteuro} 命令输出欧元符号。如果所用的字体不包含欧元符号或者想用别的字体的欧元符号，可以通过
+\mintinline{LaTeX}{\usepackage[official]{eurosym}} 导入 \texttt{eurosym} 宏包，然后用 \mintinline{LaTeX}{\euro} 输出官方的
+欧元符号。用\texttt{gen}来替换\texttt{official}参数可以使用和当前字体匹配的欧元符号。
+\begin{itemize}
+    \item \mintinline{LaTeX}{\texteuro}：\texteuro
+    \item \mintinline{LaTeX}{\euro}：\euro
+\end{itemize}
+
+\subsection{省略号（Ellipsis）}
+\LaTeX 提供了命令 \mintinline{LaTeX}{\ldots} 来生成省略号，相对于直接输入三个点的方式更为合理。\mintinline{LaTeX}{\ldots} 和 \mintinline{LaTeX}{\dots}
+是两个等效的命令。
+\begin{itemize}
+    \item \mintinline{LaTeX}{Apples, bananas, ...}：Apples, bananas, ...
+    \item \mintinline{LaTeX}{Apples, bananas, \ldots}：Apples, bananas, \ldots
+    \item \mintinline{LaTeX}{Apples, bananas, \dots}：Apples, bananas, \dots
+\end{itemize}
+
+\subsection{连字（Ligatures）}
+有些相邻的字母在排版时会连接起来，可以通过 \mintinline{LaTeX}{\mbox{}} 命令避免它们相连。
+\begin{itemize}
+    \item \mintinline{LaTeX}{ffshfilfluffia}：ffshfilfluffia（相连的情况）
+    \item \mintinline{LaTeX}{f\mbox{}fshf\mbox{}ilf\mbox{}luf\mbox{}f\mbox{}ia}：
+    f\mbox{}fshf\mbox{}ilf\mbox{}luf\mbox{}f\mbox{}ia（没有相连的情况）
+\end{itemize}
+
+\subsection{重音符号（Accents）和特殊符号}
+原始代码如下：
+\begin{minted}{LaTeX}
+    H\^otel, na\"\i ve, \'el\`eve, \\
+    sm\o rrebr\o d, !'Se\~norita!, \\
+    Sch\"onbrunner Schlo\ss{}
+    Stra\ss e
+\end{minted}
+
+输出结果如下：
+\begin{quote}
+    H\^otel, na\"\i ve, \'el\`eve, \\
+    sm\o rrebr\o d, !`Se\~norita!, \\
+    Sch\"onbrunner Schlo\ss{}
+    Stra\ss e
+\end{quote}
+
+
+\end{document}
