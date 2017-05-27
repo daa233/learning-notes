@@ -100,6 +100,7 @@ LaTeX支持使用 `\pagestyle{style}`来定义页眉页脚的风格，有三种�
 - `plain` 默认为此选项，在每一页的页脚中间打印当前页码
 - `headings` 在每一页的页眉处打印当前章节（chapter）名称和当前页码，页脚为空
 - `empty` 页眉页脚都设为空
+- `myheadings` 没有页脚，页眉是页码和用户自定义的内容
 
 可以使用`\thispagestyle{style}`来改变特定页的页眉页脚风格。
 

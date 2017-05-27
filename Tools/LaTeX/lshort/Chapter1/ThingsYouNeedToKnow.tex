@@ -19,16 +19,16 @@
 
 \LaTeXe 读作：“Lay-tech two e”
 
-\texttt{WYSIWYG}：{\itshape What you see is what you get.} “所见即所得”。当前大多数文字处理软件的理念，如 MS Word、LibreOffice。
+\texttt{WYSIWYG}：\emph{What you see is what you get.} “所见即所得”。当前大多数文字处理软件的理念，如 MS Word、LibreOffice。
 但是\LaTeX 并没有遵循这个理念。
 
 \section{\LaTeX 的优缺点}
 \begin{quotation}
-    \itshape When people from the WYSIWYG world meet people who use \LaTeX, they
+    \emph{ When people from the WYSIWYG world meet people who use \LaTeX, they
     often discuss “the advantages of \LaTeX{} over a normal word processor” or the
     opposite. The best thing to do when such a discussion starts is to keep a low
     profile(保持低调), since such discussions often get out of hand. But sometimes there is
-    no escaping...
+    no escaping... }
 \end{quotation}
 \subsection{优点}
 \begin{itemize}
@@ -39,18 +39,18 @@
             \footnote{Difference Between Bibliography and References:
             http://www.differencebetween.net/language/difference-between-bibliography-and-references/}
     \item 拥有许多针对各种排版设计任务的免费附加宏包
-    \item 促使用户写出结构良好的文档——而这也是LaTeX存在的初衷
+    \item 促使用户写出结构良好的文档——而这也是\LaTeX 存在的初衷
     \item 跨平台，完全免费，容易获得
 \end{itemize}
 \subsection{缺点}
 \begin{itemize}
-    \item 对于那些已经出卖了灵魂的人来说，LaTeX可能会不好使
+    \item 对于那些已经出卖了灵魂的人来说，\LaTeX 可能会不好使
     \item 排查错误困难。\LaTeX 作为一个依靠编写代码工作的排版工具，其使用的宏语言比 C++ 或 Python 等程序设计语言在错误排查方面困难得多。
         它虽然能够提示错误，但不提供调试的机制，有时错误提示还很难理解
     \item 在一个提前设计好的文档布局里改参数很容易，但设计一个新的布局比较困难，需要花费较多的时间
     \item 相比“所见即所得”的模式有一些不便，为了查看生成的文档，用户总要不停地编译
-    \item 若是浅尝辄止，终不能领悟“逻辑标记”的真谛（{\itshape Your hamster might, despite some encouraging first steps,
-        never be able to fully grasp the concept of Logical Markup} ）
+    \item 若是浅尝辄止，终不能领悟“逻辑标记”的真谛（\emph{ Your hamster might, despite some encouraging first steps,
+        never be able to fully grasp the concept of Logical Markup } ）
 \end{itemize}
 
 \section{\LaTeX 输入文件}
@@ -59,44 +59,44 @@
 \begin{itemize}
     \item “Whitespace”字符，如空白、Tab符等都会被 \LaTeX 认为是空格
     \item 几个连续的空格会被\LaTeX 当作一个空格
-    \item 每一行开头的空格会被忽略，末尾的断行符~\texttt{\\}~会被当作空格
+    \item 每一行开头的空格会被忽略，末尾的断行符~\mintinline{LaTeX}{\\}~会被当作空格
     \item 一个空行是一个段落结束的标志
     \item 几个空行视为一个空行
 \end{itemize}
 \subsection{特殊字符}
-保留字符：\qquad \texttt{~\#} \qquad \texttt{~\$} \qquad \texttt{~~\^} \qquad \texttt{~\&} \qquad \texttt{~\_} \qquad
-\texttt{~\{} \qquad \texttt{~\}} \qquad \texttt{$\sim$} \qquad \texttt{\textbackslash}
+保留字符：\qquad \texttt{\#} \qquad \texttt{~\$} \qquad \texttt{~~~\^} \qquad \texttt{~\&} \qquad \texttt{~\_} \qquad
+\texttt{~\{} \qquad \texttt{~\}} \qquad \texttt{~~\~} \qquad \texttt{\textbackslash}
 
-打印保留字符：\texttt{\textbackslash\#} \qquad \texttt{\textbackslash\$} \qquad \texttt{\textbackslash~\^} \qquad
-\texttt{\textbackslash\&} \qquad \texttt{\textbackslash\_} \qquad \texttt{\textbackslash\{} \qquad
-\texttt{\textbackslash\}}\qquad\texttt{\textbackslash$\sim$} \qquad \texttt{\textbackslash textbackslash}
+打印保留字符：\mintinline{LaTeX}{\#} \qquad \mintinline{LaTeX}{\$} \qquad \mintinline{LaTeX}{\^} \qquad
+\mintinline{LaTeX}{\&} \qquad \mintinline{LaTeX}{\_} \qquad \mintinline{LaTeX}|\{| \qquad
+\mintinline{LaTeX}|\}| \qquad \mintinline{LaTeX}{\~} \qquad \mintinline{LaTeX}{\textbackslash}
 
-注意：保留字符有特殊含义，任何字体下直接输入都不会打印，但可以通过加反斜杠\texttt{\textbackslash}的方式打印这些特殊字符。不能通过
-\texttt{\textbackslash\textbackslash}来输入\texttt{\textbackslash}，而应该使用\texttt{\textbackslash textbackslash}，
-\texttt{\textbackslash\textbackslash}用于断行。
+注意：保留字符有特殊含义，任何字体下直接输入都不会打印，但可以通过加反斜杠 \mintinline{LaTeX}{\} 的方式打印这些特殊字符。不能通过
+\mintinline{LaTeX}{\\} 来输入 \mintinline{LaTeX}{\}，而应该使用 \mintinline{LaTeX}{\textbackslash}，
+\mintinline{LaTeX}{\\} 用于断行。
 
 \subsection{\LaTeX 命令}
 \LaTeX 命令是区分大小写的。
-\LaTeX 命令以反斜线 \textbackslash 开头，为以下两种形式之一：
+\LaTeX 命令以反斜线 \mintinline{LaTeX}{\} 开头，为以下两种形式之一：
 \begin{itemize}
-    \item 反斜线和后面的一串字母，如 \texttt{\textbackslash LaTeX}。它们以任意非字母符号（空格、数字、标点等）作为分隔符。
-        如\texttt{\textbackslash textsl\{\}}、\texttt{\textbackslash newline}命令。
-    \item 反斜线和后面的一个非字母符号，如 \texttt{\textbackslash \$}，它们之间无需分隔符。
+    \item 反斜线和后面的一串字母，如 \mintinline{LaTeX}{\LaTeX}。它们以任意非字母符号（空格、数字、标点等）作为分隔符。
+        如\mintinline{LaTeX}{\textsl{}}、\mintinline{LaTeX}{\newline}命令。
+    \item 反斜线和后面的一个非字母符号，如 \mintinline{LaTeX}{\$}，它们之间无需分隔符。
 \end{itemize}
-\LaTeX 会忽略掉命令后的空白符。如果想在命令后添加空格，可以在命令后添加一个空的 \texttt{\{\}}，如 \texttt{\textbackslash TeX\{\}}；
-或者是在命令后添加一个空格命令或特殊字符（如\texttt{$\sim$}）。
+\LaTeX 会忽略掉命令后的空白符。如果想在命令后添加空格，可以在命令后添加一个空的 \texttt{\{\}}，如 \mintinline{LaTeX}{\TeX{}}；
+或者是在命令后添加一个空格命令或特殊字符（如 \mintinline{LaTeX}{$\sim$} ）。
 
 大多数的 \LaTeX 命令是带一个或多个参数，每个参数用花括号 \texttt{\{} 和 \texttt{\}} 包裹。有些命令带一个或多个可选参数，以方括号
-\texttt{[} 和 \texttt{]} 包裹，用法为 \texttt{\textbackslash command[optional parameter]\{parameter\}}。
+\texttt{[} 和 \texttt{]} 包裹，用法为 \mintinline{LaTeX}{\command[optional parameter]{parameter}}。
 
 还有些命令在命令名称后可以带一个星号 \texttt{*}，带星号和不带星号的命令效果有一定差异。
 
-\LaTeX 还引入了环境的用法，用以令一些效果在局部生效，或是生成特定的文档元素。\LaTeX 环境的用法为一对命令 \texttt{\textbackslash begin}
-和 \texttt{\textbackslash end}。
+\LaTeX 还引入了环境的用法，用以令一些效果在局部生效，或是生成特定的文档元素。\LaTeX 环境的用法为一对命令 \mintinline{LaTeX}{\begin}
+和 \mintinline{LaTeX}{\end}。
 
 \subsection{\LaTeX 注释}
-利用 \texttt{\%} 进行单行注释，引入 \texttt{verbatim} 宏包（\texttt{\textbackslash usepackage\{verbatim\}}）后，可以在
-\texttt{\textbackslash begin\{comment\}} 和 \texttt{\textbackslash end\{comment\}} 之间加入多行注释。
+利用 \texttt{\%} 进行单行注释，引入 \texttt{verbatim} 宏包（\mintinline{LaTeX}{\usepackage{verbatim}}）后，可以在
+\mintinline{LaTeX}{\begin{comment}} 和 \mintinline{LaTeX}{\end{comment}} 之间加入多行注释。
 
 \section{\LaTeX 输入文件结构}
 \begin{minted}{LaTeX}
@@ -137,15 +137,16 @@
     \item \texttt{twoside}, \texttt{oneside} 指定单面/双面排版。双面排版时，奇偶页的页眉页脚、页边距不同。 \texttt{article}和
         \texttt{report} 缺省为单面排版， \texttt{book} 缺省为双面。
     \item \texttt{landscape} 指定横向排版。缺省为纵向。
-    \item \texttt{openright}, \texttt{openany} 指定新的一章 \texttt{\textbackslash chapter} 是在奇数页(右侧)开头，还是直接紧
+    \item \texttt{openright}, \texttt{openany} 指定新的一章 \mintinline{LaTeX}{\chapter} 是在奇数页(右侧)开头，还是直接紧
         跟着上一页开头。\texttt{report} 缺省为 \texttt{openany}，\texttt{book} 缺省为 \texttt{openright}。（对
         \texttt{article} 无效）
 \end{itemize}
-\LaTeX 支持使用 \texttt{\textbackslash pagestyle{style}}来定义页眉页脚的风格，有三种预定义的选项可以选择：
+\LaTeX 支持使用 \mintinline{LaTeX}{\pagestyle{style}}来定义页眉页脚的风格，有三种预定义的选项可以选择：
 \begin{itemize}
     \item \texttt{plain} 默认为此选项，在每一页的页脚中间打印当前页码
     \item \texttt{headings} 在每一页的页眉处打印当前章节（chapter）名称和当前页码，页脚为空
     \item \texttt{empty} 页眉页脚都设为空
+    \item \texttt{myheadings} 没有页脚，页眉是页码和用户自定义的内容
 \end{itemize}
 可以使用\mintinline{LaTeX}|\thispagestyle{style}|来改变特定页的页眉页脚风格。
 
@@ -175,18 +176,19 @@
 
 \section{文件的组织方式}
 当编写较大规模的 \LaTeX 源代码，如书籍、毕业论文等，你有理由将源代码分成若干个文件而不是写到一堆，比如很自然地每章写一个文件。
-可以使用\texttt{\textbackslash include}命令在源代码中插入文件，如\texttt{\textbackslash include\{$\langle$filename$\rangle$\}}。
-\texttt{$\langle$filename$\rangle$}为文件名（如果是\texttt{.tex}文件，可以不加扩展名），如果和要编译的主文件不在一个目录中，则要加上
+
+可以使用 \texttt{\textbackslash include} 命令在源代码中插入文件，如 \texttt{\textbackslash include\{$\langle$filename$\rangle$\}}。
+\texttt{$\langle$filename$\rangle$} 为文件名（如果是 \texttt{.tex}文件，可以不加扩展名），如果和要编译的主文件不在一个目录中，则要加上
 相对或绝对路径。值得注意的是 \texttt{\textbackslash include} 在读入 \texttt{$\langle$filename$\rangle$} 之前会另起一页。有的时
-候我们并不需要这样，而是用\texttt{\textbackslash input} 命令， 它纯粹是把文件里的内容插入:
+候我们并不需要这样，而是用 \texttt{\textbackslash input} 命令， 它纯粹是把文件里的内容插入:
 \texttt{\textbackslash input\{$\langle$filename$\rangle$\}}。
 
 另外 \LaTeX 提供了一个 \texttt{\textbackslash includeonly} 命令来组织文件，用于导言区（ preamble ），指定只载入某些文件:
-\texttt{\textbackslash includeonly\{$\langle$filename1$\rangle$,$\langle$filename2$\rangle$,...\}}。导言区使用了
-\texttt{\textbackslash includeonly}后，正文中不在其列表范围的 \texttt{\textbackslash include} 命令不会起效。
+\texttt{\textbackslash includeonly\{$\langle$filename1$\rangle$, $\langle$filename2$\rangle$, ...\}}。导言区使用了
+\texttt{\textbackslash includeonly} 后，正文中不在其列表范围的 \texttt{\textbackslash include} 命令不会起效。
 
 注意：参考\textsl{TEX and controlled access to information}\footnote{https://www.tug.org/TUGboat/tb36-2/tb113veytsman-access.pdf}，
-\LaTeX 中没有\texttt{\textbackslash inputonly}命令，但是可以自己定义一个：
+\LaTeX 中没有 \texttt{\textbackslash inputonly} 命令，但是可以自己定义一个：
 \begin{minted}{LaTeX}
     \newif\iffinancial
     ...
@@ -194,13 +196,13 @@
 \end{minted}
 
 \section{编译小技巧}
-加载宏包\texttt{syntonly}，在导言区使用 \texttt{\textbackslash syntaxonly} 命令,可令 \LaTeX 编译后不生成 DVI 或者 PDF 文档,只排
+加载宏包\texttt{syntonly}，在导言区使用 \mintinline{LaTeX}{\syntaxonly} 命令,可令 \LaTeX 编译后不生成 DVI 或者 PDF 文档,只排
 查错误,编译速度会快不少：
 \begin{minted}{LaTeX}
     \usepackage{syntonly}
     \syntaxonly
 \end{minted}
-如果想生成文档,则将 \texttt{\textbackslash syntaxonly} 命令那一行用 \% 注释掉即可。
-如果在编译\texttt{.tex}文件时遇到了错误，使用\texttt{Ctrl+D}回到命令行。
+如果想生成文档,则将 \mintinline{LaTeX}{\syntaxonly} 命令那一行用 \% 注释掉即可。
+如果在编译 \texttt{.tex} 文件时遇到了错误，使用\texttt{Ctrl+D}回到命令行。
 
 \end{document}
