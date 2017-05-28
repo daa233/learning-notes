@@ -146,22 +146,151 @@
     f\mbox{}fshf\mbox{}ilf\mbox{}luf\mbox{}f\mbox{}ia（没有相连的情况）
 \end{itemize}
 
-\subsection{重音符号（Accents）和特殊符号}
-原始代码如下：
+\subsection{重音（Accents）符号和特殊符号}
+示例代码如下：
 \begin{minted}{LaTeX}
+    \emph{\=a}  \emph{\'a}  \emph{\v a}  \emph{\` a}
+
     H\^otel, na\"\i ve, \'el\`eve, \\
     sm\o rrebr\o d, !'Se\~norita!, \\
     Sch\"onbrunner Schlo\ss{}
     Stra\ss e
 \end{minted}
 
-输出结果如下：
+示例输出结果如下：
 \begin{quote}
+    \emph{\=a} \qquad \emph{\'a} \qquad \emph{\v a} \qquad \emph{\` a}
+
     H\^otel, na\"\i ve, \'el\`eve, \\
     sm\o rrebr\o d, !`Se\~norita!, \\
     Sch\"onbrunner Schlo\ss{}
     Stra\ss e
 \end{quote}
+
+重音符号和特殊符号命令列表：
+\begin{minted}{text}
+    \`o    \'o    \^o    \~o
+    \=o    \.o    \"o    \c c
+    \u o   \v o   \H o   \c o
+    \d o   \b o   \t oo
+    \oe    \OE    \ae    \AE
+    \aa    \AA
+    \o     \O     \l     \L
+    \i     \j     !`     ?`
+\end{minted}
+\newpage
+重音符号和特殊符号输出结果列表：
+\begin{quote}
+    \`o  \qquad  \'o  \qquad  \^o  \qquad  \~o \\
+    \=o  \qquad  \.o  \qquad  \"o  \qquad  \c c \\
+    \u o \qquad  \v o \qquad  \H o \qquad  \c o \\
+    \d o \qquad  \b o \qquad  \t oo \\
+    \oe  \qquad  \OE  \qquad  \ae  \qquad  \AE \\
+    \aa  \qquad  \AA \\
+    \o   \qquad  \O   \qquad  \l   \qquad  \L \\
+    \i   \qquad  \j   \qquad  !`   \qquad  ?` \\
+\end{quote}
+
+\section{国际语言支持/中文排版支持}
+\LaTeX 对其他很多语言提供了支持。\texttt{babel} 宏包可以用于对各种语言进行适配。其他语言暂时也用不到，这里就记录一下如何让 \LaTeX 支持中文。
+
+使用 \LaTeX 排版中文有两种方式，一种是使用 \texttt{xeCJK} 宏包，另一种是使用 \CTeX 宏包和文档类，推荐使用后者。\CTeX 宏包和文档类是对 \texttt{CJK}
+和 \texttt{xeCJK} 等宏包的进一步封装。文档类包括 \texttt{ctexart}、\texttt{ctexrep}、\texttt{ctexbook}，分别是对 \LaTeX 的三个标准文
+档类 \texttt{article}、\texttt{report}、\texttt{book} 的封装，对 \LaTeX 的排版样式做了许多调整，以切合中文排版风格。最新版本的 \CTeX
+宏包/文档类甚至支持自动配置字体。
+
+\subsection{\CTeX 的安装}
+\CTeX 宏集依赖的宏包和宏集已被最常见的 \TeX 发行版 \TeX Live 和 MiK\TeX 所收录。如果本地安装的 \TeX Live 或 MiK\TeX 不是完全版本，就
+需要通过这两个发行版提供的宏包管理器来安装宏包。
+
+\TeX Live 的宏包管理器是 \texttt{tlmgr}。在Linux系统上，一般需要 \texttt{sudo} 权限才能正确地执行 \texttt{tlmgr}的功能。
+
+直接使用 \mintinline{bash}{sudo tlmgr [arg]} 时，可能会提示找不到 \texttt{tlmgr} 或没有这个命令。乍一看，情况比较尴尬：不加
+\texttt{sudo} 没有权限，加了 \texttt{sudo} 反而找不到命令了。经过上网搜索，在一个帖子\footnote{\emph{sudo does not find tlmgr},
+https://tex.stackexchange.com/questions/203874/sudo-does-not-find-tlmgr} 里找到了解决方法。原来，\texttt{sudo} 有一种内置的
+保护机制，只会使用安全的环境变量 \texttt{PATH}。如果 \TeX Live 的路径不在 \texttt{sudo} 的安全环境变量内，它就找不到相关的命令。可以
+在终端执行 \mintinline{bash}{sudo gedit /etc/sudoers}，然后将\TeX Live的路径添加到 \texttt{sudo} 的 \texttt{secure\_path}中。
+在我的 Ubuntu 16.04 上，添加后结果如下（后面的原有路径省略，不同路径用 \texttt{:} 隔开）：
+\begin{minted}{text}
+Defaults secure_path="/usr/local/texlive/2016/bin/x86_64-linux:/usr/local/sbin:..."
+\end{minted}
+
+不能用 \texttt{sudo} 执行 \texttt{tlmgr} 的问题解决后，在终端中依次执行以下命令，以更新 \texttt{tlmgr} 宏包管理器、已安装的所有宏包、安装 \CTeX
+宏集。
+\begin{minted}{bash}
+    sudo tlmgr update --self
+    sudo tlmgr update --all
+    sudo tlmgr install ctex
+\end{minted}
+
+\subsection{使用 \CTeX 文档类}
+\CTeX 宏集提供了四个中文文档类：\texttt{ctexart}、\texttt{ctexrep}、\texttt{ctexbook} 和 \texttt{ctexbeamer}，分别对应 \LaTeX
+的标准文档类 \texttt{article}、\texttt{report}、\texttt{book} 和 \texttt{beamer}。使用它们的时候，需要将涉及到的所有源文件使用
+UTF-8 编码保存。
+
+下面是使用 \texttt{ctexart} 文档类编写的一个例子：
+\begin{minted}{LaTeX}
+    \documentclass[UTF8]{ctexart}
+    \begin{document}
+    中文文档类测试。你需要将所有源文件保存为 UTF-8 编码。
+    你可以使用 XeLaTeX、LuaLaTeX 或 upLaTeX 编译，也可以使用 (pdf)LaTeX 编译。
+    推荐使用 XeLaTeX 或 LuaLaTeX 编译。
+    \end{document}
+\end{minted}
+
+\CTeX 预定义的字库中的中文字体已经基本够用，包括{\songti 宋体}（\mintinline{LaTeX}{\songti}）、{\heiti 黑体}
+（\mintinline{LaTeX}{\heiti}）、{\kaishu 楷书}（\mintinline{LaTeX}{\kaishu}）、{\fangsong 仿宋}
+（\mintinline{LaTeX}{\fangsong}）等。更多 \CTeX 的使用参考《\CTeX 宏集手册》
+\footnote{《\CTeX 宏集手册》，http://mirror.unl.edu/ctan/language/chinese/ctex/ctex.pdf}。
+
+\section{单词之间的空格}
+为了使输出更美观、更具可读性，\LaTeX 可能会在不同单词之间或句子末尾插入更多空格。\LaTeX 默认句子以句点（periods）、问号（question marks）
+或者感叹号（exclamation marks）结尾。但是如果句点跟在一个大写字母后面，它不会认为这是句子结尾，因为大写字母后面跟句点往往是缩略词。
+
+用户可以通过具体的命令来改变上面的默认设定。一个斜杠跟一个空格会产生一个不会被扩大的空格；一个波浪线（\texttt{$\sim$}）会产生一个既不能被扩
+大、也不能从这里断行的空格；在句点前使用 \mintinline{LaTeX}{\@} 命令，不管这个句点是不是跟在大写字母后面，都会指定这个句子到句点就结束。
+使用 \mintinline{LaTeX}{\frenchspacing} 命令可以强制不在一个句子后面插入多余的空格。如果使用 \mintinline{LaTeX}{\frenchspacing}
+命令就没必要再用 \mintinline{LaTeX}{\@} 了。
+
+
+代码示例：
+\begin{minted}{LaTeX}
+    Mr.~Smith was happy to see her\\
+    cf.~Fig.~5\\
+    I like BASIC\@. What about you?
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Mr.~Smith was happy to see her\\
+    cf.~Fig.~5\\
+    I like BASIC\@. What about you?
+\end{quote}
+\newpage
+
+\section{标题、章、节}
+文档类 \texttt{article} 中有以下几种分层次结构的命令：
+\begin{minted}{LaTeX}
+    \section{...}
+    \subsection{...}
+    \subsubsection{...}
+    \paragraph{...}
+    \subparagraph{...}
+\end{minted}
+
+\mintinline{LaTeX}{\part{...}} 命令也可以把文档分为多个部分，但它不会影响 \texttt{section} 和 \texttt{chapter} 的编号。
+
+和 \texttt{article} 文档类相比，在 \texttt{report} 和 \texttt{book} 中， 可以使用 \mintinline{LaTeX}{\chapter{...}}。
+
+由于 \texttt{article} 文档类中不包含 \texttt{chapter}，所以可以很方便地把 \texttt{article} 作为 \texttt{chapter} 插入
+\texttt{book} 文档类。章节空隙、编号等由 \LaTeX 自动完成。
+
+下面是两个比较特殊的情况：
+\begin{itemize}
+    \item \mintinline{LaTeX}{\part} 命令不会影响 \texttt{chapter} 或 \texttt{section} 的编号
+    \item \mintinline{LaTeX}{\appendix} 命令没有任何参数，会把 \texttt{chapter} （对于 \texttt{report}、\texttt{book}）
+    或 \texttt{section} （对于 \texttt{article}）的数字编号转换成字母编号。
+\end{itemize}
 
 
 \end{document}
