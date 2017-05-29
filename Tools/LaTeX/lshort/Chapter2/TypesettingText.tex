@@ -15,16 +15,19 @@
 \begin{document}
 \maketitle
 
+\tableofcontents
+
+\newpage
 \section{文章和语言的结构}
 写文章最重要的一点是要把想法、信息、知识传达给读者，而好的文章结构能够帮助读者更好地查看、感受和理解我们想传达的东西。
 
-\LaTeX 中最重要的文本单位是段（paragraph）。一段文字应该只包含一个思想或一种想法。写文章时什么时候分段？应该怎么分段呢？如果要写一个新的想法了，
-那就另起一段，对应在源码中空一行）；否则，可以用换行符（line breaking）来继续写原来的想法，对应在源码中使用
-\mintinline{LaTeX}{\\} 或 \mintinline{LaTeX}{\newline}。
+\LaTeX 中最重要的文本单位是段（paragraph）。一段文字应该只包含一个思想或一种想法。写文章时什么时候分段？应该怎么分段
+呢？如果要写一个新的想法了，那就另起一段，对应在源码中空一行）；否则，可以用换行符（line breaking）来继续写原来的想
+法，对应在源码中使用 \mintinline{LaTeX}{\\} 或 \mintinline{LaTeX}{\newline}。
 
-很多人都低估了合理分段的重要性。在\LaTeX 中，很多人甚至都不知道什么是分段，自己已经新起了一段都不知道。按照我的理解，一般情况下是不需要使用换
-行符的，在该分段的时候在代码里空一行另起一段就行了。但是在使用公式（equation）的时候需要考虑好该使用什么，这时候很容易犯上述的错误。下面是说明
-该换行还是该另起一段的三个正确示例：
+很多人都低估了合理分段的重要性。在\LaTeX 中，很多人甚至都不知道什么是分段，自己已经新起了一段都不知道。按照我的理解，
+一般情况下是不需要使用换行符的，在该分段的时候在代码里空一行另起一段就行了。但是在使用公式（equation）的时候需要考虑好
+该使用什么，这时候很容易犯上述的错误。下面是说明该换行还是该另起一段的三个正确示例：
 \begin{minted}{LaTeX}
     % Example 1
     \ldots when Einstein introduced his formula
@@ -56,21 +59,23 @@
     \item \mintinline{LaTeX}{\\} 或 \mintinline{LaTeX}{\newline}：断行、不另起一段。
     \mintinline{LaTeX}{\\} 也在表格、公式等地方用于分行,而 \mintinline{LaTeX}{\newline} 只用于文本段落中。
     \item \mintinline{LaTeX}{\\*}：断行、不另起一段、不断页。
-    \item \mintinline{LaTeX}{\newpage} 或 \mintinline{LaTeX}{\clearpage}：断页。二者有些细微的区别：一是在双栏排版
-    中 \mintinline{LaTeX}{\newpage} 只起到另起一栏的作用；二是涉及到浮动体的排版上行为不同。
-    \item \mintinline{LaTeX}{\linebreak[n]}、\mintinline{LaTeX}{\nolinebreak[n]}、\mintinline{LaTeX}{\pagebreak[n]}、
-    \mintinline{LaTeX}{\nopagebreak[n]}：向 \LaTeX 建议哪些地方适合断行、断页，
-    哪些地方不适合断行、断页。n是数字，代表适合/不适合的程度，取值范围为0到4，默认为4。数字越大代表程度越高。
+    \item \mintinline{LaTeX}{\newpage} 或 \mintinline{LaTeX}{\clearpage}：断页。二者有些细微的区别：一是在
+    双栏排版中 \mintinline{LaTeX}{\newpage} 只起到另起一栏的作用；二是涉及到浮动体的排版上行为不同。
+    \item \mintinline{LaTeX}{\linebreak[n]}、\mintinline{LaTeX}{\nolinebreak[n]}、
+    \mintinline{LaTeX}{\pagebreak[n]}、\mintinline{LaTeX}{\nopagebreak[n]}：向 \LaTeX 建议哪些地方适合断
+    行、断页，哪些地方不适合断行、断页。n是数字，代表适合/不适合的程度，取值范围为0到4，默认为4。数字越大代表程度越高。
 \end{itemize}
 
-一般\LaTeX 都会努力找到最适合断行的地方。但是有些时候——比如它不知道该如何用连字符分割单词的时候，它可能会让这一行文字从右边伸出这一段，然后
-报出\texttt{overfull hbox}的警告。这时使用 \mintinline{LaTeX}{\sloppy} 命令可以使单词之间的间距增大来避免这个问题，但是这时会报出
-\texttt{underfull hbox}的警告。大多数情况下这样排版出来的都不太好看。可以使用 \mintinline{LaTeX}{\fussy} 命令恢复 \LaTeX 的默认方式。
+一般\LaTeX 都会努力找到最适合断行的地方。但是有些时候——比如它不知道该如何用连字符分割单词的时候，它可能会让这一行文字
+从右边伸出这一段，然后报出 \texttt{overfull hbox} 的警告。这时使用 \mintinline{LaTeX}{\sloppy} 命令可以使单词
+之间的间距增大来避免这个问题，但是这时会报出 \texttt{underfull hbox} 的警告。大多数情况下这样排版出来的都不太好看。
+可以使用 \mintinline{LaTeX}{\fussy} 命令恢复 \LaTeX 的默认方式。
 
-\section{连字符（Hyphenation）}
-对于绝大部分单词，\LaTeX 都能够找到合适的断词位置，在断开的行尾加上连字符 \texttt{-}。如果一些单词没能自动断词，我们可以在单词内手动使用
-\mintinline{LaTeX}{\-} 命令指定断词的位置。另外，也可以使用 \mintinline{LaTeX}{\hyphenation{word list}} 命令来指定使用连字符
-的位置，例如 \mintinline{LaTeX}|\hyphenation{FORTRAN Hy-phen-a-tion}|，其中的 \texttt{word list}是不区分大小写的。
+\subsection{连字符（Hyphenation）}
+对于绝大部分单词，\LaTeX 都能够找到合适的断词位置，在断开的行尾加上连字符 \texttt{-}。如果一些单词没能自动断词，我们
+可以在单词内手动使用 \mintinline{LaTeX}{\-} 命令指定断词的位置。另外，也可以使用
+\mintinline{LaTeX}{\hyphenation{word list}} 命令来指定使用连字符的位置，例如
+\mintinline{LaTeX}|\hyphenation{FORTRAN Hy-phen-a-tion}|，其中的 \texttt{word list} 是不区分大小写的。
 
 \mintinline{LaTeX}|\mbox{text}| 或 \mintinline{LaTeX}|\fbox{text}|：会避免 \texttt{text}被连字符分开。
 \mintinline{LaTeX}|\fbox| 比 \mintinline{LaTeX}|\mbox| 多了个可见的框。
@@ -113,8 +118,8 @@
 
 \subsection{度（Degree Symbol）}
 \begin{itemize}
-    \item \mintinline{LaTeX}{$30\,^{\circ}\mathrm{C}$}\footnote{这里的 \mintinline{LaTeX}{\,} 会输出空格}
-    ：$30\,^{\circ}\mathrm{C}$
+    \item \mintinline{LaTeX}{$30\,^{\circ}\mathrm{C}$}\footnote{这里的 \mintinline{LaTeX}{\,} 会输出空
+    格}：$30\,^{\circ}\mathrm{C}$
     \item \mintinline{LaTeX}{30 \textcelsius{}}：30 \textcelsius{}
     \item \mintinline{LaTeX}{86 \textdegree{}F}：86 \textdegree{}F
 \end{itemize}
@@ -122,16 +127,17 @@
 \subsection{欧元符号}
 要想使用欧元符号，需要先在导言区通过 \mintinline{LaTeX}{\usepackage{textcomp}} 命令导入宏包，然后再使用\\
 \mintinline{LaTeX}{\texteuro} 命令输出欧元符号。如果所用的字体不包含欧元符号或者想用别的字体的欧元符号，可以通过
-\mintinline{LaTeX}{\usepackage[official]{eurosym}} 导入 \texttt{eurosym} 宏包，然后用 \mintinline{LaTeX}{\euro} 输出官方的
-欧元符号。用\texttt{gen}来替换\texttt{official}参数可以使用和当前字体匹配的欧元符号。
+\mintinline{LaTeX}{\usepackage[official]{eurosym}} 导入 \texttt{eurosym} 宏包，然后用
+ \mintinline{LaTeX}{\euro} 输出官方的欧元符号。用\texttt{gen}来替换\texttt{official}参数可以使用和当前字体匹
+ 配的欧元符号。
 \begin{itemize}
     \item \mintinline{LaTeX}{\texteuro}：\texteuro
     \item \mintinline{LaTeX}{\euro}：\euro
 \end{itemize}
 
 \subsection{省略号（Ellipsis）}
-\LaTeX 提供了命令 \mintinline{LaTeX}{\ldots} 来生成省略号，相对于直接输入三个点的方式更为合理。\mintinline{LaTeX}{\ldots} 和 \mintinline{LaTeX}{\dots}
-是两个等效的命令。
+\LaTeX 提供了命令 \mintinline{LaTeX}{\ldots} 来生成省略号，相对于直接输入三个点的方式更为合理。
+\mintinline{LaTeX}{\ldots} 和 \mintinline{LaTeX}{\dots} 是两个等效的命令。
 \begin{itemize}
     \item \mintinline{LaTeX}{Apples, bananas, ...}：Apples, bananas, ...
     \item \mintinline{LaTeX}{Apples, bananas, \ldots}：Apples, bananas, \ldots
@@ -178,7 +184,7 @@
     \o     \O     \l     \L
     \i     \j     !`     ?`
 \end{minted}
-\newpage
+
 重音符号和特殊符号输出结果列表：
 \begin{quote}
     \`o  \qquad  \'o  \qquad  \^o  \qquad  \~o \\
@@ -187,36 +193,42 @@
     \d o \qquad  \b o \qquad  \t oo \\
     \oe  \qquad  \OE  \qquad  \ae  \qquad  \AE \\
     \aa  \qquad  \AA \\
-    \o   \qquad  \O   \qquad  \l   \qquad  \L \\
-    \i   \qquad  \j   \qquad  !`   \qquad  ?` \\
+    \o   \qquad  \O   ~\qquad  \l   ~\qquad  \L \\
+    \i   ~\qquad  \j   ~~\qquad  !`   ~\qquad  ?` \\
 \end{quote}
 
 \section{国际语言支持/中文排版支持}
-\LaTeX 对其他很多语言提供了支持。\texttt{babel} 宏包可以用于对各种语言进行适配。其他语言暂时也用不到，这里就记录一下如何让 \LaTeX 支持中文。
+\LaTeX 对其他很多语言提供了支持。\texttt{babel} 宏包可以用于对各种语言进行适配。其他语言暂时也用不到，这里就记录一
+下如何让 \LaTeX 支持中文。
 
-使用 \LaTeX 排版中文有两种方式，一种是使用 \texttt{xeCJK} 宏包，另一种是使用 \CTeX 宏包和文档类，推荐使用后者。\CTeX 宏包和文档类是对 \texttt{CJK}
-和 \texttt{xeCJK} 等宏包的进一步封装。文档类包括 \texttt{ctexart}、\texttt{ctexrep}、\texttt{ctexbook}，分别是对 \LaTeX 的三个标准文
-档类 \texttt{article}、\texttt{report}、\texttt{book} 的封装，对 \LaTeX 的排版样式做了许多调整，以切合中文排版风格。最新版本的 \CTeX
-宏包/文档类甚至支持自动配置字体。
+使用 \LaTeX 排版中文有两种方式，一种是使用 \texttt{xeCJK} 宏包，另一种是使用 \CTeX 宏包和文档类，推荐使用后者。
+\CTeX 宏包和文档类是对 \texttt{CJK} 和 \texttt{xeCJK} 等宏包的进一步封装。文档类包括 \texttt{ctexart}、
+\texttt{ctexrep}、\texttt{ctexbook}，分别是对 \LaTeX 的三个标准文档类 \texttt{article}、\texttt{report}、
+\texttt{book} 的封装，对 \LaTeX 的排版样式做了许多调整，以切合中文排版风格。最新版本的 \CTeX 宏包/文档类甚至支持自
+动配置字体。
 
 \subsection{\CTeX 的安装}
-\CTeX 宏集依赖的宏包和宏集已被最常见的 \TeX 发行版 \TeX Live 和 MiK\TeX 所收录。如果本地安装的 \TeX Live 或 MiK\TeX 不是完全版本，就
-需要通过这两个发行版提供的宏包管理器来安装宏包。
+\CTeX 宏集依赖的宏包和宏集已被最常见的 \TeX 发行版 \TeX Live 和 MiK\TeX 所收录。如果本地安装的 \TeX Live 或
+MiK\TeX 不是完全版本，就需要通过这两个发行版提供的宏包管理器来安装宏包。
 
-\TeX Live 的宏包管理器是 \texttt{tlmgr}。在Linux系统上，一般需要 \texttt{sudo} 权限才能正确地执行 \texttt{tlmgr}的功能。
+\TeX Live 的宏包管理器是 \texttt{tlmgr}。在Linux系统上，一般需要 \texttt{sudo} 权限才能正确地执行
+\texttt{tlmgr} 的功能。
 
-直接使用 \mintinline{bash}{sudo tlmgr [arg]} 时，可能会提示找不到 \texttt{tlmgr} 或没有这个命令。乍一看，情况比较尴尬：不加
-\texttt{sudo} 没有权限，加了 \texttt{sudo} 反而找不到命令了。经过上网搜索，在一个帖子\footnote{\emph{sudo does not find tlmgr},
-https://tex.stackexchange.com/questions/203874/sudo-does-not-find-tlmgr} 里找到了解决方法。原来，\texttt{sudo} 有一种内置的
-保护机制，只会使用安全的环境变量 \texttt{PATH}。如果 \TeX Live 的路径不在 \texttt{sudo} 的安全环境变量内，它就找不到相关的命令。可以
-在终端执行 \mintinline{bash}{sudo gedit /etc/sudoers}，然后将\TeX Live的路径添加到 \texttt{sudo} 的 \texttt{secure\_path}中。
-在我的 Ubuntu 16.04 上，添加后结果如下（后面的原有路径省略，不同路径用 \texttt{:} 隔开）：
+直接使用 \mintinline{bash}{sudo tlmgr [arg]} 时，可能会提示找不到 \texttt{tlmgr} 或没有这个命令。乍一看，情况
+比较尴尬：不加 \texttt{sudo} 没有权限，加了 \texttt{sudo} 反而找不到命令了。经过上网搜索，在一个帖子
+\footnote{\emph{sudo does not find tlmgr},
+https://tex.stackexchange.com/questions/203874/sudo-does-not-find-tlmgr} 里找到了解决方法。原来，
+\texttt{sudo} 有一种内置的保护机制，只会使用安全的环境变量 \texttt{PATH}。如果 \TeX Live 的路径不在
+\texttt{sudo} 的安全环境变量内，它就找不到相关的命令。可以在终端执行
+\mintinline{bash}{sudo gedit /etc/sudoers}，然后将\TeX Live的路径添加到 \texttt{sudo} 的
+\texttt{secure\_path}中。在我的 Ubuntu 16.04 上，添加后结果如下（后面的原有路径省略，不同路径用 \texttt{:}
+隔开）：
 \begin{minted}{text}
 Defaults secure_path="/usr/local/texlive/2016/bin/x86_64-linux:/usr/local/sbin:..."
 \end{minted}
 
-不能用 \texttt{sudo} 执行 \texttt{tlmgr} 的问题解决后，在终端中依次执行以下命令，以更新 \texttt{tlmgr} 宏包管理器、已安装的所有宏包、安装 \CTeX
-宏集。
+不能用 \texttt{sudo} 执行 \texttt{tlmgr} 的问题解决后，在终端中依次执行以下命令，以更新 \texttt{tlmgr} 宏包管
+理器、已安装的所有宏包、安装 \CTeX 宏集。
 \begin{minted}{bash}
     sudo tlmgr update --self
     sudo tlmgr update --all
@@ -224,9 +236,9 @@ Defaults secure_path="/usr/local/texlive/2016/bin/x86_64-linux:/usr/local/sbin:.
 \end{minted}
 
 \subsection{使用 \CTeX 文档类}
-\CTeX 宏集提供了四个中文文档类：\texttt{ctexart}、\texttt{ctexrep}、\texttt{ctexbook} 和 \texttt{ctexbeamer}，分别对应 \LaTeX
-的标准文档类 \texttt{article}、\texttt{report}、\texttt{book} 和 \texttt{beamer}。使用它们的时候，需要将涉及到的所有源文件使用
-UTF-8 编码保存。
+\CTeX 宏集提供了四个中文文档类：\texttt{ctexart}、\texttt{ctexrep}、\texttt{ctexbook} 和
+\texttt{ctexbeamer}，分别对应 \LaTeX 的标准文档类 \texttt{article}、\texttt{report}、\texttt{book} 和
+\texttt{beamer}。使用它们的时候，需要将涉及到的所有源文件使用 UTF-8 编码保存。
 
 下面是使用 \texttt{ctexart} 文档类编写的一个例子：
 \begin{minted}{LaTeX}
@@ -244,13 +256,14 @@ UTF-8 编码保存。
 \footnote{《\CTeX 宏集手册》，http://mirror.unl.edu/ctan/language/chinese/ctex/ctex.pdf}。
 
 \section{单词之间的空格}
-为了使输出更美观、更具可读性，\LaTeX 可能会在不同单词之间或句子末尾插入更多空格。\LaTeX 默认句子以句点（periods）、问号（question marks）
-或者感叹号（exclamation marks）结尾。但是如果句点跟在一个大写字母后面，它不会认为这是句子结尾，因为大写字母后面跟句点往往是缩略词。
+为了使输出更美观、更具可读性，\LaTeX 可能会在不同单词之间或句子末尾插入更多空格。\LaTeX 默认句子以句点（periods）、
+问号（question marks）或者感叹号（exclamation marks）结尾。但是如果句点跟在一个大写字母后面，它不会认为这是句子结
+尾，因为大写字母后面跟句点往往是缩略词。
 
-用户可以通过具体的命令来改变上面的默认设定。一个斜杠跟一个空格会产生一个不会被扩大的空格；一个波浪线（\texttt{$\sim$}）会产生一个既不能被扩
-大、也不能从这里断行的空格；在句点前使用 \mintinline{LaTeX}{\@} 命令，不管这个句点是不是跟在大写字母后面，都会指定这个句子到句点就结束。
-使用 \mintinline{LaTeX}{\frenchspacing} 命令可以强制不在一个句子后面插入多余的空格。如果使用 \mintinline{LaTeX}{\frenchspacing}
-命令就没必要再用 \mintinline{LaTeX}{\@} 了。
+用户可以通过具体的命令来改变上面的默认设定。一个斜杠跟一个空格会产生一个不会被扩大的空格；一个波浪线（\texttt{$\sim$}）
+会产生一个既不能被扩大、也不能从这里断行的空格；在句点前使用 \mintinline{LaTeX}{\@} 命令，不管这个句点是不是跟在大
+写字母后面，都会指定这个句子到句点就结束。使用 \mintinline{LaTeX}{\frenchspacing} 命令可以强制不在一个句子后面插
+入多余的空格。如果使用 \mintinline{LaTeX}{\frenchspacing} 命令就没必要再用 \mintinline{LaTeX}{\@} 了。
 
 
 代码示例：
@@ -266,7 +279,6 @@ UTF-8 编码保存。
     cf.~Fig.~5\\
     I like BASIC\@. What about you?
 \end{quote}
-\newpage
 
 \section{标题、章、节}
 文档类 \texttt{article} 中有以下几种分层次结构的命令：
@@ -278,19 +290,252 @@ UTF-8 编码保存。
     \subparagraph{...}
 \end{minted}
 
-\mintinline{LaTeX}{\part{...}} 命令也可以把文档分为多个部分，但它不会影响 \texttt{section} 和 \texttt{chapter} 的编号。
+\mintinline{LaTeX}{\part{...}} 命令也可以把文档分为多个部分，但它不会影响 \texttt{section} 和
+\texttt{chapter} 的编号。
 
-和 \texttt{article} 文档类相比，在 \texttt{report} 和 \texttt{book} 中， 可以使用 \mintinline{LaTeX}{\chapter{...}}。
+和 \texttt{article} 文档类相比，在 \texttt{report} 和 \texttt{book} 中， 可以使用
+\mintinline{LaTeX}{\chapter{...}}。
 
-由于 \texttt{article} 文档类中不包含 \texttt{chapter}，所以可以很方便地把 \texttt{article} 作为 \texttt{chapter} 插入
-\texttt{book} 文档类。章节空隙、编号等由 \LaTeX 自动完成。
+由于 \texttt{article} 文档类中不包含 \texttt{chapter}，所以可以很方便地把 \texttt{article} 作为
+\texttt{chapter} 插入 \texttt{book} 文档类。章节空隙、编号等由 \LaTeX 自动完成。
 
 下面是两个比较特殊的情况：
 \begin{itemize}
     \item \mintinline{LaTeX}{\part} 命令不会影响 \texttt{chapter} 或 \texttt{section} 的编号
-    \item \mintinline{LaTeX}{\appendix} 命令没有任何参数，会把 \texttt{chapter} （对于 \texttt{report}、\texttt{book}）
-    或 \texttt{section} （对于 \texttt{article}）的数字编号转换成字母编号。
+    \item \mintinline{LaTeX}{\appendix} 命令没有任何参数，会把 \texttt{chapter} （对于 \texttt{report}、
+    \texttt{book}）或 \texttt{section} （对于 \texttt{article}）的数字编号转换成字母编号。
 \end{itemize}
+
+\mintinline{LaTeX}{\tableofcontents} 命令可以用于建立目录，目录就会在这条命令所在的位置生成。一般新写的文档需要
+编译两次才能正确生成目录，必要的时候 \LaTeX 也会提示需要编译三次。
+
+上面提到的分章节的命令都有一个加星号的版本，就是在原来的命令名称后面加一个星号，成为稍有不同的新命令。例如
+\mintinline{LaTeX}{\section{Help}} 命令，加星号之后的命令为 \mintinline{LaTeX}{\section*{Help}}。加星版本
+的章节命令对应的标题不会显示在目录里，也不会被编号。
+
+有时候章节的标题太长，这会导致其在目录里显示不佳。可以通过下面的命令在真正的标题前选择添加一个参数，指定在目录中显示的标
+题。
+\begin{minted}{LaTeX}
+    \chapter[Title for the table of contents]{A long
+        and especially boring title, shown in the text}
+\end{minted}
+
+整个文档的标题是通过 \mintinline{LaTeX}{\maketitle} 命令产生的。在调用 \mintinline{LaTeX}{\maketitle} 命令
+之前，文档标题的内容需要由 \mintinline{LaTeX}{\title{...}}、\mintinline{LaTeX}{\author{...}}、
+\mintinline{LaTeX}{\date{...}}（可选）等参数指定。在 \mintinline{LaTeX}{\author{...}} 命令的参数中，可以用
+\mintinline{LaTeX}{\and} 来间隔多个作者名字。
+
+所有标准文档类都提供了一个 \mintinline{LaTeX}{\appendix} 命令将正文和附录分开，使用
+\mintinline{LaTeX}{\appendix} 后，最高一级章节改为使用拉丁字母编号，从A开始。
+
+\LaTeXe 在 \texttt{book} 文档类有以下三个额外的命令，可以进行前言、正文、后记的结构划分。这三个命令还可和
+\mintinline{LaTeX}{\appendix} 命令结合,生成有前言、正文、附录、后记四部分的文档。
+\begin{itemize}
+    \item \mintinline{LaTeX}{\frontmatter} 前言部分，放置在文档主体的最开始
+    （\mintinline{LaTeX}{\begin{document}}），它会把页码变成罗马数字，其后的 \mintinline{LaTeX}{\chapter}
+    不编号
+    \item \mintinline{LaTeX}{\mainmatter} 正文部分，页码为阿拉伯数字格式，从 1 开始计数，其后的章节编号正常
+    \item \mintinline{LaTeX}{\backmatter} 后记部分，页码格式不变，继续正常计数；其后的
+    \mintinline{LaTeX}{\chapter} 不编号
+\end{itemize}
+
+\section{交叉引用（Cross References）}
+在写作时经常要用到对图片、表格等的交叉引用，在 \LaTeX 中可以用下面的命令完成：
+\begin{minted}{LaTeX}
+\label{marker}, \ref{marker}, \pageref{marker}
+\end{minted}
+其中，\texttt{marker} 是由用户自行定义的标识符。
+示例代码：
+\begin{minted}{LaTeX}
+A reference to this subsection \label{sec:this} looks like:
+``see section~\ref{sec:this} on page~\pageref{sec:this}.''
+\end{minted}
+示例输出：
+A reference to this subsection \label{sec:this} looks like: ``see section~\ref{sec:this} on
+page~\pageref{sec:this}.''
+
+\section{脚注（Footnotes）}
+可以使用 \mintinline{LaTeX}{\footnote{...}} 命令来添加脚注，脚注应该紧跟在它注解的词或句子（包括标点符号）后面。
+
+由于脚注会分散读者的注意力，所以尽量在文章主体说清楚，少用脚注。
+
+\section{强调（Emphasize）}
+以前用打印机打字的时候，习惯把重要的词用 \underline{下划线} 来强调，这在 \LaTeX 中可以通过
+\mintinline{LaTeX}{\underline{...}} 命令来实现。但在印刷书籍中，一般通过 \mintinline{LaTeX}{\emph{...}} 命
+令，使用意大利字体（\emph{italic} font）进行强调。
+
+\mintinline{LaTeX}{\emph{...}} 命令使用意大利字体进行强调并不是绝对的，这还要结合具体的语境。
+
+\newpage
+示例代码：
+\begin{minted}{LaTeX}
+    \emph{If you use emphasizing inside a piece of emphasized text, then \LaTeX{} uses the
+        \emph{normal} font for emphasizing.}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \emph{If you use emphasizing inside a piece of emphasized text, then \LaTeX{} uses the
+        \emph{normal} font for emphasizing.}
+\end{quote}
+
+\section{环境（Environments）}
+环境的典型命令为 \mintinline{LaTeX}{\begin{\emph{environment}} text \end{\emph{environment}}}，其中
+\emph{environment} 是环境的名字。
+
+环境可以相互嵌套，例如：
+\begin{minted}{LaTeX}
+    \begin{aaa}
+        ...
+        \begin{bbb}
+            ...
+        \end{bbb}
+        ...
+    \end{aaa}
+\end{minted}
+\subsection{Itemize，Enumerate 和 Description}
+示例代码：
+\begin{minted}{LaTeX}
+    \flushleft % 左对齐
+    \begin{enumerate}
+        \item You can nest the list environments to your taste:
+        \begin{itemize}
+            \item But it might start to look silly.
+            \item[-] With a dash.
+        \end{itemize}
+        \item Therefore remember:
+        \begin{description}
+            \item[Stupid] things will not become smart because they are in a list.
+            \item[Smart] things, though, can be presented beautifully in a list.
+        \end{description}
+    \end{enumerate}
+\end{minted}
+\newpage
+示例输出：
+\begin{quote}
+    \flushleft
+    \begin{enumerate}
+        \item You can nest the list environments to your taste:
+        \begin{itemize}
+            \item But it might start to look silly.
+            \item[-] With a dash.
+        \end{itemize}
+        \item Therefore remember:
+        \begin{description}
+            \item[Stupid] things will not become smart because they are in a list.
+            \item[Smart] things, though, can be presented beautifully in a list.
+        \end{description}
+    \end{enumerate}
+\end{quote}
+
+\subsection{Flushleft，Flushright 和 Center}
+\texttt{flushleft}、\texttt{flushright} 和 \texttt{center} 环境分别会使段落左对齐、右对齐和居中。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{flushleft}
+        This text is\\ left-aligned.
+        \LaTeX{} is not trying to make
+            each line the same length.
+    \end{flushleft}
+
+    \begin{flushright}
+        This text is right-\\aligned.
+        \LaTeX{} is not trying to make
+            each line the same length.
+    \end{flushright}
+
+    \begin{center}
+        At the centre\\of the earth
+    \end{center}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{flushleft}
+        This text is\\ left-aligned.
+        \LaTeX{} is not trying to make
+            each line the same length.
+    \end{flushleft}
+
+    \begin{flushright}
+        This text is right-\\aligned.
+        \LaTeX{} is not trying to make
+            each line the same length.
+    \end{flushright}
+
+    \begin{center}
+        At the centre\\of the earth
+    \end{center}
+\end{quote}
+
+\subsection{Quote，Quotation 和 Verse}
+\texttt{quote} 环境适合引用一些名言、重要的词句、示例等。
+\newpage
+示例代码：
+\begin{minted}{LaTeX}
+    A typographical rule of thumb for the line length is:
+    \begin{quote}
+        On average, no line should be longer than 66 characters.
+    \end{quote}
+    This is why \LaTeX{} pages have such large borders by default and also why
+         multicolumn print is used in newspapers.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    A typographical rule of thumb for the line length is:
+    \begin{quote}
+        On average, no line should be longer than 66 characters.
+    \end{quote}
+    This is why \LaTeX{} pages have such large borders by default and also why
+         multicolumn print is used in newspapers.
+\end{quote}
+
+\texttt{quotation} 环境和 \texttt{verse} 环境很像。但由于 \texttt{quotation} 环境对每一段都会缩进，所以适合
+引用比较长的、一般有几段的内容；而 \texttt{verse} 环境很适合引用诗歌，利用 \mintinline{LaTeX}{\\} 或空行来分行。
+
+示例代码：
+\begin{minted}{LaTeX}
+    I know only one English poem by heart. It is about Humpty Dumpty.
+    \begin{flushleft}
+        \begin{verse}
+            Humpty Dumpty sat on a wall:\\
+            Humpty Dumpty had a great fall.\\
+            All the King’s horses and all
+            the King’s men\\
+            Couldn’t put Humpty together
+            again.
+        \end{verse}
+    \end{flushleft}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    I know only one English poem by heart. It is about Humpty Dumpty.
+    \begin{flushleft}
+        \begin{verse}
+            Humpty Dumpty sat on a wall:\\
+            Humpty Dumpty had a great fall.\\
+            All the King’s horses and all
+            the King’s men\\
+            Couldn’t put Humpty together
+            again.
+        \end{verse}
+    \end{flushleft}
+\end{quote}
+
+\subsection{Abstract}
+在科学刊物中，一般会以一段摘要开头，让读者对这篇文章有一个整体的认知，这是一个惯例。\LaTeX 的 \texttt{abstract} 环
+境就是用于写摘要的，一般用于 \texttt{article} 文档类。
+\newpage
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{abstract}
+        The abstract contents.
+    \end{abstract}
+\end{minted}
+
 
 
 \end{document}
