@@ -7,6 +7,7 @@
 \usepackage{minted}
 \usepackage{textcomp}
 \usepackage[gen]{eurosym}
+\usepackage{array}
 
 \title{\heiti Chapter 2 Typesetting Text}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -25,7 +26,7 @@
 呢？如果要写一个新的想法了，那就另起一段，对应在源码中空一行）；否则，可以用换行符（line breaking）来继续写原来的想
 法，对应在源码中使用 \mintinline{LaTeX}{\\} 或 \mintinline{LaTeX}{\newline}。
 
-很多人都低估了合理分段的重要性。在\LaTeX 中，很多人甚至都不知道什么是分段，自己已经新起了一段都不知道。按照我的理解，
+很多人都低估了合理分段的重要性。在\LaTeX 中，很多人甚至都不知道什么是分段，有时自己已经新起了一段都不知道。按照我的理解，
 一般情况下是不需要使用换行符的，在该分段的时候在代码里空一行另起一段就行了。但是在使用公式（equation）的时候需要考虑好
 该使用什么，这时候很容易犯上述的错误。下面是说明该换行还是该另起一段的三个正确示例：
 \begin{minted}{LaTeX}
@@ -66,8 +67,8 @@
     行、断页，哪些地方不适合断行、断页。n是数字，代表适合/不适合的程度，取值范围为0到4，默认为4。数字越大代表程度越高。
 \end{itemize}
 
-一般\LaTeX 都会努力找到最适合断行的地方。但是有些时候——比如它不知道该如何用连字符分割单词的时候，它可能会让这一行文字
-从右边伸出这一段，然后报出 \texttt{overfull hbox} 的警告。这时使用 \mintinline{LaTeX}{\sloppy} 命令可以使单词
+一般\LaTeX 都会找到最适合断行的地方。但是有些时候——比如它不知道该如何用连字符分割单词的时候，它可能会让一行文字从段落
+右边伸出一部分，然后报出 \texttt{overfull hbox} 的警告。这时使用 \mintinline{LaTeX}{\sloppy} 命令可以使单词
 之间的间距增大来避免这个问题，但是这时会报出 \texttt{underfull hbox} 的警告。大多数情况下这样排版出来的都不太好看。
 可以使用 \mintinline{LaTeX}{\fussy} 命令恢复 \LaTeX 的默认方式。
 
@@ -359,7 +360,7 @@ page~\pageref{sec:this}.''
 
 由于脚注会分散读者的注意力，所以尽量在文章主体说清楚，少用脚注。
 
-\section{强调（Emphasize）}
+\section{强调（Emphasis）}
 以前用打印机打字的时候，习惯把重要的词用 \underline{下划线} 来强调，这在 \LaTeX 中可以通过
 \mintinline{LaTeX}{\underline{...}} 命令来实现。但在印刷书籍中，一般通过 \mintinline{LaTeX}{\emph{...}} 命
 令，使用意大利字体（\emph{italic} font）进行强调。
@@ -536,6 +537,342 @@ page~\pageref{sec:this}.''
     \end{abstract}
 \end{minted}
 
+\subsection{Verbatim}
+在 \mintinline{LaTeX}{verbatim} 和 \mintinline{LaTeX}{verbatim} 之间的所有文本都会原封不动地打印出来，文本中的
+\LaTeX 命令不会被执行，所以可以用 \texttt{verbatim} 环境来插入一段代码。
 
+如果要插入行间代码，可以用 \mintinline{LaTeX}{\verb+text+} 命令。其中的 \texttt{+} 只是分隔符，可以由用户随意指
+定，但不能用字母、\texttt{*} 或空格，习惯上用 \texttt{|}。
+
+示例代码：
+\begin{minted}{LaTeX}
+    The \verb|\ldots| command \ldots
+
+    \begin{verbatim}
+        10 PRINT "HELLO WORLD ";
+        20 GOTO 10
+    \end{verbatim}
+\end{minted}
+
+示例输出：
+\begin{quote}
+The \verb|\ldots| command \ldots
+
+\begin{verbatim}
+    10 PRINT "HELLO WORLD ";
+    20 GOTO 10
+\end{verbatim}
+\end{quote}
+
+\texttt{verbatim} 环境和 \texttt{verb} 命令都各自有一个加 \texttt{*} 的版本，区别是会把空格显示成 \verb*| |。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \verb*|like   this :-) |
+
+    \begin{verbatim*}
+    the starred version of the verbatim environment emphasizes the spaces
+    in the text.
+    \end{verbatim*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+\verb*|like   this :-) |
+
+\begin{verbatim*}
+the starred version of the verbatim environment emphasizes the spaces
+in the text.
+\end{verbatim*}
+\end{quote}
+
+\texttt{verbatim} 环境和 \verb|\verb| 命令对符号的处理比较复杂，一般不能用在其它命令的参数里，否则多半会出错。
+
+\texttt{verbatim} 宏包优化了 \texttt{verbatim} 环境的内部命令，并提供了
+\mintinline{LaTeX}|\verbatiminput| 命令用来直接读入文件生成代码环境。\texttt{fancyvrb} 宏包提供了可定制格式的
+\texttt{verbatim} 环境；\texttt{listings} 宏包更进一步，可生成关键字高亮的代码环境，支持各种程序设计语言的语法和
+关键字；本篇笔记使用的是 \texttt{minted} 宏包，代码可以有彩色高亮。详情请参考各自的帮助手册。
+
+\subsection{Tabular}
+\texttt{tabular} 环境可以用于排版表格，\LaTeX 会自动地调整表格每一列的宽度。具体命令如下：
+\mint{LaTeX}{   \begin{tabular}[pos]{talbe spec}}
+其中，\texttt{table spec} 参数决定了表格的格式，\texttt{l}、\texttt{r}、\texttt{c} 分别会使单元格内容左对齐、
+右对齐、居中，不折行；\texttt{|} 会绘制竖线；\texttt{p\{\emph{width}\}} 会使单元格固定宽度为
+\texttt{\emph{width}}，可以自动折行；可以通过 \texttt{@\{...\}} 来在单元格前后插入任意的文本，但同时它会消除单元
+格前后额外添加的间距。
+
+表格中每行的单元格数目不能多于列格式里 l/c/r/p 的总数(可以少于这个总数)，否则出错。
+
+\texttt{pos} 参数用于指定表格相对于环绕为基线的垂直位置，可以为 \texttt{t}、\texttt{b} 和 \texttt{c}，分别代表
+顶部（top）、底部（bottom）和中间（center）。
+
+在 \texttt{tabular} 环境内，\texttt{\&} 会跳到下一列，\mintinline{LaTeX}{\\} 会新起一行，
+\mintinline{LaTeX}{\hline} 会插入一条水平线。使用 \mintinline{LaTeX}{\cline{i-j}} 会插入一部分水平线，其中
+\texttt{i} 和 \texttt{j} 是列的编号。
+
+示例代码 1：
+\begin{minted}{LaTeX}
+    \begin{tabular}{|r|l|}
+    \hline
+    7C0 & hexadecimal \\
+    3700 & octal \\ \cline{2-2}
+    11111000000 & binary \\
+    \hline \hline
+    1984 & decimal \\
+    \hline
+    \end{tabular}
+\end{minted}
+
+示例输出 1：
+\begin{quote}
+    \begin{tabular}{|r|l|}
+    \hline
+    7C0 & hexadecimal \\
+    3700 & octal \\ \cline{2-2}
+    11111000000 & binary \\
+    \hline \hline
+    1984 & decimal \\
+    \hline
+    \end{tabular}
+\end{quote}
+
+示例代码 2：
+\begin{minted}{LaTeX}
+    \begin{tabular}{|p{4.7cm}|}
+    \hline
+    Welcome to Boxy's paragraph.
+    We Sincerely hope you'll all enjoy the show.\\
+    \hline
+    \end{tabular}
+\end{minted}
+
+示例输出 2：
+\begin{quote}
+    \begin{tabular}{|p{4.7cm}|}
+    \hline
+    Welcome to Boxy's paragraph.
+    We Sincerely hope you'll all enjoy the show.\\
+    \hline
+    \end{tabular}
+\end{quote}
+
+如果想让表格的某一列按小数点对齐，又不使用额外的宏包（\texttt{dcolumn}），可以采用一种比较折中的方法：把该列的所有小
+数分为整数部分和小数部分，各作为一列，然后在 \texttt{tabular} 环境中使用 \texttt{@{.}} 作为整数列和小数列的分隔
+符。整数部分和小数部分之间不要忘了用 \texttt{\&} 隔开，因为它们现在是两列了。为了在这两列的表头仅显示一个标签，可以使用
+\mintinline{LaTeX}{\multicolumn} 命令。
+
+示例代码 3：
+\begin{minted}{LaTeX}
+    \begin{tabular}{c r @{.} l}
+    Pi expression       &
+    \multicolumn{2}{c}{Value} \\
+    \hline
+    $\pi$               & 3&1416  \\
+    $\pi^{\pi}$         & 36&46   \\
+    $(\pi^{\pi})^{\pi}$ & 80662&7 \\
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|c|}
+    \hline
+    \multicolumn{2}{|c|}{Ene} \\
+    \hline
+    Mene & Muh! \\
+    \hline
+    \end{tabular}
+\end{minted}
+
+示例输出 3：
+\begin{quote}
+    \begin{tabular}{c r @{.} l}
+    Pi expression       &
+    \multicolumn{2}{c}{Value} \\
+    \hline
+    $\pi$               & 3&1416  \\
+    $\pi^{\pi}$         & 36&46   \\
+    $(\pi^{\pi})^{\pi}$ & 80662&7 \\
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|c|}
+    \hline
+    \multicolumn{2}{|c|}{Ene} \\
+    \hline
+    Mene & Muh! \\
+    \hline
+    \end{tabular}
+\end{quote}
+
+有时需要为整列修饰格式，比如整列改变为粗体，如果每个单元格都加上 \mintinline{LaTeX}{\bfseries} 命令会比较麻烦。
+\texttt{array} 宏包提供了辅助格式 \texttt{>} 和 \texttt{<}，用于给列格式前后加上修饰命令。辅助格式甚至支持插入
+\mintinline{LaTeX}{\centering} 等命令改变\texttt{p\{\emph{width}\}} 列格式的对齐方式,一般还要加额外的命令
+\mintinline{LaTeX}{\arraybackslash} 以免出错。因为 \mintinline{LaTeX}{\centering} 等对齐命令会破坏表格环境
+里 \mintinline{LaTeX}{\\} 换行命令的定义，\mintinline{LaTeX}{\arraybackslash} 用来恢复之。如果不加
+\mintinline{LaTeX}{\arraybackslash} 命令，也可以用 \mintinline{LaTeX}{\tabularnewline} 命令代替原来的
+\mintinline{LaTeX}{\\} 实现表格换行。
+\newpage
+示例代码 4：
+\begin{minted}{LaTeX}
+    \begin{tabular}{>{\itshape}r<{*}l}
+    \hline
+    italic & normal \\
+    column & column \\
+    \hline
+    \end{tabular}
+
+    \begin{tabular}
+    {>{\centering\arraybackslash}p{9em}}
+    \hline
+    Some center-aligned long text. \\
+    \hline
+    \end{tabular}
+\end{minted}
+
+示例输出 4：
+\begin{quote}
+    \begin{tabular}{>{\itshape}r<{*}l}
+    \hline
+    italic & normal \\
+    column & column \\
+    \hline
+    \end{tabular}
+
+    \begin{tabular}
+    {>{\centering\arraybackslash}p{9em}}
+    \hline
+    Some center-aligned long text. \\
+    \hline
+    \end{tabular}
+\end{quote}
+
+有时 \LaTeX 默认的表格会比较拥挤，可以通过改变 \verb|\arraystretch| 和 \verb|\tabcolsep| 参数来调节。
+
+示例代码 5：
+\begin{minted}{LaTeX}
+    \begin{tabular}{|l|}
+    \hline
+    These lines\\\hline
+    are tight\\\hline
+    \end{tabular}
+
+    {\renewcommand{\arraystretch}{1.5}
+    \renewcommand{\tabcolsep}{0.2cm}
+    \begin{tabular}{|l|}
+    \hline
+    less cramped\\\hline
+    table layout\\\hline
+    \end{tabular}}
+\end{minted}
+
+示例输出 5：
+\begin{quote}
+    \begin{tabular}{|l|}
+    \hline
+    These lines\\\hline
+    are tight\\\hline
+    \end{tabular}
+
+    {\renewcommand{\arraystretch}{1.5}
+    \renewcommand{\tabcolsep}{0.2cm}
+    \begin{tabular}{|l|}
+    \hline
+    less cramped\\\hline
+    table layout\\\hline
+    \end{tabular}}
+\end{quote}
+
+如果只想增加表格中某一行的高度，可以通过添加一条不可见的“支柱”（\texttt{bar}）来实现。即使用
+\mintinline{LaTeX}{\rule} 命令，并把宽度设置为0。
+
+示例代码 6：
+\begin{minted}{LaTeX}
+    \begin{tabular}{|c|}
+    \hline
+    \rule{1pt}{4ex}Pitprop \ldots\\ % 宽度不为0，可见
+    \hline
+    \rule{0pt}{4ex}Strut\\          % 宽度为0，不可见
+    \hline
+    \end{tabular}
+\end{minted}
+
+示例输出 6：
+\begin{quote}
+    \begin{tabular}{|c|}
+    \hline
+    \rule{1pt}{4ex}Pitprop \ldots\\ % 宽度不为0，可见
+    \hline
+    \rule{0pt}{4ex}Strut\\          % 宽度为0，不可见
+    \hline
+    \end{tabular}
+\end{quote}
+
+如果想排版较长的表格，可以使用 \texttt{longtable} 环境。在 \texttt{booktabs} 宏包中，还有很多其他的命令可以美化
+表格。
+
+\section{浮动体（Floating Bodies）}
+一般的刊物、出版品都会有各种图表，由于这类元素不能跨页，所以需要特殊对待。有一种方法是每当遇到一个图或表在当前页放不开
+的时候，就新起一页。这种方法会让页面有比较多的留白，看起来会不美观。
+
+一种比较好的解决方法是当前页放不开这个图表时，把它们“浮动”到后面的页面去，当前页面用正文进行填充。\LaTeX 提供了两种浮
+动体环境：\texttt{figure} 和 \texttt{table}，分别针对图片和表格。任何放在 \texttt{figure} 和 \texttt{table}
+环境中的东西都会被视为是浮动体。
+\mint{LaTeX}{   \begin{figure}[placement specifier] or \begin{table}[...]}
+所有的浮动体环境都会有一个叫 \texttt{placement specifier} 的可选的参数，可以用于指定这个浮动体被允许移动到哪里。下
+面是 \texttt{placement specifier} 参数的可选值（默认为 \texttt{tbp}，与顺序无关）：
+\begin{itemize}
+    \item \texttt{h}，当前位置(代码所处的上下文)
+    \item \texttt{t}，顶部
+    \item \texttt{b}，底部
+    \item \texttt{p}，单独成页
+    \item \texttt{!}，在决定位置时忽视限制
+\end{itemize}
+
+\LaTeX 会根据用户指定的 \texttt{placement specifier} 参数来放置每个浮动体。如果一个浮动体不能被放置在当前页，它
+就会被加入 \texttt{figures} 队列或 \texttt{tables} 队列。当新起一页的时候，\LaTeX 会先从浮动体队列中拿出一个浮
+动体，检查其能否在当前页放置。如果还是无法放置，队列中的第一个浮动体就会被认为是在这个新起的一页刚产生的，然后 \LaTeX
+就再次根据它们的 \texttt{placement specifier} 参数进行放置。\LaTeX 会严格地按照浮动体在队列中的顺序来执行这一过
+程，这也就是为什么在如果 \texttt{figures} 队列中的第一个图片一直无法放置，那么所有的图片都会被拖到文档最后的原因。因
+此，如果 \LaTeX 如果没有按照要求放置浮动体，在两个浮动体队列中经常会出现一个干扰下一个的情况。
+
+尽管可以只指定一个值给 \texttt{placement specifier} 参数，但这样往往会产生问题，一个浮动体没法放置，之后的浮动体
+也会受到阻碍无法放置。永远都不要只给 \texttt{placement specifier} 参数设置一个 \texttt{h}，这很容易产生问题，以
+至于新版本的 \LaTeX 会自动将其替换为 \texttt{ht}。
+
+\mintinline{LaTeX}{\clearpage} 命令会在另起一页之前,先将所有推迟处理的浮动体排版成页,此时 \texttt{htbp} 等位置
+限制被完全忽略。
+
+\texttt{float} 宏包为浮动体提供了 \texttt{H} 位置参数，不与 \texttt{htbp} 及 \texttt{!} 混用。使用
+\texttt{H} 位置参数时,会取消浮动机制，将浮动体视为一般的盒子插入当前位置。
+
+用 \mintinline{LaTeX}{\caption{caption text}} 命令来给 \texttt{table} 或 \texttt{figure} 环境加说明文
+字，\LaTeX 会自动根据其类型分别编号。
+
+\mintinline{LaTeX}{\listoffigures} 和 \mintinline{LaTeX}{\listoftables} 命令和
+\mintinline{LaTeX}{\tableofcontents} 命令很类似，可以用于建立图表索引。这种图表索引会完整地显示所有图标的说明文
+字，所以如果说明文字太长也不太好，这时可以用 \mintinline{LaTeX}{\caption[Short][LLLLLLLooooonnnnnggggggg]}
+命令来指定一个对应的短点的说明。
+
+可以通过 \mintinline{LaTeX}{\label} 和 \mintinline{LaTeX}{\ref} 命令来对浮动体建立标签和进行引用。需要注意，
+既然是要引用图表的编号，所以要把 \mintinline{LaTeX}{\label} 命令放置在 \mintinline{LaTeX}{\caption}之后。
+
+示例代码：
+\begin{minted}{LaTeX}
+    Figure~\ref{white} is an example of Pop-Art.
+    \begin{figure}[!hbtp]
+    \makebox[\textwidth]{\framebox[5cm]{\rule{0pt}{5cm}}}
+    \caption{Five by Five in Centimetres.\label{white}}
+    \end{figure}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Figure~\ref{white} is an example of Pop-Art.
+    \begin{figure}[!hbtp]
+    \makebox[\textwidth]{\framebox[5cm]{\rule{0pt}{5cm}}}
+    \caption{Five by Five in Centimetres.\label{white}}
+    \end{figure}
+\end{quote}
+
+在上里面的示例中，\LaTeX 会先努力尝试（\texttt{!}）将图片放置在产生它的地方（\texttt{h}）。如果不行，它会尝试放置
+在该页的底部（\texttt{b}）。如果还是不行，就不能放在该页了，它会考虑能不能建立一个浮动体页来放置这个浮动体以及其他的浮
+动体。如果不足以新建一个浮动体页，那 \LaTeX 就会新起一页，并把它看作是新产生的浮动体来放置。
 
 \end{document}
