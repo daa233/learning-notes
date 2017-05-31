@@ -539,3 +539,8 @@ Figure~\ref{white} is an example of Pop-Art.
 像 `\caption` 和 `\section` 这种命令以文本作为参数，而且这些文本参数在文档中可能不只出现一次，所以这些文本参数称为[移动参数](http://www.dickimaw-books.com/latex/novices/html/fragile.html)。但有些脆弱命令，如 `\footnote` 和 `\phantom` 等，作为它们的参数的时候会失效，甚至引起报错。需要在脆弱命令前加上 `\protect` 命令来保护它们，这样它们就可以作为移动参数了。
 
 `\protect` 命令只会影响紧跟在它之后的一个命令，一般多加了 `\protect` 命令也不会出什么问题。
+
+示例代码：
+```LaTeX
+\section{I am considerate \protect\footnote{and protect my footnotes}}
+```

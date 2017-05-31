@@ -887,4 +887,9 @@ http://www.dickimaw-books.com/latex/novices/html/fragile.html}。但有些脆弱
 \mintinline{LaTeX}{\protect} 命令只会影响紧跟在它之后的一个命令，一般多加了 \mintinline{LaTeX}{\protect} 命
 令也不会出什么问题。
 
+示例代码：
+\begin{minted}{LaTeX}
+    \section{I am considerate \protect\footnote{and protect my footnotes}}
+\end{minted}
+
 \end{document}
