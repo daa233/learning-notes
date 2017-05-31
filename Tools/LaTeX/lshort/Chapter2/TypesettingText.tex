@@ -154,7 +154,7 @@
 \end{itemize}
 
 \subsection{重音（Accents）符号和特殊符号}
-示例代码如下：
+示例代码：
 \begin{minted}{LaTeX}
     \emph{\=a}  \emph{\'a}  \emph{\v a}  \emph{\` a}
 
@@ -164,7 +164,7 @@
     Stra\ss e
 \end{minted}
 
-示例输出结果如下：
+示例输出：
 \begin{quote}
     \emph{\=a} \qquad \emph{\'a} \qquad \emph{\v a} \qquad \emph{\` a}
 
@@ -267,7 +267,7 @@ Defaults secure_path="/usr/local/texlive/2016/bin/x86_64-linux:/usr/local/sbin:.
 入多余的空格。如果使用 \mintinline{LaTeX}{\frenchspacing} 命令就没必要再用 \mintinline{LaTeX}{\@} 了。
 
 
-代码示例：
+示例代码：
 \begin{minted}{LaTeX}
     Mr.~Smith was happy to see her\\
     cf.~Fig.~5\\
@@ -343,17 +343,21 @@ Defaults secure_path="/usr/local/texlive/2016/bin/x86_64-linux:/usr/local/sbin:.
 \section{交叉引用（Cross References）}
 在写作时经常要用到对图片、表格等的交叉引用，在 \LaTeX 中可以用下面的命令完成：
 \begin{minted}{LaTeX}
-\label{marker}, \ref{marker}, \pageref{marker}
+    \label{marker}, \ref{marker}, \pageref{marker}
 \end{minted}
 其中，\texttt{marker} 是由用户自行定义的标识符。
+
 示例代码：
 \begin{minted}{LaTeX}
-A reference to this subsection \label{sec:this} looks like:
-``see section~\ref{sec:this} on page~\pageref{sec:this}.''
+    A reference to this subsection \label{sec:this} looks like:
+    ``see section~\ref{sec:this} on page~\pageref{sec:this}.''
 \end{minted}
+
 示例输出：
+\begin{quote}
 A reference to this subsection \label{sec:this} looks like: ``see section~\ref{sec:this} on
 page~\pageref{sec:this}.''
+\end{quote}
 
 \section{脚注（Footnotes）}
 可以使用 \mintinline{LaTeX}{\footnote{...}} 命令来添加脚注，脚注应该紧跟在它注解的词或句子（包括标点符号）后面。
@@ -657,7 +661,7 @@ in the text.
 \end{quote}
 
 如果想让表格的某一列按小数点对齐，又不使用额外的宏包（\texttt{dcolumn}），可以采用一种比较折中的方法：把该列的所有小
-数分为整数部分和小数部分，各作为一列，然后在 \texttt{tabular} 环境中使用 \texttt{@{.}} 作为整数列和小数列的分隔
+数分为整数部分和小数部分，各作为一列，然后在 \texttt{tabular} 环境中使用 \texttt{@\{.\}} 作为整数列和小数列的分隔
 符。整数部分和小数部分之间不要忘了用 \texttt{\&} 隔开，因为它们现在是两列了。为了在这两列的表头仅显示一个标签，可以使用
 \mintinline{LaTeX}{\multicolumn} 命令。
 
