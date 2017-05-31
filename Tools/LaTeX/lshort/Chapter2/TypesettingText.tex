@@ -816,28 +816,29 @@ in the text.
 环境中的东西都会被视为是浮动体。
 \mint{LaTeX}{   \begin{figure}[placement specifier] or \begin{table}[...]}
 所有的浮动体环境都会有一个叫 \texttt{placement specifier} 的可选的参数，可以用于指定这个浮动体被允许移动到哪里。下
-面是 \texttt{placement specifier} 参数的可选值（默认为 \texttt{tbp}，与顺序无关）：
+面是 \texttt{placement specifier} 参数的可选值（默认为 \texttt{tbp}，优先级按照 \texttt{h-t-b-p} 排列，与顺
+序无关）：
 \begin{itemize}
     \item \texttt{h}，当前位置(代码所处的上下文)
-    \item \texttt{t}，顶部
+    \item \texttt{t}，顶部，如果是当页排版可能出现在代码之前
     \item \texttt{b}，底部
-    \item \texttt{p}，单独成页
-    \item \texttt{!}，在决定位置时忽视限制
+    \item \texttt{p}，一个或多个浮动体被放在单独的页面中，这个页面被称为浮动页（float page），与之对应，有文本的页
+    面称为文本页（text page）
+    \item \texttt{!}，在决定位置时忽略文本页的限制（\LaTeX 对每个位置的浮动体的总数和占用大小等有一定的限制），只
+    有浮动页的限制（\mintinline{LaTeX}{\floatpagefraction} 和
+    \mintinline{LaTeX}{\dblfloatpagefraction}）起效。
 \end{itemize}
 
 \LaTeX 会根据用户指定的 \texttt{placement specifier} 参数来放置每个浮动体。如果一个浮动体不能被放置在当前页，它
-就会被加入 \texttt{figures} 队列或 \texttt{tables} 队列。当新起一页的时候，\LaTeX 会先从浮动体队列中拿出一个浮
-动体，检查其能否在当前页放置。如果还是无法放置，队列中的第一个浮动体就会被认为是在这个新起的一页刚产生的，然后 \LaTeX
-就再次根据它们的 \texttt{placement specifier} 参数进行放置。\LaTeX 会严格地按照浮动体在队列中的顺序来执行这一过
-程，这也就是为什么在如果 \texttt{figures} 队列中的第一个图片一直无法放置，那么所有的图片都会被拖到文档最后的原因。因
-此，如果 \LaTeX 如果没有按照要求放置浮动体，在两个浮动体队列中经常会出现一个干扰下一个的情况。
+就会被加入 \texttt{figures} 队列或 \texttt{tables} 队列。当新起一页的时候，\LaTeX 会先检查能否把这一页作为一个
+浮动页来放置队列中的浮动体。如果不行，队列中的第一个浮动体就会被认为是这个新起的一页刚产生的，然后 \LaTeX 就再次根据它
+们的 \texttt{placement specifier} 参数在这个新起的一页进行放置。\LaTeX 会严格地按照浮动体在队列中的顺序来执行这
+一过程，这也就是为什么在如果 \texttt{figures} 队列中的第一个图片一直无法放置，那么所有的图片都会被拖到文档最后的原
+因。因此，如果 \LaTeX 如果没有按照要求放置浮动体，在两个浮动体队列中经常会出现一个干扰下一个的情况。
 
 尽管可以只指定一个值给 \texttt{placement specifier} 参数，但这样往往会产生问题，一个浮动体没法放置，之后的浮动体
 也会受到阻碍无法放置。永远都不要只给 \texttt{placement specifier} 参数设置一个 \texttt{h}，这很容易产生问题，以
 至于新版本的 \LaTeX 会自动将其替换为 \texttt{ht}。
-
-\mintinline{LaTeX}{\clearpage} 命令会在另起一页之前,先将所有推迟处理的浮动体排版成页,此时 \texttt{htbp} 等位置
-限制被完全忽略。
 
 \texttt{float} 宏包为浮动体提供了 \texttt{H} 位置参数，不与 \texttt{htbp} 及 \texttt{!} 混用。使用
 \texttt{H} 位置参数时,会取消浮动机制，将浮动体视为一般的盒子插入当前位置。
@@ -862,17 +863,24 @@ in the text.
     \end{figure}
 \end{minted}
 
-示例输出：
-\begin{quote}
-    Figure~\ref{white} is an example of Pop-Art.
-    \begin{figure}[!hbtp]
-    \makebox[\textwidth]{\framebox[5cm]{\rule{0pt}{5cm}}}
-    \caption{Five by Five in Centimetres.\label{white}}
-    \end{figure}
-\end{quote}
+在上里面的示例中，\texttt{[!hbtp]} 是 \LaTeX 中最宽松的浮动体位置参数。\LaTeX 会先努力尝试（\texttt{!}）将图片
+放置在产生它代码所在的上下文位置（\texttt{h}）。如果不行，它会尝试放置在该页的底部（\texttt{b}）。如果还是不行，就不
+能放在该页了，它会考虑能不能建立一个浮动体页来放置这个浮动体以及其他的浮动体。如果不满足新建一个浮动体页的条件，那
+\LaTeX 就会新起一页，并把它看作是新起的一页刚产生的浮动体，并按照它的参数重新放置。
 
-在上里面的示例中，\LaTeX 会先努力尝试（\texttt{!}）将图片放置在产生它的地方（\texttt{h}）。如果不行，它会尝试放置
-在该页的底部（\texttt{b}）。如果还是不行，就不能放在该页了，它会考虑能不能建立一个浮动体页来放置这个浮动体以及其他的浮
-动体。如果不足以新建一个浮动体页，那 \LaTeX 就会新起一页，并把它看作是新产生的浮动体来放置。
+
+在遇到 \mintinline{LaTeX}{\clearpage}、\mintinline{LaTeX}{\cleardoublepage} 或
+\mintinline{LaTeX}{\end{document}} 这三个命令时，所有队列中未处理的浮动体都会直接输出，
+\texttt{placement specifier} 参数中的 \texttt{p} 选项也会打开以保证可以将所有的浮动体输出。
+
+\section{保护脆弱命令（Protecting Fragile Commads）}
+像 \mintinline{LaTeX}{\caption} 和 \mintinline{LaTeX}{\section} 这种命令以文本作为参数，而且这些文本参数在
+文档中可能不只出现一次，所以这些文本参数称为移动参数~\footnote{\emph{Moving Arguments And Fragile Commands},
+http://www.dickimaw-books.com/latex/novices/html/fragile.html}。但有些脆弱命令，如
+\mintinline{LaTeX}{\footnote} 和 \mintinline{LaTeX}{\phantom} 等，作为它们的参数的时候会失效，甚至引起报错。
+需要在脆弱命令前加上 \mintinline{LaTeX}{\protect} 命令来保护它们，这样它们就可以作为移动参数了。
+
+\mintinline{LaTeX}{\protect} 命令只会影响紧跟在它之后的一个命令，一般多加了 \mintinline{LaTeX}{\protect} 命
+令也不会出什么问题。
 
 \end{document}
