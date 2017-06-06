@@ -1,0 +1,34 @@
+%-*- coding: UTF-8 -*-
+% Math.tex
+%
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{a4paper, centering, scale=0.8}
+\usepackage{minted}
+\usepackage{amsmath}
+
+\title{\heiti Chapter 3 Typesetting Mathematical Formulae}
+\author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+本章将简单地介绍如何用 \LaTeX 进行它所擅长的数学排版。如果这一章介绍的数学排版内容无法解决你的问题，不要灰心，使用
+\AmS-\LaTeX{} 宏集，一般都能找到答案。
+
+\section{\AmS-\LaTeX{} 宏集}
+\AmS-\LaTeX{}宏集是一些用于数学排版的包和类的集合，可以排版出高质量的数学内容。\texttt{amsmath} 宏包是这个宏集的
+核心部分，一般用这个就足够了。\AmS-\LaTeX{}是由美国数学学会 (American Mathematical Society) 提供的对 \LaTeX
+原生的数学公式排版的扩展，目前 \TeX{}最近的发行版都默认包含它了。在本章，需要在导言区使用
+\mintinline{LaTeX}{\usepackage{amsmath}} 命令引入 \texttt{amsmath} 宏包。
+
+
+
+
+
+\end{document}
