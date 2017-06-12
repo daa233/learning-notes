@@ -13,9 +13,513 @@
 \begin{document}
 \maketitle
 
+\section{课程介绍和二进制数}
+\subsection{课程介绍}
+\paragraph{计算导论}
+\begin{itemize}
+    \item 计算机的基本原理
+    \item 计算机的发展趋势
+    \item 程序运行的基本原理
+\end{itemize}
 
+\paragraph{C程序设计}
+\begin{itemize}
+    \item 感性认识C程序
+    \item 理性认识C程序
+\end{itemize}
 
+\subsection{计算机的基本原理}
+\paragraph{计算机的理论模型——图灵机}
+图灵机——判定一个问题是否可以计算。
 
+对于一个问题的输入A，A是否能推证出B？如果能找到一个图灵机，得出对应的符号序列B，那么从A到B就是可计算的；否则，该问题不
+可计算。
 
+图灵机的三大特点：简单、强大、可实现。
+
+\subsection{数的二进制表示}
+十进制整数转换为二进制整数：除以2取余数，除到商为0为止（“触底反弹”）。
+
+二进制整数转换为十进制整数：要从右到左用二进制的每个数去乘以2的相应次方。
+
+二进制转八进制：从右向左，每三位进行一次转换。
+
+二进制转十六进制：从右向左，每四位进行一次转换。
+
+\subsection{二进制数的布尔运算}
+基本逻辑：与，或，非
+
+复合逻辑：同或、异或，与非、或非，与或非
+
+二进制数运算可以通过基本的布尔运算实现，而布尔运算都可以通过电路实现，所以电路能够计算。
+
+\section{计算机的发展和摩尔定律}
+\subsection{计算机发展史}
+\paragraph{早期计算机}
+\begin{itemize}
+    \item 手工计算机
+    \item 机械计算机
+    \item 计算机原型
+\end{itemize}
+
+\paragraph{现代计算机}
+\begin{itemize}
+    \item 电子管计算机：ENIAC，EDVAC。EDVAC是所有现代计算机的原型。
+    \item 晶体管计算机
+    \item 集成电路计算机
+    \item 超大规模集成电路计算机
+    \item 未来第五代计算机：量子计算机、生物计算机
+\end{itemize}
+
+\subsection{摩尔定律}
+\paragraph{摩尔定律}
+芯片密度大约每18个月增加1倍；CPU性能价格比大约每18个月翻一番。
+
+摩尔定律下的挑战：
+\begin{enumerate}
+    \item 散热
+    \item 晶体管大小限制
+    \item 电泄露
+\end{enumerate}
+
+随着晶体管密度与速度的增加，芯片会消耗更多的电力，产生更多的热能。能不能把芯片做大以增加散热呢？答案是不能，更大的芯片意
+味着更高的电压，反而会带来更大的热量。
+
+\section{计算机结构}
+\paragraph{计算机结构}
+运算器、控制器、存储器、输入设备、输出设备，它们通过总线相连。
+
+CPU包含运算器、控制器和存储器的一部分（高速缓存Cache）。
+
+CPU访问数据的局部性原理：\\
+时间局部性：如果一个内存地址正在被使用，那么近期它很可能还会被再次访问。\\
+空间局部性：在最近的将来可能用到的信息很可能与当前使用的信息是相邻的。
+
+存储器包括RAM（Ramdom Access Memory）和ROM（Read Only Memory）两大类。ROM（掩膜ROM）在生产时写入，用户不可更
+改。
+
+\paragraph{RAM}
+\begin{itemize}
+    \item DRAM（Dynamic RAM）：必须周期性刷新以保持存储内容
+        \begin{itemize}
+            \item EDO DRAM（Extended Data Out DRAM）扩展数据输出动态存储器
+            \item SDRAM（Synchronous DRAM）同步动态存储器
+            \item DDR（Double Data Rate SDRAM）双数据输出同步动态存储器，目前的主流内存
+        \end{itemize}
+    \item SRAM（Static RAM）：不需要周期性刷新
+\end{itemize}
+
+\paragraph{ROM}
+\begin{itemize}
+    \item PROM（Programmable ROM）
+    \item EPROM（Erasable PROM）
+    \item EEPROM（Electrically EPROM）
+    \item Flash EPROM
+\end{itemize}
+
+为什么32位计算机最大只能支持4G内存？因为CPU的寻址能力以字节（Byte）为单位，32位计算机的寻址空间只有$2^{32}=4$GB。
+
+\section{编程语言和程序设计}
+\subsection{关于编程语言的三个问题}
+\begin{description}
+    \item[问题1] 是不是无论我们在程序里写什么“单词”，计算机都能明白？
+    \item[答] 不是。编程语言定义了一些有特定含义的“关键字”，计算机“只能明白”这些“词”的含义。
+\end{description}
+
+\begin{description}
+    \item[问题2] 是不是无论我们在程序里写什么“数”和“计算符号”，计算机都能明白？
+    \item[答] 不是。计算机只能“看懂”某些类型的数据，这些“数据类型”和相应的“操作符号”是定义好的。
+\end{description}
+
+\begin{description}
+    \item[问题3] 世间用“程序来表达的逻辑”纷繁复杂，多少“句式”才能够用？
+    \item[答] 三种。顺序、分支、循环。
+\end{description}
+
+\subsection{什么样的程序是“好程序”}
+在这门课中，重视：
+\begin{itemize}
+    \item 正确性，结果对
+    \item 可读性，能看懂
+    \item 结构性，看着美
+\end{itemize}
+
+在这门课中，不重视：
+\begin{itemize}
+    \item 少用了几个变量
+    \item 程序行数少
+    \item 程序运行快
+\end{itemize}
+
+\section{结构化程序设计}
+在面临一个问题时，没有想出解决方案之前不要动手写程序。原因有三：
+\begin{itemize}
+    \item 没有想出解决方案，不可能写出程序
+    \item 急于写程序很可能会限制思维，导致想不出创新方案
+    \item 急于写程序会导致程序漏洞百出，改来改去，结构混乱
+\end{itemize}
+
+结构化程序设计的基本思想：先粗后细，先抽象后具体。\\
+写程序的过程：由大到小，由粗到精，由抽象到具体地方法分析。\\
+程序的结构：若干个模块，高内聚、低耦合。
+
+开始编写程序，我用Ubuntu上的文本编辑器来写，通过 g++ 编译。
+\footnote{http://wiki.ubuntu.org.cn/Compiling\_Cpp} 编译示例如下：
+\begin{minted}{shell}
+    g++ helloworld.cpp -o helloworld
+\end{minted}
+
+程序中 \mintinline{C++}{int main(int argc, char* argv[])} 中的 \texttt{argc} 是参数的个数，
+\texttt{argv[]} 是参数值。
+\footnote{http://stackoverflow.com/questions/18649547/how-to-find-the-length-of-argv-in-c}
+
+\texttt{atoi} 函数可以将 \texttt{char} 型转换为 \texttt{int} 型，在C++中要包含 \texttt{cstdlib}。
+
+\section{C/C++简介}
+Alan J. Perlis在1960年写的 \emph{Report on the Algorithmic Language ALGOL 60} 是程序设计语言领域一篇里程
+碑式的论文。
+
+程序设计语言的构成：
+\begin{enumerate}
+    \item 数据成分
+    \item 运算成分
+    \item 控制成分
+    \item 传输成分
+\end{enumerate}
+
+C++语言支持了C语言所有的特性。
+
+\paragraph{Assignment 2}
+C语言中数组的初始长度能不能由用户输入来决定？ 在我学C语言时，老师通过VC6.0告诉我们不可以。但是现在我用
+gcc（ver. 5.4）却可以编译成功，而且gcc没有对数组越界进行报错。具体来说，如果定义数组 \mintinline{C++}{int a[n]}，
+初始长度由用户输入的 \texttt{n} 来决定，那么越界部分既可以读取，也可以写入；如果定义数组
+\mintinline{C++}{int b[2]}，即初始长度固定为某个整数，那么可以读取越界值 \mintinline{C++}{b[2]}、
+\mintinline{C++}{b[3]} 等，但是无法写入（运行程序时，向越界部分写入时会报 \texttt{stack smashing} 的错误）。读
+取到的越界部分的值均是没有初始化过的、内存中的随机值。gcc 支持的C标准和VC6.0支持的C标准有所不同：gcc允许使用变量作为
+数组初始长度，不检查数组越界。\footnote{https://www.zhihu.com/question/28786159}
+
+示例代码如下：
+\begin{minted}{C++}
+    #include <stdio.h>
+
+    int main(int argc, char *argv[])
+    {
+        int n;
+        scanf("%d", &n);
+        int a[n];
+
+        for (int i = 0; i < n*2; i++) {
+            printf("a[%d] = %d\n", i, a[i]);
+        }
+        for (int i = 0; i < n*2; i++) {
+            a[i] = -1;
+            printf("a[%d] = %d\n", i, a[i]);
+        }
+
+        int b[2];
+        for (int i = 0; i < 4; i++) {
+            printf("b[%d] = %d\n", i, b[i]);
+        }
+        // b[2] = 3;    // stack smashing
+        /*for (int i = 0; i < 4; i++) { // stack smashing
+            b[i] = -2;
+            printf("b[%d] = %d\n", i, b[i]);
+        }*/
+
+        return 0;
+    }
+\end{minted}
+
+\paragraph{Assignment 3}
+\mintinline{C++}{ceil(a)} 可以返回比 \texttt{a} 大的最小整数（\mintinline{C++}{#include <math.h>}）。
+
+\section{C语言的数据成分}
+\begin{enumerate}
+    \item 变量的定义。先定义，再使用。定义时最好赋初始值。
+    \item 整数型的分类。C标准没有具体规定各种整型数据所占内存字节数，只要求 \texttt{long} 型不短于 \texttt{int}
+    型，\texttt{short} 型不长于 \texttt{int} 型。VC++中，\texttt{int == long int (4 Byte)}。
+    \mintinline{C++}{sizeof()} 可以打印指定类型占内存的字节数。
+    \item 正数的补码是它本身；负数的补码 = 反码 + 1。
+    \item 打印控制符 \texttt{hex}、\texttt{oct}、\texttt{dec}。十六进制数以 \texttt{0x} 开头，八进制数以
+    \texttt{0} 开头。可以通过控制打印输出来完成数制间的转换。注意：同一程序内，设定打印控制符后，之后所有的打印都会
+    默认这个设定好的打印控制符。
+    \item 计算机中二进制数的最高位是1、其他位是0时，最高位既表示负号、也表示整数的最高位。因此 \texttt{10\ldots0}
+    是能表示的最小的整数。
+    \item 浮点型 = 实型。\texttt{float} 型的有效精度为7位，\texttt{double} 型的有效精度为15位。
+    \mintinline{C++}{setprecision(x)} 设置 \texttt{x} 位打印精度
+    （\mintinline{C++}{#include <iomanip>}）。应避免将一个很大的数与一个很小的数相加或相减，否则就会“丢失”小的
+    数。
+    \item 字符型占一个字节，存储和整型相同，可以与整型相互赋值、运算。\texttt{char} 型变量赋值时要使用单引号。
+    \item 布尔类型占一个字节，有“非0即1”的特点。为什么不用一位？因为字节是计算机能控制的最小单元。
+    \item 常量：字面常量、符号常量。定义常量时，类型前加 \texttt{const} 限定符。字面常量（即赋值符号右边的具体值）
+    也是有类型的，可以通过后缀来明确定义其类型，如 \texttt{L}、\texttt{U}、\texttt{LU}、\texttt{F} 等，均可以
+    小写。浮点型常量默认为 \texttt{double} 类型。
+    \item 标识符：各种有效字符序列（名字），由字母、数字、下划线组成，第一个字符不能为下划线，不可与保留字冲突。变量
+    的命令方法主要有两种：匈牙利命名法和驼峰命名法。合适的地方用合适的命名方法，不要死磕某一种。定义变量时最好加注释。
+\end{enumerate}
+
+\section{C语言的运算成分}
+\subsection{赋值运算符}
+\mintinline{C++}{int a, b, c = 5;} 表示只给 \texttt{c} 赋初值
+
+\mintinline{C++}{int a = b = c = 5;} 错误，定义时不能连等
+
+若“=”两边类型不一致，赋值时右边自动转换为左边的类型。
+
+长数赋给短数，截取低位赋给短数。短数赋给长数，原来是什么数，现在还是什么数。计算机处理时会根据有无符号在高位补0或补1，
+下面是 \texttt{short} 型赋给 \texttt{long} 型的例子。
+\begin{itemize}
+    \item 若 \texttt{short} 型为无符号数：
+    \begin{itemize}
+        \item \texttt{short} 型16位到 \texttt{long} 型低16位，\texttt{long} 型高16位补0；
+    \end{itemize}
+    \item 若 \texttt{short} 型为有符号数：
+    \begin{itemize}
+        \item \texttt{short} 型16位到 \texttt{long} 型低16位；
+        \item 若 \texttt{short} 型最高位为0，则 \texttt{long} 型高16位补0；
+        \item 若 \texttt{short} 型最高位为1，则 \texttt{long} 型高16位补1；
+    \end{itemize}
+\end{itemize}
+
+\texttt{signed} 和 \texttt{unsigned} 之间原封不动地赋值，不管符号位还是数字位。
+
+赋值表达式也是有返回值的，返回值即为 \texttt{=} 所传递的值。连续赋值运算，自右向左结合。
+
+\subsection{算术运算符和算术表达式}
+\texttt{\%} 是模运算，操作数必须是整数。整数运算，结果仍然是整数，如 \texttt{5 / 3} 的结果为1；实数运算，结果是
+\texttt{double} 型，如 \texttt{5.3 / 3} 和 \texttt{5 / 3.0} 的结果都是 \texttt{double} 型。在算术运算中的
+优先级：\texttt{double} > \texttt{long} > \texttt{unsigned} > \texttt{int} > \texttt{char, short}；
+\texttt{double} > \texttt{float}。
+
+\subsection{自增自减运算符}
+\mintinline{C++}{(-i)++;} 错误，\texttt{++/--} 只能作用于变量，不能作用于表达式。
+
+\mintinline{C++}{cout} 语句中包含多个表达式时，从右向左计算表达式的值。
+
+\mintinline{C++}{c = 2; (c++) + (++c) = ?} 答案是6，表达式中有 \mintinline{C++}{++c}，则先计算
+\mintinline{C++}{++c}，此时 \texttt{c} 自增为3，把 \mintinline{C++}{c = 3} 代入 \mintinline{C++}{c++}，
+得到最后的结果为6。
+
+\subsection{关系运算符}
+混合运算的优先级：逻辑非（!）> 算术运算符 > 关系运算符 > 逻辑与（\&\&）> 逻辑或（||）> 赋值运算符。不确定优先级时，加
+括号。
+
+逻辑表达式求解时，并不总是执行所有的运算。只有在必须执行下一个逻辑运算符才能求出表达式的解时，才执行该运算符。\\
+示例程序：
+\begin{minted}{C++}
+    int a = 0, b = 0;
+    a = 5 > 3 && 2 || 8 < 4 - (b = !0);
+    cout << a << " " << b << endl;  // 结果：1 0。因为b未赋值
+\end{minted}
+
+\subsection{逗号表达式}
+逗号表达式用于连接两个表达式，所有运算符中优先级最低。
+
+用法示例：\mintinline{text}{表达式1, 表达式2, ... 表达式n}\\
+先求表达式1，再求表达式2……一直到表达式n，整个表达式的值为表达式n的值。\\
+\mintinline{C++}{x = (a = 3, 6 * 3);    // x的值为18}\\
+\mintinline{C++}{x = a, 6 * 3;  // x的值为3，赋值运算符优先级高于逗号运算符}
+
+\texttt{if} 语句比条件运算符可读性更高。
+
+强制类型转换后，被转换的量的类型并没有发生改变。
+
+\subsection{位运算}
+\begin{tabular}{|c|c|c|}
+    \hline
+    运算符 & 含义 & 备注 \\
+    \hline
+    \& & 按位与 & 双目 \\
+    \hline
+    |  & 按位或 & 双目 \\
+    \hline
+    \^{} & 按位异或 & 双目 \\
+    \hline
+    $\sim$ & 取反 & 单目 \\
+    \hline
+    <{}< & 左移 & 单目 \\
+    \hline
+    >{}> & 右移 & 单目 \\
+    \hline
+\end{tabular}
+
+\mintinline{C++}{a = ~a;        // 对a按位取反}
+
+\mintinline{C++}{a = a << 1;    // a 左移1位，相当于乘2}
+
+\mintinline{C++}{a = a >> 1;    // a 右移1位，相当于除以2}
+
+注意：
+\begin{enumerate}
+    \item 右移时，无符号数左边高位移入0；有符号数，原符号位为0时，左边移入0，原符号位为1时，取决于编译器。
+    \item 不同长度的数进行位运算时，按右端对齐。如果短数是无符号整型，左侧补满0；如果短数为有符号整型，则短数为正时
+    左侧补满0，为负时左侧补满1。
+\end{enumerate}
+
+用途：
+\begin{enumerate}
+    \item 和0按位与，“清零”
+    \item 和特定数按位与，取指定位，如 \mintinline{C++}{a & 377} 可以取出 \texttt{a} 的低8位
+    \item 按位与指定某些位为1
+    \item 异或：与1异或，使特定位翻转；与0异或，使特定位保持不变
+\end{enumerate}
+示例：a = 3，b = 4，不使用第三个变量，交换a和b的值。\\
+解答：\mintinline{C++}{a = a ^ b; b = b ^ a; a = a ^ b;}
+
+\section{C语言的控制成分}
+任何具有单入口单出口的程序均可以用三种基本的结构表达：顺序结构、分支结构、循环结构。
+
+\mintinline{C++}{if} 语句的括号内可以是任意的数值类型。若括号内表达式的值为0，按“假”处理；若非0，按“真”处理。
+
+\mintinline{C++}{switch} 语句中，\mintinline{C++}{default} 后也要跟 \mintinline{C++}{break}。
+\mintinline{C++}{default} 与 \mintinline{C++}{case} 相比并没有那么特殊。\\
+示例程序：
+\begin{minted}{C++}
+    switch(3) {
+        case 0:
+            ...
+        default:
+            ...
+        // default 后表面的 case 也会被执行
+        case 1:
+            ...
+        case 2:
+            ...
+    }
+\end{minted}
+
+\mintinline{C++}{for} 循环中嵌套 \mintinline{C++}{switch} 语句，\mintinline{C++}{switch} 中有
+\mintinline{C++}{break}，跳出哪一个？经过实验，\mintinline{C++}{switch} 语句中的 \mintinline{C++}{break}
+仅仅跳出了 \mintinline{C++}{switch}，没有跳出外部的循环。而如果把 \mintinline{C++}{switch} 语句换成
+\mintinline{C++}{if} 语句，其中的 \mintinline{C++}{break} 可以跳出外部循环。
+
+在循环嵌套时，必须先跳出内层的循环，才能回到外层的循环。\\
+示例程序：
+\begin{minted}{C++}
+    int i = 0;
+    while (i < 2) {
+        while (i < 5) {
+            i++;
+        }
+    }
+    cout << "i = " << i << endl;    // 输出结果为 i = 5
+\end{minted}
+
+\section{C程序中的数组}
+\subsection{数组的定义}
+定义数组：类型 数组名[常量表达式];
+
+VC++不允许用变量定义数组的初始长度，但是gcc/g++允许。
+
+在VC++中，如果想方便地修改数组的初始长度，有下面有种做法：
+\begin{minted}{C++}
+    // 方法1
+    const int i = 4;
+    int a[i] = {1, 2, 3, 4};
+    // 方法2
+    #define N 4
+    int main()
+    {
+        int a[N] = {1, 2, 3, 4};
+        return 0;
+    }
+\end{minted}
+
+\subsection{数组的初始化}
+\mintinline{C++}{int a[] = {1, 2, 3, 4};        // 初始化后，数组a的长度为4}
+
+\mintinline{C++}{int a[4] = {1, 2};             // 初始化后，a[0]为1，a[1]为2，其余为0}
+
+\mintinline{C++}{int a[4] = {0};                // 初始化后，a的所有元素均为0}
+
+\mintinline{C++}{int a[4] = {1, 2, 3, 4, 5, 6}; // 编译错误，数组下标越界}
+
+\mintinline{C++}{int a[][4] = {{1}, {0, 6}, {0, 0, 11}};    // 空缺部分为0}
+
+\mintinline{C++}{int a[3][4] = {0};             // 指明数组维数时，将所有元素初始化为0}
+
+\subsection{数组的应用}
+打印数组：\mintinline{C++}{cout << setw(3);      // 输出控制符setw(x)，设置输出占x个字宽}
+
+当有一些数据要存储时，用于存放一系列数据类型相同的数据。当处理的对象是连续的整数时，利用数据和下标间的对应关系，用于数字
+统计等应用问题。
+
+\mintinline{C++}{double sqrt(double x);         // sqrt() 函数的参数和返回值都是 double 类型}
+
+\section{字符数组和字符串}
+\subsection{定义}
+\mintinline{C++}{char a[10] = {'a', 'b', 'c'};          // a[]的后7位会被初始化为'\0'}
+
+\mintinline{C++}{char a[] = {'C', 'h', 'i', 'n', 'a'};  // 初始化后，a[]包含5个元素}
+
+\mintinline{C++}{char a[] = "China";    // 初始化后，a[]包含6个元素，a[5]为'\0'}
+
+\mintinline{C++}{char a[5] = "China";   // 错误}
+
+内容相同的字符串会比字符数组多一个 \mintinline{C++}{'\0'}。所以有 \mintinline{C++}{'\0'} 结尾的字符数组都可以
+看作是字符串。
+
+\mintinline{C++}{char a[6] = "China";   // 只可以在数组定义并初始化时可以用}
+
+不能用赋值语句将一个字符串常量或字符数组直接赋给另一个字符数组。
+
+\mintinline{C++}{str1[] = "China";      // 赋值不合法}
+
+\mintinline{C++}{str1 = "China";        // 赋值不合法}
+
+\mintinline{C++}{str2 = "China";        // 赋值不合法}
+
+\mintinline{C++}{cout << "String 1: " << str1 << endl; // 打印字符数组}
+
+\subsection{输入}
+键盘输入的内容在敲回车键后会先存到输入缓存区，然后再被程序读取。\mintinline{C++}{cin} 会跳过空格和回车，把它们作为
+区分不同输入数据的标志。
+\begin{minted}{C++}
+    float grade;
+    // 连续读入数据，如果不能读到float型数据，跳出循环。
+    while (cin >> grade) {
+        ...
+    }
+\end{minted}
+
+在用 \mintinline{C++}{cin} 连续读取字符时，可以用\^{}Z（Ctrl+Z）结束输入。
+
+比较 \mintinline{C++}{cin.get()}、\mintinline{C++}{cin.get(char)} 和 \mintinline{C++}{getchar()}
+\begin{minted}{C++}
+    char c;
+    // cin.get()会从输入缓存区读取一个字符，能读取空格字符和回车字符。也就是cin.get()说不会跳过空格和回车，把它们
+    // 当作普通字符对待。EOF是文件结束标志，表示输入结束。
+    while ((c = cin.get()) != EOF) {
+        ...
+    }
+
+    // 下面的cin.get(char)与上面的cin.get()运行结果完全相同
+    while(cin.get(c)) {
+        ...
+    }
+
+    // getchar()不跳过任何字符
+    while (c = getchar()) {
+        ...
+    }
+\end{minted}
+
+使用 \mintinline{C++}{cout} 打印字符数组时需要注意，字符数组要以 \mintinline{C++}{'\0'} 结尾，否则会一直向后打
+印，直至遇到 \mintinline{C++}{'\0'}。
+\begin{minted}{C++}
+    char a[8] = {'H', 'e', 'l', 'l', 'o'};
+    cout << a;  // a[]没有以'\0'结尾，会一直向后输出，直到遇到'\0'
+\end{minted}
+
+输入字符串的三种方法：
+\begin{enumerate}
+    \item \mintinline{C++}{cin}
+    \item \mintinline{C++}{cin.get(ch[], length, end_char)}  （\texttt{end\_char} 一般默认为
+    '\textbackslash n'）
+    \item \mintinline{C++}{cin.getline(ch[], length, end_char)}
+\end{enumerate}
+
+\mintinline{C++}{getline} 和 \mintinline{C++}{get} 的区别：\mintinline{C++}{getline} 遇到终止标志字符时结
+束，缓存区指针移动到终止标志字符之后；\mintinline{C++}{get} 遇到终止标志字符时停止读取，指针不移动。
 
 \end{document}
