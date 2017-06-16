@@ -6,6 +6,7 @@
 \geometry{a4paper, centering, scale=0.8}
 \usepackage{minted}
 \usepackage{amsmath}
+\usepackage{amssymb} % to use \mathbb
 
 \title{\heiti Chapter 3 Typesetting Mathematical Formulae}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -23,10 +24,180 @@
 
 \section{\AmS-\LaTeX{} 宏集}
 \AmS-\LaTeX{}宏集是一些用于数学排版的包和类的集合，可以排版出高质量的数学内容。\texttt{amsmath} 宏包是这个宏集的
-核心部分，一般用这个就足够了。\AmS-\LaTeX{}是由美国数学学会 (American Mathematical Society) 提供的对 \LaTeX
+核心部分，一般用这个就足够了。\AmS-\LaTeX{}是由美国数学学会（American Mathematical Society）提供的对 \LaTeX
 原生的数学公式排版的扩展，目前 \TeX{}最近的发行版都默认包含它了。在本章，需要在导言区使用
 \mintinline{LaTeX}{\usepackage{amsmath}} 命令引入 \texttt{amsmath} 宏包。
 
+\section{单个方程}
+行内公式应该放在一对 \texttt{\$} 之间。
+
+示例代码：
+\begin{minted}{LaTeX}
+    Add $a$ squared and $b$ squared to get $c$ squared. Or, using
+    a more mathematical approach:
+    $a^2 + b^2 = c^2$
+
+    \TeX{} is pronounced as $\tau\epsilon\chi$ \\ [5pt]
+    100~m$^{3}$ of water \\ [5pt]
+    This comes from my $\heartsuit$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Add $a$ squared and $b$ squared to get $c$ squared. Or, using a more mathematical approach:
+    $a^2 + b^2 = c^2$
+
+    \TeX{} is pronounced as $\tau\epsilon\chi$ \\ [5pt]
+    100~m$^{3}$ of water \\ [5pt]
+    This comes from my $\heartsuit$
+\end{quote}
+
+行间公式放在 \mintinline{LaTeX}{\begin{equation}} 和 \mintinline{LaTeX}{\end{equation}} 之间。可以通过
+\mintinline{LaTeX}{\labell} 和 \mintinline{LaTeX}{\eqref} 来给公式添加标签和建立引用，用
+\mintinline{LaTeX}{\tag} 来给公式指定具体的名字。
+
+示例代码：
+\begin{minted}{LaTeX}
+    Add $a$ squared and $b$ squared to get $c$ squared. Or, using
+    a more mathematical approach:
+        \begin{equation}
+            a^2 + b^2 = c^2
+        \end{equation}
+    Einstein says
+        \begin{equation}
+            E = mc^2 \label{clever}
+        \end{equation}
+    He didn't say
+        \begin{equation}
+            1 + 1 = 3 \tag{dumb}
+        \end{equation}
+    This a reference to \eqref{clever}.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Add $a$ squared and $b$ squared to get $c$ squared. Or, using
+    a more mathematical approach:
+        \begin{equation}
+            a^2 + b^2 = c^2
+        \end{equation}
+    Einstein says
+        \begin{equation}
+            E = mc^2 \label{clever}
+        \end{equation}
+    He didn't say
+        \begin{equation}
+            1 + 1 = 3 \tag{dumb}
+        \end{equation}
+    This a reference to \eqref{clever}.
+\end{quote}
+
+如果不想给公式编号，用 \texttt{equation} 的加星版本 \texttt{equation*}；或者把公式放在
+\mintinline{LaTeX}{\[} 和 \mintinline{LaTeX}{\]} 之间。
+
+示例代码：
+\begin{minted}{LaTeX}
+    Add $a$ squared and $b$ squared to get $c$ squared. Or, using a more mathematical approach
+        \begin{equation*}
+            a^2 + b^2 = c^2
+        \end{equation*}
+    or you can type less for the same effect:
+        \[ a^2 + b^2 = c^2 \]
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Add $a$ squared and $b$ squared to get $c$ squared. Or, using a more mathematical approach
+        \begin{equation*}
+            a^2 + b^2 = c^2
+        \end{equation*}
+    or you can type less for the same effect:
+        \[ a^2 + b^2 = c^2 \]
+\end{quote}
+
+虽然 \mintinline{LaTex}{\[} 和 \mintinline{LaTeX}{\]} 很简洁，但是使用时不能像 \texttt{equation} 和
+\texttt{equation*} 那样在有编号和无编号之间切换。
+
+注意排版格式中行内公式（text style）和行间公式（display style）的区别。
+
+示例代码：
+\begin{minted}{LaTeX}
+    This is text style:
+    $\lim_{n \to \infty} \sum_{k=1}^n \frac{1}{k^2} = \frac{\pi^2}{6}$.
+
+    And this is display style:
+        \begin{equation}
+            \lim_{n \to \infty} \sum_{k=1}^n \frac{1}{k^2} = \frac{\pi^2}{6}
+        \end{equation}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    This is text style:
+    $\lim_{n \to \infty} \sum_{k=1}^n \frac{1}{k^2} = \frac{\pi^2}{6}$.
+
+    And this is display style:
+        \begin{equation}
+            \lim_{n \to \infty} \sum_{k=1}^n \frac{1}{k^2} = \frac{\pi^2}{6}
+        \end{equation}
+\end{quote}
+
+在排版行间公式时，可以把一些比较高的公式放在 \mintinline{LaTeX}{\smash} 命令里，让 \LaTeX 忽略这些公式的高度，使
+行间距保持不变。
+
+示例代码：
+\begin{minted}{LaTeX}
+    A $d_{e_{e_{p_{e_r}}}}$ mathematical expression followed \\
+    by a $h^{i^{g^{h^{e^r}}}}$ expression. As opposed to a \\
+    smashed \smash{$d_{e_{e_{p_{e_r}}}}$} expression followed by a
+    \smash{$h^{i^{g^{h^{e^r}}}}$} \\ expression.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    A $d_{e_{e_{p_{e_r}}}}$ mathematical expression followed \\
+    by a $h^{i^{g^{h^{e^r}}}}$ expression. As opposed to a \\
+    smashed \smash{$d_{e_{e_{p_{e_r}}}}$} expression followed by a
+    \smash{$h^{i^{g^{h^{e^r}}}}$} \\ expression.
+\end{quote}
+
+\subsection{数学模式（Math Mode）}
+当使用 \mintinline{LaTeX}{$} 开启行内公式输入，或是使用 \mintinline{LaTeX}{\[} 命令、\texttt{equation} 环
+境时，就进入了数学模式。数学模式相比于文本模式（text mode）有以下特点:
+\begin{enumerate}
+    \item 大多数的空格、换行都不起作用，数学符号的间隙默认完全由符号的性质（关系符号、运算符等）决定。需要人为引入空
+    隙时，使用 \mintinline{LaTeX}{\,}、\mintinline{LaTeX}{\quad} 和 \mintinline{LaTeX}{\qquad} 等命令
+    \item 不允许有空行、分段
+    \item 所有的字母被当作公式中的变量处理，字母间距与文本模式不一致，也无法生成单词间的空格。如果想在数学公式中输入
+    正体的文本，可以使用 \mintinline{LaTeX}{\text{...}} 命令
+\end{enumerate}
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\forall x \in \mathbf{R}: \qquad x^{2} \geq 0$
+
+    $x^{2} \geq 0\qquad \text{for all }x\in\mathbf{R}$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\forall x \in \mathbf{R}: \qquad x^{2} \geq 0$
+
+    $x^{2} \geq 0\qquad \text{for all }x\in\mathbf{R}$
+\end{quote}
+
+数学家们对应该使用什么符号很挑剔：上面的公式最好使用“blackboard bold”字体，可以使用 \texttt{amssymb} 宏包里的
+\mintinline{LaTeX}{\mathbb} 命令来完成。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $x^{2} \geq 0\qquad \text{for all } x \in \mathbb{R}$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $x^{2} \geq 0\qquad \text{for all } x \in \mathbb{R}$
+\end{quote}
 
 
 
