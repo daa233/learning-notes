@@ -199,7 +199,38 @@
     $x^{2} \geq 0\qquad \text{for all } x \in \mathbb{R}$
 \end{quote}
 
+\section{构建数学公式块}
+在这一小节中大部分的命令都不需要引入 \texttt{amsmath} 宏包。
 
+\subsection{希腊字母}
+小写希腊字母通过 \mintinline{LaTeX}{\alpha}、\mintinline{LaTeX}{\beta}、\mintinline{LaTeX}{\gamma} 等输
+入，大写希腊字母通过 \mintinline{LaTeX}{\Gamma}、\mintinline{LaTeX}{\Delta} 等输入。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\lambda, \xi, \pi, \theta, \mu, \Phi, \Omega, \Delta$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\lambda, \xi, \pi, \theta, \mu, \Phi, \Omega, \Delta$
+\end{quote}
+
+\subsection{指数（Exponents），上标（Superscripts），下标（Subscripts）}
+指数、上标和下标可以分别通过 \mintinline{LaTeX}{^} 和 \mintinline{LaTeX}{_} 指定。大多数的数学模式命令仅对它之后
+的那个字母起作用，所以如果想对多个字母起作用，应该用 \mintinline{LaTeX}|{...}| 括起来。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $p^3_{ij} \qquad m_\text{Knuth}\qquad \sum_{k=1}^3 k \\[5pt]
+    a^x+y \neq a^{x+y}\qquad e^{x^2} \neq {e^x}^2$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $p^3_{ij} \qquad m_\text{Knuth}\qquad \sum_{k=1}^3 k \\[5pt]
+    a^x+y \neq a^{x+y}\qquad e^{x^2} \neq {e^x}^2$
+\end{quote}
 
 
 \end{document}
