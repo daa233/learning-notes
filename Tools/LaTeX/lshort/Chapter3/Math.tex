@@ -12,6 +12,9 @@
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
 \date{\today}
 
+\DeclareMathOperator{\argh}{argh}
+\DeclareMathOperator*{\nut}{Nut}
+
 \begin{document}
 \maketitle
 
@@ -230,6 +233,331 @@
 \begin{quote}
     $p^3_{ij} \qquad m_\text{Knuth}\qquad \sum_{k=1}^3 k \\[5pt]
     a^x+y \neq a^{x+y}\qquad e^{x^2} \neq {e^x}^2$
+\end{quote}
+
+\subsection{根式}
+通过 \mintinline{LaTeX}{\sqrt} 输入平方根（square root）；通过 \mintinline{LaTeX}{\sqrt[n]} 输入n次方根。
+根号的大小是由 \LaTeX 自动决定的，如果只需要一个符号标记，可以用 \mintinline{LaTeX}{\surd} 命令。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\sqrt{x} \Leftrightarrow x^{1/2} \quad \sqrt[3]{2} \quad \sqrt{x^{2} + \sqrt{y}}
+    \quad \surd[x^2 + y^2]$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\sqrt{x} \Leftrightarrow x^{1/2} \quad \sqrt[3]{2} \quad \sqrt{x^{2} + \sqrt{y}}
+    \quad \surd[x^2 + y^2]$
+\end{quote}
+
+\subsection{点}
+示例代码：
+\begin{minted}{LaTeX}
+    $\Psi = v_1 \cdot v_2 \cdot \ldots \qquad n! = 1 \cdot 2 \cdots (n-1) \cdot n
+    \qquad \vdots \qquad \ddots$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\Psi = v_1 \cdot v_2 \cdot \ldots \qquad n! = 1 \cdot 2 \cdots (n-1) \cdot n
+    \qquad \vdots \qquad \ddots$
+\end{quote}
+
+\subsection{横线}
+利用 \mintinline{LaTeX}{\overline} 和 \mintinline{LaTeX}{\underline} 命令来产生上划线和下划线。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $0.\overline{3} = \underline{\underline{1/3}}$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $0.\overline{3} = \underline{\underline{1/3}}$
+\end{quote}
+
+\subsection{水平花括号}
+利用 \mintinline{LaTeX}{\overbrace} 和 \mintinline{LaTeX}{\underbrace} 命令来产生水平的上、下花括号。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\underbrace{\overbrace{a+b+c}^6 \cdot \overbrace{d+e+f}^7}_\text{meaning of life} = 42$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\underbrace{\overbrace{(a+b+c)}^6 \cdot \overbrace{(d+e+f)}^7}_\text{meaning of life} = 42$
+\end{quote}
+
+\subsection{数学重音符号}
+示例代码：
+\begin{minted}{LaTeX}
+    $f(x) = x^2 \qquad f'(x) = 2x \qquad f''(x) = 2\\[5pt]
+    \hat{XY} \quad \widehat{XY} \quad \bar{x_0} \quad \bar{x}_0\\[5pt]
+    \tilde{a} \quad \widetilde{a}$
+\end{minted}
+
+注意：上面示例代码中，\mintinline{LaTeX}{\\} 命令后跟了可选参数 \mintinline{LaTeX}{[5pt]} 来增加额外的行距。
+
+示例输出：
+\begin{quote}
+    $f(x) = x^2 \qquad f'(x) = 2x \qquad f''(x) = 2\\[5pt]
+    \hat{XY} \quad \widehat{XY} \quad \bar{x_0} \quad \bar{x}_0\\[5pt]
+    \tilde{a} \quad \widetilde{a}$
+\end{quote}
+
+\subsection{向量}
+在变量上加箭头来表示向量，可以通过 \mintinline{LaTeX}{\vec} 命令完成。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\vec{a} \qquad \vec{AB} \qquad \overrightarrow{AB}$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\vec{a} \qquad \vec{AB} \qquad \overrightarrow{AB}$
+\end{quote}
+
+\subsection{函数名}
+在排版数学公式时，通常函数名不像变量那样用斜体，所以要用命令来进行区别。下面是 \LaTeX 中常用的函数名命令：
+
+\begin{tabular}{lllllll}
+    \mintinline{LaTeX}{\arccos} & \mintinline{LaTeX}{\cos} & \mintinline{LaTeX}{\csc}
+        & \mintinline{LaTeX}{\exp} & \mintinline{LaTeX}{\ker} & \mintinline{LaTeX}{\limsup} \\
+    \mintinline{LaTeX}{\arcsin} & \mintinline{LaTeX}{\cosh} & \mintinline{LaTeX}{\deg}
+        & \mintinline{LaTeX}{\gcd} & \mintinline{LaTeX}{\lg} & \mintinline{LaTeX}{\ln} \\
+    \mintinline{LaTeX}{\arctan} & \mintinline{LaTeX}{\cot} & \mintinline{LaTeX}{\det}
+        & \mintinline{LaTeX}{\hom} & \mintinline{LaTeX}{\lim} & \mintinline{LaTeX}{\log} \\
+    \mintinline{LaTeX}{\arg} & \mintinline{LaTeX}{\coth} & \mintinline{LaTeX}{\dim}
+        & \mintinline{LaTeX}{\inf} & \mintinline{LaTeX}{\liminf} & \mintinline{LaTeX}{\max} \\
+    \mintinline{LaTeX}{\sinh} & \mintinline{LaTeX}{\sup} & \mintinline{LaTeX}{\tan}
+        & \mintinline{LaTeX}{\tanh} & \mintinline{LaTeX}{\min} & \mintinline{LaTeX}{\Pr} \\
+    \mintinline{LaTeX}{\sec} & \mintinline{LaTeX}{\sin} & & & &
+\end{tabular}
+
+对于上面没有列出的一些函数，可以在导言区用 \mintinline{LaTeX}{\DeclareMathOperator} 或其加星版本的命令来定义。
+加星和不加星版本主要是在显示为行内公式还是行间公式上有区别。
+\footnote{MathJax: \textbackslash DeclareMathOperator and \textbackslash operatorname
+vs starred versions: http://mathb.in/13571}
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        \lim_{x \rightarrow 0} \frac{\sin x}{x} = 1
+    \end{equation*}
+
+    % \DeclareMathOperator{\argh}{argh}
+    % \DeclareMathOperator*{\nut}{Nut}
+    \begin{equation*}
+        3\argh = 2\nut_{x=1}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        \lim_{x \rightarrow 0} \frac{\sin x}{x} = 1
+    \end{equation*}
+
+    % \DeclareMathOperator{\argh}{argh}
+    % \DeclareMathOperator*{\nut}{Nut}
+    \begin{equation*}
+        3\argh = 2\nut_{x=1}
+    \end{equation*}
+\end{quote}
+
+\subsection{取模函数}
+取模函数有两种命令：\mintinline{LaTeX}{\bmod} 和 \mintinline{LaTeX}{\pmod}。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $a\bmod b \\
+     x\equiv a \pmod{b}$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $a\bmod b \\
+     x\equiv a \pmod{b}$
+\end{quote}
+
+\subsection{分式和偏导}
+可以通过 \mintinline{LaTeX}{\frac{...}{...}} 命令来排版分式。在行内公式中，分式会收缩以和所在行保持一致。可以通
+过 \mintinline{LaTeX}{\tfrac} 命令在行间公式中将分式强制显示为行内模式，同样地，也可以通过
+\mintinline{LaTeX}{\dfrac} 命令在行内公式中将分式强制显示为行间模式。一般，在行间公式中更经常使用斜杠的形式来表示
+比较短的分式，如1/2。
+
+示例代码：
+\begin{minted}{LaTeX}
+    In display style:
+    \begin{equation*}
+        3/8 \qquad \frac{3}{8} \qquad \tfrac{3}{8}
+    \end{equation*}
+
+    In text style:
+    $1\frac{1}{2}$~hours \qquad $1\dfrac{1}{2}$~hours
+\end{minted}
+
+示例输出：
+\begin{quote}
+    In display style:
+    \begin{equation*}
+        3/8 \qquad \frac{3}{8} \qquad \tfrac{3}{8}
+    \end{equation*}
+
+    In text style:
+    $1\frac{1}{2}$~hours \qquad $1\dfrac{1}{2}$~hours
+\end{quote}
+
+使用 \mintinline{LaTeX}{\partial} 命令来输入偏导符号。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        \sqrt{\frac{x^2}{k+1}} \qquad x^\frac{2}{k+1} \qquad
+        \frac{\partial^2f}{\partial x^2}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        \sqrt{\frac{x^2}{k+1}} \qquad x^\frac{2}{k+1} \qquad
+        \frac{\partial^2f}{\partial x^2}
+    \end{equation*}
+\end{quote}
+
+\subsection{二项式系数和符号堆叠}
+可以通过 \texttt{amsmath} 宏包里的 \mintinline{LaTeX}{\binom} 命令来排版二项式系数
+（binomial coefficients）。
+
+示例代码：
+\begin{minted}{LaTeX}
+    Pascal's rule is
+    \begin{equation*}
+        \binom{n}{k} = \binom{n-1}{k} + \binom{n-1}{k-1}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Pascal's rule is
+    \begin{equation*}
+        \binom{n}{k} = \binom{n-1}{k} + \binom{n-1}{k-1}
+    \end{equation*}
+\end{quote}
+
+对于一些二元关系，有时候可能需要对符号进行堆叠，这时可以使用 \mintinline{LaTeX}{\stackrel{#1}{#2}} 命令。其中
+\mintinline{LaTeX}{#1} 会变成上标大小，\mintinline{LaTeX}{#2} 会保持原来的大小和位置。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        f_n(x) \stackrel{*}{\approx} 1
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        f_n(x) \stackrel{*}{\approx} 1
+    \end{equation*}
+\end{quote}
+
+\subsection{积分运算符、求和运算符、乘积运算符}
+分别用 \mintinline{LaTeX}{\int}、\mintinline{LaTeX}{\sum}、\mintinline{LaTeX}{\prod} 命令来输入积分运算
+符、求和运算符和乘积运算符。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        \sum_{i=1}^n \qquad \int_0^{\frac{\pi}{2}} \qquad \prod_\epsilon
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        \sum_{i=1}^n \qquad \int_0^{\frac{\pi}{2}} \qquad \prod_\epsilon
+    \end{equation*}
+\end{quote}
+
+在更复杂的表达式中，可以通过 \texttt{amsmath} 宏包中的 \mintinline{LaTeX}{\substack} 命令来更好地控制索引的位
+置。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        \sum^n_{\substack{0<i<n \\ j\subseteq i}} P(i,j) = Q(i,j)
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        \sum^n_{\substack{0<i<n \\ j\subseteq i}} P(i,j) = Q(i,j)
+    \end{equation*}
+\end{quote}
+
+\LaTeX 可以输入各种括号（bracketing）和分隔符（delimiters）。圆括号和方括号可以通过各自的键位输入，花括号需要使用
+\mintinline{LaTeX}|\{| 命令，其他的分隔符都要用特殊的命令（如 \mintinline{LaTeX}{\updownarrow}）。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        {a,b,c} \neq \{a,b,c\}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        {a,b,c} \neq \{a,b,c\}
+    \end{equation*}
+\end{quote}
+
+把 \mintinline{LaTeX}|\left| 命令放在左分隔符前面，把 \mintinline{LaTeX}|\right| 放在右分隔符前面，这样
+\LaTeX 就会自动地调整分隔符的大小。如果不想要右半个分隔符，使用不可见的 \mintinline{LaTeX}|\right.| 命令。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        1 + \left(\frac{1}{1-x^{2}} \right)^3 \qquad
+        \left. \ddagger \frac{~}{~}\right)
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        1 + \left(\frac{1}{1-x^{2}} \right)^3 \qquad
+        \left. \ddagger \frac{~}{~}\right)
+    \end{equation*}
+\end{quote}
+
+在有些情况下，需要通过 \mintinline{LaTeX}|\big|、\mintinline{LaTeX}|\Big|、\mintinline{LaTeX}|\bigg|、
+\mintinline{LaTeX}|\Bigg| 来手动指定分隔符的大小。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\Big((x+1)(x-1)\Big)^{2}$ \\
+    $\big( \Big( \bigg( \Bigg( \quad
+    \big\} \Big\} \bigg\} \Bigg\} \quad
+    \big\| \Big\| \bigg\| \Bigg\| \quad
+    \big\Downarrow \Big\Downarrow
+    \bigg\Downarrow \Bigg\Downarrow$
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\Big((x+1)(x-1)\Big)^{2}$ \\
+    $\big( \Big( \bigg( \Bigg( \quad
+    \big\} \Big\} \bigg\} \Bigg\} \quad
+    \big\| \Big\| \bigg\| \Bigg\| \quad
+    \big\Downarrow \Big\Downarrow
+    \bigg\Downarrow \Bigg\Downarrow$
 \end{quote}
 
 
