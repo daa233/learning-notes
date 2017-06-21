@@ -560,5 +560,73 @@ vs starred versions: http://mathb.in/13571}
     \bigg\Downarrow \Bigg\Downarrow$
 \end{quote}
 
+\section{长公式折行}
+有时候一个等式或方程太长了，有必要使其折行。但是折行会降低等式的可读性，为了提高可读性，在折行时可遵循以下规则：
+
+\begin{enumerate}
+    \item 应该在等号或者某个操作符前折行
+    \item 优先在等号前而不是操作符前折行
+    \item 优先在加号、减号而不是乘号前折行
+    \item 避免其他的折行方式
+\end{enumerate}
+
+实现这种折行的最简单方式是使用 \texttt{amsmath} 宏包中的 \texttt{multline} 环境。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{multline}
+        a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q
+        \\
+        = r + s + t + u + v + w + x + y + z
+    \end{multline}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{multline}
+        a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q
+        \\
+        = r + s + t + u + v + w + x + y + z
+    \end{multline}
+\end{quote}
+
+与之相比，\texttt{equation} 环境可能会引入任意的一个或多个折行。而使用 \texttt{multline} 环境时，仅在需要折行
+的地方使用 \mintinline{LaTeX}{\\} 命令进行折行。和 \texttt{equation*} 类似，\texttt{multline*} 不对公式进
+行编号。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation}
+        a = b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q
+        + r + s + t + u + v + w + x + y + z + aa + bb + cc + dd + ee + ff
+        \label{eq:equation_too_long}
+    \end{equation}
+
+    \begin{multline}
+        a = b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q \\
+        + r + s + t + u + v + w + x + y + z + aa + bb + cc + dd + ee + ff
+        \label{eq:equation_too_long_multl}
+    \end{multline}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation}
+        a = b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q
+        + r + s + t + u + v + w + x + y + z + aa + bb + cc + dd + ee + ff
+        \label{eq:equation_too_long}
+    \end{equation}
+
+    \begin{multline}
+        a = b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q \\
+        + r + s + t + u + v + w + x + y + z + aa + bb + cc + dd + ee + ff
+        \label{eq:equation_too_long_multl}
+    \end{multline}
+\end{quote}
+
+比较公式~\ref{eq:equation_too_long} 和公式~\ref{eq:equation_too_long_multl}，由于等号右边很长，
+公式~\ref{eq:equation_too_long_multl} 的输出更好一些，但是违反了等号优先于加号、减号的规则。更好的解决方案是
+使用 \texttt{IEEEeqnarray} 环境，将在下一小节讨论。
+
 
 \end{document}
