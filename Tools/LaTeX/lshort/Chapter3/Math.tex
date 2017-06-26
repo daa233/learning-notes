@@ -626,7 +626,138 @@ vs starred versions: http://mathb.in/13571}
 
 比较公式~\ref{eq:equation_too_long} 和公式~\ref{eq:equation_too_long_multl}，由于等号右边很长，
 公式~\ref{eq:equation_too_long_multl} 的输出更好一些，但是违反了等号优先于加号、减号的规则。更好的解决方案是
-使用 \texttt{IEEEeqnarray} 环境，将在下一小节讨论。
+使用 \texttt{IEEEeqnarray} 环境，将在第~\ref{sec:mult_eq} 节讨论。
 
+\section{多行公式}
+\label{sec:mult_eq}
+在遇到一些公式中有连等的情况时，我们希望在竖直方向上等号能够对齐。为了应对这个问题，先看一些常用的方法以及它们的不足之
+处。
+
+\subsection{传统命令存在的问题}
+可以使用 \texttt{align} 环境来实现等号的对齐。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{align}
+        a & = b + c \\
+        & = d + e
+    \end{align}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{align}
+        a & = b + c \\
+        & = d + e
+    \end{align}
+\end{quote}
+
+但是在某一行公式过长时，使用 \texttt{align} 环境的输出会出现问题。如下面的示例，\texttt{+ v} 应该和 \texttt{d}
+对齐，而不是和上面的等号对齐。可以通过在它前面加一些空格（\mintinline{LaTeX}|\hspace{...}|）来实现我们想要的效
+果，但是这不够准确。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{align}
+        a & = b + c \\
+        & = d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u \nonumber \\
+        & + v + w + x + y + z + aa + bb + cc \\
+        & = dd + ee + ff + gg + hh + ii
+    \end{align}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{align}
+        a & = b + c \\
+        & = d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u \nonumber \\
+        & + v + w + x + y + z + aa + bb + cc \\
+        & = dd + ee + ff + gg + hh + ii
+    \end{align}
+\end{quote}
+
+\texttt{eqnarray} 环境提供了一种更好的解决方案。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{eqnarray}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u \nonumber \\
+        && +\: v + w + x + y + z + aa + bb + cc \\
+        & = & dd + ee + ff + gg + hh + ii
+    \end{eqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{eqnarray}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + u \nonumber \\
+        && +\: v + w + x + y + z + aa + bb + cc \\
+        & = & dd + ee + ff + gg + hh + ii
+    \end{eqnarray}
+\end{quote}
+
+但使用 \texttt{eqnarray} 环境仍不是最优的解决方案。等号两边的空太大了，而且和 \texttt{multline} 环境、
+\texttt{equation} 环境中的大小不一样。而且有些时候即使左边有足够的空间，右边还是会和公式编号重叠。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{eqnarray}
+        a & = & a = a
+    \end{eqnarray}
+
+    \begin{eqnarray}
+        a & = & b + c
+        \\
+        & = & d + e + f + g + h^2 + i^2 + j + k + l + m + n + o + p + q + r + s + t + u + v
+         + w + x + y + z
+        \label{eq:faultyeqnarray}
+    \end{eqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{eqnarray}
+        a & = & a = a
+    \end{eqnarray}
+
+    \begin{eqnarray}
+        a & = & b + c
+        \\
+        & = & d + e + f + g + h^2 + i^2 + j + k + l + m + n + o + p + q + r + s + t + u + v
+         + w + x + y + z
+        \label{eq:faultyeqnarray}
+    \end{eqnarray}
+\end{quote}
+
+\texttt{eqnarray} 环境提供了 \mintinline{LaTeX}{\lefteqn} 命令，可以在公式的等号左边部分过长时使用。但是这样并
+不是最优的解决方案，而且等号右边部分过短时公式可能不会居中。
+
+\begin{minted}{LaTeX}
+    \begin{eqnarray}
+        \lefteqn{a + b + c + d + e + f + g + h} \nonumber \\
+        & = & i + j + k + l + m \\
+        & = & n + o + p + q + r + s
+    \end{eqnarray}
+
+    \begin{eqnarray}
+        \lefteqn{a + b + c + d + e + f + g + h} \nonumber \\
+        & = & i + j
+    \end{eqnarray}
+\end{minted}
+
+\begin{quote}
+    \begin{eqnarray}
+        \lefteqn{a + b + c + d + e + f + g + h} \nonumber \\
+        & = & i + j + k + l + m \\
+        & = & n + o + p + q + r + s
+    \end{eqnarray}
+
+    \begin{eqnarray}
+        \lefteqn{a + b + c + d + e + f + g + h} \nonumber \\
+        & = & i + j
+    \end{eqnarray}
+\end{quote}
 
 \end{document}
