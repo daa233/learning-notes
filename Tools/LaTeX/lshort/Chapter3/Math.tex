@@ -7,6 +7,7 @@
 \usepackage{minted}
 \usepackage{amsmath}
 \usepackage{amssymb} % to use \mathbb
+\usepackage[retainorgcmds]{IEEEtrantools} % to use \IEEEeqnarray
 
 \title{\heiti Chapter 3 Typesetting Mathematical Formulae}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -734,6 +735,7 @@ vs starred versions: http://mathb.in/13571}
 \texttt{eqnarray} 环境提供了 \mintinline{LaTeX}{\lefteqn} 命令，可以在公式的等号左边部分过长时使用。但是这样并
 不是最优的解决方案，而且等号右边部分过短时公式可能不会居中。
 
+示例代码：
 \begin{minted}{LaTeX}
     \begin{eqnarray}
         \lefteqn{a + b + c + d + e + f + g + h} \nonumber \\
@@ -747,6 +749,7 @@ vs starred versions: http://mathb.in/13571}
     \end{eqnarray}
 \end{minted}
 
+示例输出：
 \begin{quote}
     \begin{eqnarray}
         \lefteqn{a + b + c + d + e + f + g + h} \nonumber \\
@@ -759,5 +762,187 @@ vs starred versions: http://mathb.in/13571}
         & = & i + j
     \end{eqnarray}
 \end{quote}
+
+\subsection{\texttt{IEEEeqnarray} 环境}
+为了使用 \texttt{IEEEeqnarray} 环境，需要在导言区使用一下命令引入 \texttt{IEEEtrantools} 宏包：\\
+\mintinline{LaTeX}|\usepackage[retainorgcmds]{IEEEtrantools}|。
+
+\texttt{IEEEeqnarray} 的一个优点是可以指定公式排列的列数。通常情况下，指定参数为 \texttt{\{rCl\}}，表示总共
+有三列，第一列右对齐，中间列居中（和小写字母c相比，大写字母C还会使其左右两边留有空隙），第三列左对齐。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k \nonumber \\
+        && \negmedspace {} + l + m + n + o \\
+        & = & p + q + r + s
+    \end{IEEEeqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k \nonumber \\
+        && \negmedspace {} + l + m + n + o \\
+        & = & p + q + r + s
+    \end{IEEEeqnarray}
+\end{quote}
+
+可以指定任意多列：\texttt{\{c\}} 表示只有居中的一列；\texttt{\{rCll\}} 会增加左对齐的第四列，一般用于添加注
+释。
+
+\subsection{\texttt{IEEEeqnarray} 环境的一般用法}
+如果某行公式会和公式编号重叠，可以在对应公式行后使用 \mintinline{LaTeX}{\IEEEeqnarraynumspace} 命令来解决。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h^2 + i^2 + j + k + l + m + n + o + p + q + r + s + t + u + v
+         + w + x + y + z
+    \end{IEEEeqnarray}
+
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h^2 + i^2 + j + k + l + m + n + o + p + q + r + s + t + u + v
+         + w + x + y + z \IEEEeqnarraynumspace
+    \end{IEEEeqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h^2 + i^2 + j + k + l + m + n + o + p + q + r + s + t + u + v
+         + w + x + y + z
+    \end{IEEEeqnarray}
+
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h^2 + i^2 + j + k + l + m + n + o + p + q + r + s + t + u + v
+         + w + x + y + z \IEEEeqnarraynumspace
+    \end{IEEEeqnarray}
+\end{quote}
+
+如果等号左边部分过长，\texttt{IEEEeqnarray} 提供了 \mintinline{LaTeX}{\IEEEeqnarraymulticol} 命令来取
+代有缺陷的 \mintinline{LaTeX}{\lefteqn} 命令。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{IEEEeqnarray}{rCl}
+        \IEEEeqnarraymulticol{3}{l}{
+            a + b + c + d + e + f + g + h
+        } \nonumber \\ \quad
+        & = & i + j \\
+        & = & k + l + m
+    \end{IEEEeqnarray}
+
+    \begin{IEEEeqnarray}{rCl}
+        \IEEEeqnarraymulticol{3}{l}{
+            a + b + c + d + e + f + g + h
+        } \nonumber \\ \qquad \qquad
+        & = & i + j \\
+        & = & k + l + m
+    \end{IEEEeqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{IEEEeqnarray}{rCl}
+        \IEEEeqnarraymulticol{3}{l}{
+            a + b + c + d + e + f + g + h
+        } \nonumber \\ \quad
+        & = & i + j \\
+        & = & k + l + m
+    \end{IEEEeqnarray}
+
+    \begin{IEEEeqnarray}{rCl}
+        \IEEEeqnarraymulticol{3}{l}{
+            a + b + c + d + e + f + g + h
+        } \nonumber \\ \qquad \qquad
+        & = & i + j \\
+        & = & k + l + m
+    \end{IEEEeqnarray}
+\end{quote}
+
+\mintinline{LaTeX}{\IEEEeqnarraymulticol} 的用法和 \texttt{tabular} 环境中
+\mintinline{LaTeX}{\multicolumns} 命令的用法是相同的。第一个参数 \texttt{\{3\}} 指定三列合并为一列，
+\texttt{\{l\}} 参数指定其左对齐。可以通过 \mintinline{LaTeX}{\quad} 等命令可以方便地控制等号的缩进。
+
+如果公式折成了两行或多行，\LaTeX 会把首个 $+$ 或者 $-$ 作为一个标识符，而不是运算符。因此需要在运算符和操作数之
+间插入额外的空格。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k \nonumber \\
+        && + l + m + n + o \\
+        & = & p + q + r + s
+    \end{IEEEeqnarray}
+
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k \nonumber \\
+        && \negmedspace {} + l + m + n + o \\ % negative medium space
+        & = & p + q + r + s
+    \end{IEEEeqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k \nonumber \\
+        && + l + m + n + o \\
+        & = & p + q + r + s
+    \end{IEEEeqnarray}
+
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \\
+        & = & d + e + f + g + h + i + j + k \nonumber \\
+        && \negmedspace {} + l + m + n + o \\
+        & = & p + q + r + s
+    \end{IEEEeqnarray}
+\end{quote}
+
+\texttt{IEEEeqnarray} 环境也有加星版本，会省略所有的公式编号，但可以使用
+\mintinline{LaTeX}{\IEEEyesnumber} 和 \mintinline{LaTeX}{\IEEEyessubnumber}
+命令来显示某行公式的编号或子编号。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{IEEEeqnarray*}{rCl}
+        a & = & b + c \\
+        & = & d + e \IEEEyesnumber \\
+        & = & f + g
+    \end{IEEEeqnarray*}
+
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \IEEEyessubnumber \\
+        & = & d + e \nonumber \\
+        & = & f + g \IEEEyessubnumber
+    \end{IEEEeqnarray}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{IEEEeqnarray*}{rCl}
+        a & = & b + c \\
+        & = & d + e \IEEEyesnumber \\
+        & = & f + g
+    \end{IEEEeqnarray*}
+
+    \begin{IEEEeqnarray}{rCl}
+        a & = & b + c \IEEEyessubnumber \\
+        & = & d + e \nonumber \\
+        & = & f + g \IEEEyessubnumber
+    \end{IEEEeqnarray}
+\end{quote}
+
+
+
 
 \end{document}
