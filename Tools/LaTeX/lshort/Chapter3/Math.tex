@@ -942,6 +942,83 @@ vs starred versions: http://mathb.in/13571}
     \end{IEEEeqnarray}
 \end{quote}
 
+\section{数组和矩阵}
+可以通过 \texttt{array} 环境来排版数组，它的工作方式和 \texttt{tabular} 环境类似。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        \mathbf{X} = \left(
+            \begin{array}{ccc}
+                x_1 & x_2 & \ldots \\
+                x_3 & x_4 & \ldots \\
+                \vdots & \vdots & \ddots
+            \end{array} \right)
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        \mathbf{X} = \left(
+            \begin{array}{ccc}
+                x_1 & x_2 & \ldots \\
+                x_3 & x_4 & \ldots \\
+                \vdots & \vdots & \ddots
+            \end{array} \right)
+    \end{equation*}
+\end{quote}
+
+通过将 \texttt{.} 作为一个不可见的右分隔符，\texttt{array} 环境也可以用于排版分段函数（piecewise functions）。
+\texttt{amsmath} 宏包中的 \texttt{cases} 环境也可以实现类似的效果，且语法更为简洁。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        |x| = \left\{
+            \begin{array}{rl}
+                -x & \text{if } x < 0, \\
+                0 & \text{if } x = 0, \\
+                x & \text{if } x > 0.
+            \end{array} \right.
+    \end{equation*}
+
+    \begin{equation*}
+        |x| =
+        \begin{cases}
+            -x & \text{if } x < 0, \\
+            0 & \text{if } x = 0, \\
+            x & \text{if } x > 0.
+        \end{cases}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        |x| = \left\{
+            \begin{array}{rl}
+                -x & \text{if } x < 0, \\
+                0 & \text{if } x = 0, \\
+                x & \text{if } x > 0.
+            \end{array} \right.
+    \end{equation*}
+
+    \begin{equation*}
+        |x| =
+        \begin{cases}
+            -x & \text{if } x < 0, \\
+            0 & \text{if } x = 0, \\
+            x & \text{if } x > 0.
+        \end{cases}
+    \end{equation*}
+\end{quote}
+
+可以通过 \texttt{array} 环境来排版矩阵，但是 \texttt{amsmath} 提供了一系列的 \texttt{matrix} 环境，可以更好
+地排版矩阵。共有六种不同的分隔符：\texttt{matrix}（无）、\texttt{pmatrix}（(）、\texttt{bmatrix}（[）、
+\texttt{Bmatrix}（\{）、\texttt{vmatrix}（|） 和 \texttt{Vmatrix}（||）。和 \texttt{array} 环境不同，
+\texttt{matrix} 环境不需要指定列数，最大列数为10。
+
 
 
 
