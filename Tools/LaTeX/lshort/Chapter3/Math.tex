@@ -1019,6 +1019,33 @@ vs starred versions: http://mathb.in/13571}
 \texttt{Bmatrix}（\{）、\texttt{vmatrix}（|） 和 \texttt{Vmatrix}（||）。和 \texttt{array} 环境不同，
 \texttt{matrix} 环境不需要指定列数，最大列数为10。
 
+\section{数学模式中的空格}
+如果 \LaTeX 数学公式中的空格不能满足要求，可以通过插入一些特殊的命令进行调整。\mintinline{LaTeX}{\,} 命令对应
+$\frac{3}{18}$ 个quad；\mintinline{LaTeX}{\:} 命令对应 $\frac{4}{18}$ 个 quad；
+\mintinline{LaTeX}{\;} 命令对应 $\frac{5}{18}$ 个quad；转移空格字符（escaped space character）
+\verb*|\ | 会产生一个和单词间距大小相当的空格；\mintinline{LaTeX}{\quad} 会产生一个当前字体下‘M’字母宽度的空格，
+\mintinline{LaTeX}{\qquad} 相当于两个 \mintinline{LaTeX}{\quad}；\mintinline{LaTeX}{\!}
+命令会产生一个$-\frac{3}{18}$ 个quad。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        \int_1^2 \ln x \mathrm{d}x
+        \qquad
+        \int_1^2 \ln x \, \mathrm{d}x
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        \int_1^2 \ln x \mathrm{d}x
+        \qquad
+        \int_1^2 \ln x \, \mathrm{d}x
+    \end{equation*}
+\end{quote}
+
+
 
 
 
