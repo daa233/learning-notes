@@ -1,4 +1,4 @@
-# LearningNotes
+# 学习笔记
 这里记录了我的一些学习笔记，分为**Profession**、**Programming**、**Tools**三个部分。  
 **Profession**主要是和我研究生阶段的研究方向相关的一些笔记，**Programming**部分是我学习算法和编程语言的记录，而**Tools**则包含一些我经常用到的工具的使用方法和技巧。  
 
