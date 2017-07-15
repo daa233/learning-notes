@@ -1094,5 +1094,65 @@ $\frac{3}{18}$ 个quad；\mintinline{LaTeX}{\:} 命令对应 $\frac{4}{18}$ 个 
 
 \texttt{mhchem} 宏包可以更方便地输入同位素和化学方程式。
 
+\section{折腾数学字体}
+示例代码：
+\begin{minted}{LaTeX}
+    $\Re \qquad \mathcal{R} \qquad \mathfrak{R} \qquad \mathbb{R} \qquad $
+\end{minted}
+
+示例输出：
+\begin{quote}
+    $\Re \qquad \mathcal{R} \qquad \mathfrak{R} \qquad \mathbb{R} \qquad $
+\end{quote}
+
+上面的后两种字体命令需要用到 \texttt{amssymb} 或 \texttt{amsfonts} 宏包。
+
+有时候需要给 \LaTeX 指定合适的字体大小。在数学模式中，可以通过以下的命令进行设定：\\
+\mintinline{LaTeX}{\displaystyle}（$\displaystyle 123$），
+\mintinline{LaTeX}{\textstyle}（$\textstyle 123$），
+\mintinline{LaTeX}{\scriptstyle}（$\scriptstyle 123$），
+\mintinline{LaTeX}{\scriptscriptsytle}（$\scriptscriptstyle 123$）。
+
+如果 $\sum$ 符号放在分式中，它会默认排版成文本模式，所以可以根据需要用 \mintinline{LaTeX}{\displaystyle}
+进行指定。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        P = \frac{\displaystyle{\sum_{i=1}^n (x_i-x)(y_i-y)}}
+            {\displaystyle{\left[\sum_{i=1}^n(x_i-x)^2 \sum_{i=1}^n(y_i-y)^2 \right]^{1/2}}}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        P = \frac{\displaystyle{\sum_{i=1}^n (x_i-x)(y_i-y)}}
+            {\displaystyle{\left[\sum_{i=1}^n(x_i-x)^2 \sum_{i=1}^n(y_i-y)^2 \right]^{1/2}}}
+    \end{equation*}
+\end{quote}
+
+\subsection{粗体符号}
+在 \LaTeX 中打印粗体符号有一些困难。\mintinline{LaTeX}{\mathbf} 命令可以打印粗体的的英文字母，但是打印出的是罗马
+字体的，而数学公式中的字母大都是斜体的，而且该命令对希腊字母无效。\mintinline{LaTeX}{\boldmath} 命令可以打印粗体
+的英文字母和希腊字母，但是它不能用在数学公式中，只能包裹在数学公式外面。
+
+\texttt{amsbsy} 宏包（包含于 \texttt{amsmath}）和 \texttt{bm} 宏包（包含于 \texttt{tools}）中都有一个
+\mintinline{LaTeX}{boldsymbol} 命令，可以比较方便地打印粗体符号。
+
+示例代码：
+\begin{minted}{LaTeX}
+    $\mu, M \qquad \mathbf{\mu}, \mathbf{M}$
+    \qquad \boldmath{$\mu, M$}
+    $\qquad \boldsymbol{\mu}, \boldsymbol{M}$
+\end{minted}
+
+\begin{quote}
+    $\mu, M \qquad \mathbf{\mu}, \mathbf{M}$
+    \qquad \boldmath{$\mu, M$}
+    $\qquad \boldsymbol{\mu}, \boldsymbol{M}$
+\end{quote}
+
+
 
 \end{document}
