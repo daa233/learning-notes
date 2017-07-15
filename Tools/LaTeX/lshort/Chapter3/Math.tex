@@ -1045,8 +1045,54 @@ $\frac{3}{18}$ 个quad；\mintinline{LaTeX}{\:} 命令对应 $\frac{4}{18}$ 个 
     \end{equation*}
 \end{quote}
 
+注意微分运算中的字母‘d’一般用罗马字体。下面的例子会定义一个新命令 \mintinline{LaTeX}{\ud}（upright d），可以实现
+相同的效果。
 
+示例代码：
+\begin{minted}{LaTeX}
+    \newcommand{\ud}{\, \mathrm{d}}
 
+    \begin{IEEEeqnarray*}{c}
+        \int\int f(x)g(y) \ud x \ud y \\
+        \int\!\!\!\int f(x)g(y) \ud x \ud y \\
+        \iint f(x)g(y) \ud x \ud y
+    \end{IEEEeqnarray*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \newcommand{\ud}{\, \mathrm{d}}
+
+    \begin{IEEEeqnarray*}{c}
+        \int\int f(x)g(y) \ud x \ud y \\
+        \int\!\!\!\int f(x)g(y) \ud x \ud y \\
+        \iint f(x)g(y) \ud x \ud y
+    \end{IEEEeqnarray*}
+\end{quote}
+
+\subsection{幽灵（Phantoms）}
+\mintinline{LaTeX}{\phantom} 命令可以为其中的内容保留位置，但这些内容又不会在最终的输出中出现。下面的例子可以帮助
+我们很好地理解它的用途。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{equation*}
+        {}^{14}_{6}\text{C}
+        \qquad \text{versus} \qquad
+        {}^{14}_{\phantom{1}6}\text{C}
+    \end{equation*}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{equation*}
+        {}^{14}_{6}\text{C}
+        \qquad \text{versus} \qquad
+        {}^{14}_{\phantom{1}6}\text{C}
+    \end{equation*}
+\end{quote}
+
+\texttt{mhchem} 宏包可以更方便地输入同位素和化学方程式。
 
 
 \end{document}
