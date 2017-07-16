@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb} % to use \mathbb
 \usepackage[retainorgcmds]{IEEEtrantools} % to use \IEEEeqnarray
+\usepackage{amsthm}
 
 \title{\heiti Chapter 3 Typesetting Mathematical Formulae}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -1153,6 +1154,288 @@ $\frac{3}{18}$ 个quad；\mintinline{LaTeX}{\:} 命令对应 $\frac{4}{18}$ 个 
     $\qquad \boldsymbol{\mu}, \boldsymbol{M}$
 \end{quote}
 
+\section{定理（theorems），引理（Lemmas）……}
+在撰写数学文档的时候，可能需要排版引理、定义、公理等。可以通过下面的命令来完成：
+\begin{minted}{LaTeX}
+    \newtheorem{name}[counter]{text}[section]
+\end{minted}
 
+其中，\emph{name} 参数是我们定义定理的名称，作为一个环境来使用；\emph{text} 参数是定理真正的名字，会显示在
+最终的文档中。方括号中的参数是可选的，定理的序号由两个可选参数之一决定，它们不能同时使用。\emph{section} 为章节
+名称，使定理序号成为章节的下一级序号。\emph{counter} 可以为用 \mintinline{LaTeX}{\newcounter} 自定义的计数器
+名称，定理序号由这个计数器管理；也可以为前面定义的“theorem”的名称。如果两个参数都不用的话，则使用一个默认的计数器。
+
+例如，我们用 \mintinline{LaTeX}{\newtheorem{mythm}{My Theorem}[section]} 命令定义了一个
+\texttt{mythem} 环境，然后就可以用它来排版定理。定理带有一个可选参数，可以用于注明定理的名称。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \newtheorem{mythm}{My Theorem}[section]
+
+    \begin{mythm}
+        \label{thm:light}
+        The light speed in vaccum is $299,792,458\,\mathrm{m/s}$.
+    \end{mythm}
+
+    \begin{mythm}[Energy]
+        The relationship of energy, momentum and mass is
+            \[E^2 = m_0^2 c^4 + p^2 c^2\]
+        where $c$ is the light speed described in theorem \ref{thm:light}.
+    \end{mythm}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \newtheorem{mythm}{My Theorem}[section] % custom theorem
+
+    \begin{mythm}
+        \label{thm:light}
+        The light speed in vaccum is $299,792,458\,\mathrm{m/s}$.
+    \end{mythm}
+
+    \begin{mythm}[Energy]
+        The relationship of energy, momentum and mass is
+            \[E^2 = m_0^2 c^4 + p^2 c^2\]
+        where $c$ is the light speed described in theorem \ref{thm:light}.
+    \end{mythm}
+\end{quote}
+
+\texttt{amsthm} 宏包提供了 \mintinline{LaTeX}|\theoremstyle{style}| 命令，可以定义不同的 theorem 类型，包括
+\texttt{definition}、\texttt{plain}、\texttt{remark} 三种。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \theoremstyle{definition}   \newtheorem{law}{Law}
+    \theoremstyle{plain}        \newtheorem{jury}[law]{Jury}
+    \theoremstyle{remark}       \newtheorem*{marg}{Margaret}
+
+    \begin{law}
+        \label{law:box}
+        Don't hide in the witness box
+    \end{law}
+    \begin{jury}[The Twelve]
+        It could be you! So beware and see law~\ref{law:box}.
+    \end{jury}
+    \begin{jury}
+        You will disregard the last statement.
+    \end{jury}
+    \begin{marg}No, No, No \end{marg}
+    \begin{marg}Denis! \end{marg}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \theoremstyle{definition}   \newtheorem{law}{Law}
+    \theoremstyle{plain}        \newtheorem{jury}[law]{Jury}
+    \theoremstyle{remark}       \newtheorem*{marg}{Margaret}
+
+    \begin{law}
+        \label{law:box}
+        Don't hide in the witness box
+    \end{law}
+    \begin{jury}[The Twelve]
+        It could be you! So beware and see law~\ref{law:box}.
+    \end{jury}
+    \begin{jury}
+        You will disregard the last statement.
+    \end{jury}
+    \begin{marg}No, No, No \end{marg}
+    \begin{marg}Denis! \end{marg}
+\end{quote}
+
+在上面的示例中，“Jury”定理和“Law”定理用了相同的 \emph{counter} 参数，所以“Jury”的编号是接着“Law”的。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \newtheorem{mur}{Murphy}[section]
+
+    \begin{mur}
+        If there are two or more ways to do something, and one of those ways can
+        result in a catastrophe, then someone will do it.
+    \end{mur}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \newtheorem{mur}{Murphy}[section]
+
+    \begin{mur}
+        If there are two or more ways to do something, and one of those ways can
+        result in a catastrophe, then someone will do it.
+    \end{mur}
+\end{quote}
+
+上面示例中的“Murphy”定理由于定义时指定了 \emph{section} 参数，所以它的编号和当前章节有关。\emph{section} 参数
+也可以换成 \emph{chapter} 或 \emph{subsection}。
+
+\subsection{证明（Proofs）和证毕符号（End-of-Proof Symbol）}
+\texttt{amsthm} 宏包也提供了 \texttt{proof} 环境。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{proof}
+        Trival, use
+        \begin{equation*}
+            E = mc^2.
+        \end{equation*}
+    \end{proof}
+
+    \begin{proof}
+        Trival, use
+        \begin{equation*}
+            E = mc^2. \qedhere
+        \end{equation*}
+    \end{proof}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{proof}
+        Trival, use
+        \begin{equation*}
+            E = mc^2.
+        \end{equation*}
+    \end{proof}
+
+    \begin{proof}
+        Trival, use
+        \begin{equation*}
+            E = mc^2. \qedhere
+        \end{equation*}
+    \end{proof}
+\end{quote}
+
+如果行末是一个不带编号的公式，证毕符号会另起一行，这时可以使用 \mintinline{LaTeX}{\qedhere} 命令将证毕符号放在
+公式末尾。\mintinline{LaTeX}{\qedhere} 命令对 \texttt{IEEEeqnarray} 无效。这是由于 \texttt{IEEEeqnarray}
+的内部结构导致的。为了保证公式可以水平居中，\texttt{IEEEeqnarray} 在公式块两边各加了一列。这两列只包含一个可以拉伸的
+空格，是不可见的，因此 \mintinline{LaTeX}{\qedhere} 命令无法放在可拉伸空格的外面。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{proof}
+        This is a proof that ends with an equation array:
+        \begin{IEEEeqnarray*}{rCl}
+            a & = & b + c \\
+            & = & d + e. \qedhere
+        \end{IEEEeqnarray*}
+    \end{proof}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{proof}
+        This is a proof that ends with an equation array:
+        \begin{IEEEeqnarray*}{rCl}
+            a & = & b + c \\
+            & = & d + e. \qedhere
+        \end{IEEEeqnarray*}
+    \end{proof}
+\end{quote}
+
+对于上面的问题，有一种简单的解决方法，即对可拉伸的空格进行明确指定。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{proof}
+        This is a proof that ends with an equation array:
+        \begin{IEEEeqnarray*}{+rCl+x*}
+            a & = & b + c \\
+            & = & d + e. & \qedhere
+        \begin{IEEEeqnarray*}
+    \end{proof}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{proof}
+        This is a proof that ends with an equation array:
+        \begin{IEEEeqnarray*}{+rCl+x*}
+            a & = & b + c \\
+            & = & d + e. & \qedhere
+        \end{IEEEeqnarray*}
+    \end{proof}
+\end{quote}
+
+\texttt{\{+rCl+x*\}} 中的 \texttt{+} 表示可拉伸的空格，在公式左右各一列。现在又在右边可拉伸的空格外加了一个空白列
+\texttt{x}，这一列只有最后一行的 \mintinline{LaTeX}{\qedhere} 命令需要。最后又指定一个 \texttt{*}，表示没有
+空格，防止 \texttt{IEEEeqnarray} 在最右边添加额外的 \texttt{+} 空格。
+
+对于有编号的公式，也有类似的问题和解决方法。
+
+示例代码：
+\begin{minted}{LaTeX}
+    % Wrong with equation
+    \begin{proof}
+        This is a proof that ends with a nubmered equation:
+        \begin{equation}
+            a = b + c.
+        \end{equation}
+    \end{proof}
+
+    % Right with equation
+    \begin{proof}
+        This is a proof that ends with a nubmered equation:
+        \begin{equation}
+            a = b + c. \qedhere
+        \end{equation}
+    \end{proof}
+
+    % Wrong with IEEEeqnarray
+    \begin{proof}
+        This is a proof that ends with a equation array:
+        \begin{IEEEeqnarray}{rCl}
+            a & = & b + c \\
+            & = & d + e.
+        \end{IEEEeqnarray}
+    \end{proof}
+
+    % Right with IEEEeqnarray
+    \begin{proof}
+        This is a proof that ends with an equation array:
+        \begin{IEEEeqnarray}{+rCl+x*}
+            a & = & b + c \\
+            & = & d + e. \\
+            &&& \qedhere \nonumber
+        \end{IEEEeqnarray}
+    \end{proof}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    % Wrong with equation
+    \begin{proof}
+        This is a proof that ends with a nubmered equation:
+        \begin{equation}
+            a = b + c.
+        \end{equation}
+    \end{proof}
+
+    % Right with equation
+    \begin{proof}
+        This is a proof that ends with a nubmered equation:
+        \begin{equation}
+            a = b + c. \qedhere
+        \end{equation}
+    \end{proof}
+
+    % Wrong with IEEEeqnarray
+    \begin{proof}
+        This is a proof that ends with a equation array:
+        \begin{IEEEeqnarray}{rCl}
+            a & = & b + c \\
+            & = & d + e.
+        \end{IEEEeqnarray}
+    \end{proof}
+
+    % Right with IEEEeqnarray
+    \begin{proof}
+        This is a proof that ends with an equation array:
+        \begin{IEEEeqnarray}{+rCl+x*}
+            a & = & b + c \\
+            & = & d + e. \\
+            &&& \qedhere \nonumber
+        \end{IEEEeqnarray}
+    \end{proof}
+\end{quote}
 
 \end{document}
