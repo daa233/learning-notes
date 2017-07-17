@@ -1,19 +1,19 @@
 # 第1章 关于 LaTeX 你不得不知道的事
 
-LaTeX作者： Donald E. Knuth(高德纳)  
-LaTeX读音：“Lay-tech”或者“Lah-tech”
-LaTeX2e读作： “Lay-tech two e”
+LaTeX 作者： Donald E. Knuth(高德纳)  
+LaTeX 读音：“Lay-tech”或者“Lah-tech”
+LaTeX2e 读作： “Lay-tech two e”
 
 WYSIWYG：*What you see is what you get.* 当前大多数文字处理软件的理念，如 MS Word，LibreOffice。
 
-## LaTeX的优缺点
+## 1. LaTeX 的优缺点
 > *When people from the WYSIWYG world meet people who use LATEX, they
 often discuss “the advantages of LATEX over a normal word processor” or the
 opposite. The best thing to do when such a discussion starts is to keep a low
 profile(保持低调), since such discussions often get out of hand. But sometimes there is
 no escaping...*
 
-### 优点
+### 1.1 优点
 - 可以获得专业的布局，让文档宛如印刷品一般精美
 - 方便地排版数学公式
 - 只需学几个简单的命令就能明确文档的逻辑结构，几乎不用对文档的布局修修补补
@@ -22,29 +22,29 @@ no escaping...*
 - 促使用户写出结构良好的文档——而这也是LaTeX存在的初衷
 - 跨平台，完全免费，容易获得
 
-### 缺点
-- 对于那些已经出卖了灵魂的人来说，LaTeX可能会不好使
-- 排查错误困难。LaTeX作为一个依靠编写代码工作的排版工具，其使用的宏语言比 C++ 或 Python 等程序设计语言在错误排查方面困难得多。它虽然能够提示错误，但不提供调试的机制，有时错误提示还很难理解
+### 1.2 缺点
+- 对于那些已经出卖了灵魂的人来说，LaTeX 可能会不好使
+- 排查错误困难。LaTeX 作为一个依靠编写代码工作的排版工具，其使用的宏语言比 C++ 或 Python 等程序设计语言在错误排查方面困难得多。它虽然能够提示错误，但不提供调试的机制，有时错误提示还很难理解
 - 在一个提前设计好的文档布局里改参数很容易，但设计一个新的布局比较困难，需要花费较多的时间
 - 相比“所见即所得”的模式有一些不便，为了查看生成的文档，用户总要不停地编译
 - 若是浅尝辄止，终不能领悟“逻辑标记”的真谛（*Your hamster might, despite some encouraging first steps, never be able to fully grasp the concept of Logical Markup*）
 
-## LaTeX输入文件
+## 2. LaTeX 输入文件
 LaTeX的输入文件是纯文本文件。
-### 空格
+### 2.1 空格
 - “Whitespace”字符，如空白、Tab符等都会被 LaTeX 认为是空格
-- 几个连续的空格会被LaTeX当作一个空格
+- 几个连续的空格会被 LaTeX 当作一个空格
 - 每一行开头的空格会被忽略，末尾的断行符`\\`会被当作空格
 - 一个空行是一个段落结束的标志
 - 几个空行视为一个空行
 
-### 特殊字符
+### 2.2 特殊字符
 保留字符：`#` `$` `^` `&` `_` `{` `}` `~` `\`  
 保留字符有特殊含义，任何字体下直接输入都不会打印，但可以通过加反斜杠`\`的方式打印这些特殊字符。  
 打印保留字符：`\#` `\$` `\%` `\^` `\&` `\_` `\{` `\}` `\textbackslash`  
 注意：不能通过`\\`来输入`\`，而应该使用`\textbackslash`，`\\`用于断行。
 
-### LaTeX命令
+### 2.3 LaTeX 命令
 LaTeX 命令是区分大小写的。
 LaTeX 命令以反斜线 \ 开头，为以下两种形式之一：
 - 反斜线和后面的一串字母，如 `\LaTeX`。它们以任意非字母符号（空格、数字、标点等）作为分隔符。如`\textsl{}`、`\newline`命令。
@@ -56,10 +56,10 @@ LaTeX会忽略掉命令后的空白符。如果想在命令后添加空格，可
 还有些命令在命令名称后可以带一个星号 `*`，带星号和不带星号的命令效果有一定差异。
 LaTeX 还引入了环境的用法，用以令一些效果在局部生效，或是生成特定的文档元素。LaTeX 环境的用法为一对命令 `\begin` 和 `\end`。  
 
-### LaTeX注释
+### 2.4 LaTeX 注释
 利用 `%` 进行单行注释，引入 `verbatim` 宏包（`\usepackage{verbatim}`）后，可以在 `\begin{comment}` 和 `\end{comment}` 之间加入多行注释。
 
-## LaTeX输入文件结构
+## 3. LaTeX 输入文件结构
 ```
 \documentclass{...}
 \usepackage{...}
@@ -69,7 +69,7 @@ LaTeX 还引入了环境的用法，用以令一些效果在局部生效，或�
 \end{document}
 ```
 
-## LaTeX布局
+## 4. LaTeX 布局
 典型命令：`\documentclass[options]{class}`  
 `class` 指定文档类型，包含以下几种类型：
 - `article` 文章格式的文档类，广泛用于科技论文、报告、说明文档等
