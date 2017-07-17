@@ -1,4 +1,4 @@
-# Chapter 1 Things You Need to Know
+# 第1章 关于 LaTeX 你不得不知道的事
 
 LaTeX作者： Donald E. Knuth(高德纳)  
 LaTeX读音：“Lay-tech”或者“Lah-tech”
