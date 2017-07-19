@@ -20,10 +20,38 @@
 在编写大型文档的时候，\LaTeX 还提供了一些像创建索引、管理参考文献等一些特色功能，详情见 \emph{\LaTeX Manual} 和
 \emph{The \LaTeX Companion}。
 
+\section{包含 Encapsulated PostScript}
+借助 \texttt{figure} 和 \texttt{table} 环境，\LaTeX 能够支持一些像图像、图形这种简单的浮动体。
 
+在基本的 \LaTeX 中或 \LaTeX 的扩展包中，有很多种方法能够生成一些实际的图形。一种比较简单的方法是，通过一些专业软件生
+成这些图形，然后将它们包含到文档中。这里我们仅讨论使用 Encapsulated PostScript（EPS）来生
+成图形，因为这种方法非常简单，而且获得了广泛的应用。为了使用 EPS 格式的图片，必须要有 PostScript 打印机来输出。
 
+D. P. Carlisle 开发的 \texttt{graphicx} 宏包提供了很多包含图片的命令，这个宏包属于“graphics”宏集。
 
+假设现在的系统有可以输出 PostScript 打印机，也安装好了 \texttt{graphicx} 宏包，可以根据下面的步骤在文档中包含图
+片：
+\begin{enumerate}
+    \item 通过画图程序输出 EPS 格式的图片。
+    \item 通过 \mintinline{LaTeX}|\usepackage[driver]{graphicx}| 命令，在导言区引入 \texttt{graphicx}
+    宏包。 \\
+    其中 \emph{driver} 是 dvi 转 PostScript 的转换程序，最常用的一种叫 \texttt{dvips}。知道
+    \emph{driver} 的名字后，\texttt{graphicx} 宏包就可以选择正确的方法来将图形信息插入到 \texttt{.dvi} 文件
+    中，然后打印机就能理解它并且正确地包含 \texttt{.eps} 文件。
+    \item 在文档中使用 \mintinline{LaTeX}|\includegraphics[key=value, ...]{file}| 来包含 \emph{file}。
+    \\ 命令中的可选参数允许有多个，之间用逗号隔开。\emph{key} 可以是 \texttt{width}、\texttt{height}、
+    \texttt{angle}、\texttt{scale} 等参数，用于对包含的图形进行调整。
+\end{enumerate}
 
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{figure}
+        \centering
+        \includegraphics[angle=90, width=0.5\textwidth]{test}
+        \caption{This is a test.}
+    \end{figure}
+\end{minted}
 
-
+上面的代码包含了存储好的 \texttt{test.eps} 图片。图片旋转了90度，并且图片的宽度缩放到了标准图片的0.5倍。由于没有
+指定高度，所以默认宽高比是1。宽度和高度也可以指定为具体的长度。
 \end{document}
