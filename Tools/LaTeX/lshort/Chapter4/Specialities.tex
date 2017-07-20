@@ -5,10 +5,12 @@
 \usepackage{geometry}
 \geometry{a4paper, centering, scale=0.8}
 \usepackage{minted}
+\usepackage{float}
 
 \title{\heiti 第4章 \quad 特色功能}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
 \date{\today}
+
 
 \begin{document}
 \maketitle
@@ -80,7 +82,40 @@ Partl~\cite{pa} has proposed that \ldots
 对于更大型的项目，使用 Bib\TeX 是更好的选择。可以利用 Bib\TeX 建立一个参考文献数据库，然后再在文档中引用相关的文献。
 Bib\TeX 产生的参考文献格式是通过样式文件定义的，网上有很多现成的样式文件可供选择。
 
+\section{索引}
+索引是一个非常有用的功能，在很多书中都能看到它。\LaTeX 中有个 \texttt{makeindex} 程序，可以方便地建立索引。这里仅
+介绍基本的索引生成命令，更多内容见 \emph{The \LaTeX Companion}。
 
+为了建立索引，需要在导言区通过 \mintinline{LaTeX}|\usepackage{makeindex}| 命令来引入 \texttt{makeidx} 宏
+包，然后再在导言区中加入 \mintinline{LaTeX}{\makeindex} 命令来开启这项功能。
+
+在正文中需要建立索引的地方，通过 \mintinline{LaTeX}|\index{key@formatted_entry}| 命令添加索引项。
+可选参数 \emph{formatted\_entry} 会出现在建立索引的地方；参数 \emph{key} 用来排序。表~\ref{tab:index}
+是索引项的写法示例。
+
+\begin{table}[H]
+\caption{索引项写法示例}
+\label{tab:index}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+  \textbf{Example} &\textbf{Index Entry} &\textbf{Comment}\\\hline
+  \rule{0pt}{1.05em}\verb|\index{hello}| &hello, 1 &Plain entry\\
+\verb|\index{hello!Peter}|   &\hspace*{2ex}Peter, 3 &Subentry under `hello'\\
+\verb|\index{Sam@\textsl{Sam}}|     &\textsl{Sam}, 2& Formatted entry\\
+\verb|\index{Lin@\textbf{Lin}}|     &\textbf{Lin}, 7& Formatted entry\\
+\verb|\index{Kaese@K\"ase}|     &\textbf{K\"ase}, 33& Formatted entry\\
+\verb.\index{ecole@\'ecole}.     &\'ecole, 4& Formatted entry\\
+\verb.\index{Jenny|textbf}.     &Jenny, \textbf{3}& Formatted page number\\
+\verb.\index{Joe|textit}.     &Joe, \textit{5}& Formatted page number
+\end{tabular}
+\end{center}
+\end{table}
+
+\LaTeX 在编译输入文件（\texttt{.tex} 文件）时，每一个 \mintinline{LaTeX}{\index} 命令都会把相应的索引项和当前页码写入和输入文件同名的
+\texttt{.idx} 文件。\texttt{makeindex} 程序会对 \texttt{.idx} 文件进行处理，生成 \texttt{.ind} 文件。当再次
+编译输入文件时，遇到 \mintinline{LaTeX}{\printindex} 命令时会在文档中输出索引。
+
+\LaTeXe{} 中的 \texttt{showidx} 宏包将所有的索引项打印在相应的文本左侧，这在验证索引时十分有用。
 
 
 \end{document}
