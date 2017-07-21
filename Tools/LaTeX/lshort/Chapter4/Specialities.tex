@@ -82,7 +82,7 @@ Partl~\cite{pa} has proposed that \ldots
 对于更大型的项目，使用 Bib\TeX 是更好的选择。可以利用 Bib\TeX 建立一个参考文献数据库，然后再在文档中引用相关的文献。
 Bib\TeX 产生的参考文献格式是通过样式文件定义的，网上有很多现成的样式文件可供选择。
 
-\section{索引}
+\section{索引（Indexing）}
 索引是一个非常有用的功能，在很多书中都能看到它。\LaTeX 中有个 \texttt{makeindex} 程序，可以方便地建立索引。这里仅
 介绍基本的索引生成命令，更多内容见 \emph{The \LaTeX Companion}。
 
@@ -116,6 +116,42 @@ Bib\TeX 产生的参考文献格式是通过样式文件定义的，网上有很
 编译输入文件时，遇到 \mintinline{LaTeX}{\printindex} 命令时会在文档中输出索引。
 
 \LaTeXe{} 中的 \texttt{showidx} 宏包将所有的索引项打印在相应的文本左侧，这在验证索引时十分有用。
+
+\section{自定义页眉页脚（Headers and Footers）}
+Piet van Oostrm 写的 \texttt{fancyhdr} 宏包提供了一些简单的命令，允许用户自定义文档的页眉页脚。
+
+\texttt{fancyhdr} 宏包改善了页眉页脚的定义方式，允许我们将内容自由安置在页眉和页脚的左、中、右三个位置，还为页眉和
+页脚各加了一条横线。
+
+\texttt{fancyhdr} 自定义了样式名称 fancy，使用 \texttt{fancyhdr} 宏包定义页眉页脚之前，通常先用
+\mintinline{LaTeX}|\pagestyle{fancy}| 调用这个样式。在 \texttt{fancyhdr} 中定义页眉页脚的命令为：
+\begin{minted}{LaTeX}
+    \fancyhead[position]{...}
+    \fancyfoot[position]{...}
+\end{minted}
+
+其中 \emph{position} 参数为 \texttt{L}（左）/ \texttt{C}（中）/ \texttt{R}（右）以及与 \texttt{O}（奇数页）
+/ \texttt{E}（偶数页）字母的组合。
+
+下面是使用 \texttt{fancyhdr} 的一个示例。它的效果为将章节标题放在和 headings 一致的位置，但使用加粗格式；页码都放
+在页脚正中；修改横线宽度，“去掉”页脚的横线。
+
+示例代码：
+\begin{minted}{LaTeX}
+    % 导言区部分
+    \usepackage{fancyhdr}
+    \pagestyle{fancy}
+    \renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+    \renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+    \fancyhf{} % 清空当前的页眉页脚
+    \fancyfoot[C]{\bfseries\thepage}
+    \fancyhead[LO]{\bfseries\rightmark}
+    \fancyhead[RE]{\bfseries\leftmark}
+    \renewcommand{\headrulewidth}{0.4pt} % 注意不用 \setlength
+    \renewcommand{\footrulewidth}{0pt}
+\end{minted}
+
+
 
 
 \end{document}
