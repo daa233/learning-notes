@@ -151,7 +151,45 @@ Piet van Oostrm 写的 \texttt{fancyhdr} 宏包提供了一些简单的命令，
     \renewcommand{\footrulewidth}{0pt}
 \end{minted}
 
+\section{Verbatim 宏包}
+前面我们已经接触过了 \texttt{verbatim} 环境，\texttt{verbatim} 宏包是在 \texttt{verbatim} 红包的基础上重新
+实现的，摆脱了原来的一些限制。
 
+\texttt{verbatim} 宏包提供了 \mintinline{LaTeX}|\verbatiminput{filename}| 命令，允许我们将纯 ASCII 码文件
+以 \texttt{verbatim} 环境的样式插入文档。
 
+\texttt{verbatim} 宏包属于“tools”宏集，所以大多数系统都已经预装了。
+
+\section{安装额外的宏包}
+大多数 \LaTeX 发行版都已经预装了大量的样式宏包，但网上有更多，可以在 CTAN \footnote{http://www.ctan.org/} 找
+到。
+
+像 \texttt{geometry}、\texttt{hyphenat} 以及其他很多宏包，都由两个文件组成：\texttt{.ins} 文件和
+\texttt{.dtx} 文件。有时会附加一个 \texttt{readme.txt} 文件，包含了对宏包的简要说明。
+
+将宏包文件下载到计算机以后，需要执行以下步骤，一方面告诉 \LaTeX 发行版我们安装了新宏包，另一方面获得宏包的文档：
+\begin{enumerate}
+    \item 运行 \texttt{.ins} 文件，这会提取出 \texttt{.sty} 文件。
+    \item 将 \texttt{.sty} 文件移动到 \LaTeX 发行版可以找到的地方。通常是 \texttt{.../localtexmf/tex/latex}
+    的子目录。
+    \item 刷新 \LaTeX 发行版的文件名数据库。不同的 \LaTeX 发行版对应的命令有所不同：\TeX Live -
+    \mintinline{bash}{texhash}；web2c - \mintinline{bash}{maktexlsr}；MiK\TeX{} -
+    \mintinline{bash}{inittexmf --update-fndb}。
+\end{enumerate}
+
+现在从 \texttt{.dtx} 文件中提取文档：
+\begin{enumerate}
+    \item 运行 \texttt{.dtx} 文件，会生成一个 \texttt{.dvi} 文件。注意，可能需要编译多次才能保证交叉引用正确。
+    \item 检查是否产生了 \texttt{.idx} 文件。如果产生了该文件，继续执行下面的步骤；否则，说明文档没有索引，跳转到
+    步骤~\ref{item:make_pdf}。
+    \item 执行 \mintinline{bash}{makeindex -s gind.ist name} 命令以产生索引。其中的 \emph{name} 参数是不
+    包含扩展名的主文件名。
+    \item \label{item:run_dtx_again} 再次运行 \texttt{.dtx} 文件。
+    \item \label{item:make_pdf} 通过 \texttt{.dvi} 文件生成 \texttt{.ps} 或者 \texttt{.pdf} 文件进行阅读。
+\end{enumerate}
+
+有时候会看到一个 \texttt{.glo} （glossary）文件，这时需要在步骤~\ref{item:run_dtx_again} 和
+步骤~\ref{item:make_pdf} 之间执行 \\ \mintinline{LaTeX}{makeindex -s gglo.ist name.gls name.glo}。还要
+确保在执行步骤~\ref{item:make_pdf} 之前再运行一遍 \texttt{.dtx} 文件。
 
 \end{document}
