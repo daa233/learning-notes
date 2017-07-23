@@ -6,6 +6,7 @@
 \geometry{a4paper, centering, scale=0.8}
 \usepackage{minted}
 \usepackage{float}
+\usepackage{hyperref}
 
 \title{\heiti 第4章 \quad 特色功能}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -301,6 +302,114 @@ Piet van Oostrm 写的 \texttt{fancyhdr} 宏包提供了一些简单的命令，
     \fcolorbox{blue}{yellow}{\textcolor{blue}{蓝色边框+文字，黄色背景}}
 \end{quote}
 
+\section{使用超链接}
+PDF 文档格式是现今最流行的电子文档格式，而电子文档格式最实用的需求之一就是链接功能。\LaTeX 实现这一功能的是
+\texttt{hyperref} 宏包。
+
+\subsection{\texttt{hyperref} 宏包}
+\texttt{hyperref} 宏包涉及到的链接遍布 \LaTeX 的每一个角落——目录、引用、脚注、索引、参考文献等等都被封装成链接。但
+这也使得它与其它宏包的冲突机会大大增加，虽然宏包已经尽力解决各方面的兼容性，但仍不能面面俱到。为减少冲突的可能性，习惯上
+将 \texttt{hyperref} 宏包放在其它宏包之后调用。
+
+\texttt{hyperref} 宏包提供了命令 \mintinline{LaTeX}{\hypersetup} 配置各种参数，或者也可以作为宏包选项，在调用
+宏包时指定：
+\begin{minted}{LaTeX}
+    \hypersetup{option1, option2, ...}
+    \usepackage[option1, option2, ...]{hyperref}
+\end{minted}
+
+\begin{table}[H]
+\caption{\texttt{hyperref} 宏包提供的参数设置}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+    \hline
+    \textbf{参数} & \textbf{默认值} & \textbf{含义} \\ \hline
+    \texttt{colorlinks=$\langle$\emph{true}|\emph{false}$\rangle$} & \emph{false} & 设置为
+    \emph{true} 为链接文字带颜色，反之加上带 \\ & & 颜色的边框 \\
+    \texttt{hidelinks} & & 取消链接的颜色和边框 \\
+    \texttt{pdfborder=\{\emph{n} \emph{n} \emph{n}\}} & 0 0 1 & 超链接边框设置，设为 0 0 0 可取消边框 \\
+    \hline
+    \texttt{bookmark=$\langle$\emph{true}|\emph{false}$\rangle$} & \emph{true} & 是否生成书签 \\
+    \texttt{bookmarkopen=$\langle$\emph{true}|\emph{false}$\rangle$} & \emph{false} & 是否展开书签 \\
+    \texttt{bookmarknumbered=$\langle$\emph{true}|\emph{false}$\rangle$} & \emph{false} & 书签是否带
+    章节编号 \\
+    \texttt{CJKbookmarks=$\langle$\emph{true}|\emph{false}$\rangle$} & \emph{false} & 使用 CJK 宏包 /
+    GBK 编码排版中文时必须 \\ & & 设定的参数，在第一次编译后需要将生成的 \\ & & \texttt{.out} 文件用工具处理编码 \\
+    \texttt{unicode} & & 使用 CJKutf8 宏包 / UTF-8 编码排版中文时 \\ & & 必须设定的参数 \\ \hline
+    \texttt{pdftitle=$\langle$\emph{string}$\rangle$} & 空 & 标题 \\
+    \texttt{pdfauthor=$\langle$\emph{string}$\rangle$} & 空 & 作者 \\
+    \texttt{pdfsubject=$\langle$\emph{string}$\rangle$} & 空 & 主题 \\
+    \texttt{pdfkeywords=$\langle$\emph{string}$\rangle$} & 空 & 关键词 \\
+    \texttt{pdfstartview=$\langle$\emph{Fit}|\emph{FitH}|\emph{FitV}$\rangle$} & \emph{Fit} & 设置
+    PDF 页面以适合页面/适合宽度/适合 \\ & & 高度等方式显示，默认为适合页面 \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{超链接}
+\texttt{hyperref} 宏包提供了直接书写超链接的命令，用于在 PDF 中生成 URL：
+\begin{minted}{LaTeX}
+    \url{url}
+    \nolinkurl{url}
+\end{minted}
+
+\mintinline{LaTeX}{\url} 和 \mintinline{LaTeX}{\nolinkurl} 都生成可以点击的 URL，区别是前者有彩色，后者没有。在
+\mintinline{LaTeX}{\url} 命令中作为参数的 URL 里，可直接输入如 \%、\& 这样的特殊符号。
+
+我们也可以像网页一样，把一段文字赋予其“超链接”的作用：\mintinline{LaTeX}{\href{url}{text}}
+
+示例代码：
+\begin{minted}{LaTeX}
+    \url{http://wikipedia.org} \\
+    \nolinkurl{http://wikipedia.org} \\
+    \href{http://wikipedia.org}{Wiki}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \url{http://wikipedia.org} \\
+    \nolinkurl{http://wikipedia.org} \\
+    \href{http://wikipedia.org}{Wiki}
+\end{quote}
+
+使用 \texttt{hyperref} 宏包后，文档中所有的引用、参考文献、索引等等都转换为超链接。用户也可以对某个
+\mintinline{LaTeX}{\label} 命令定义的标签 \emph{label} 作超链接（注意这里的 \emph{label} 虽然是可选参数的形
+式，但通常是必填的）：\mintinline{LaTeX}{\hyperref[label]{text}}。
+
+默认的超链接在文字外边加上一个带颜色的边框（在打印 PDF 时边框不会打印），可指定 \emph{colorlinks} 参数修改为将
+文字本身加上颜色，或修改 \emph{pdfborder} 参数调整边框宽度以“去掉”边框；\emph{hidelinks} 参数则令超链接既不变色
+也不加边框。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \hypersetup{hidelinks}
+    \hypersetup{pdfborder={0 0 0}}
+\end{minted}
+
+\subsection{PDF 书签}
+\texttt{hyperref} 宏包另一个强大的功能是为 PDF 生成书签。对于章节命令 \mintinline{LaTeX}{\chapter}、
+\mintinline{LaTeX}{\section} 等，默认情况下会为 PDF 自动生成书签。和交叉引用、索引等类似，生成书签也需要多次编译
+源代码，第一次编译将书签记录写入 \texttt{.out} 文件，第二次编译才正确生成书签。
+
+书签的一些属性见表~\ref{tab:hyperref}。在 \texttt{latex + dvipdfmx} 或 \texttt{pdflatex} 命令下使用 \CTeX
+或 CJK 宏集时，为了正确生成中文书签而不出现乱码，需要额外的设置，甚至繁琐的工序（这也是推荐使用 \texttt{xelatex} 命
+令处理中文的原因）。
+
+\texttt{hyperref} 还提供了手动生成书签的命令：\mintinline{LaTeX}{\pdfbookmark[level]{bookmark}{anchor}}。
+其中，\emph{bookmark} 为书签名称，\emph{anchor} 为书签项使用的锚点（类似交叉引用的标签）。可选参数 \emph{level}
+为书签的层级，默认为 0。
+
+章节命令里往往有 \LaTeX 命令甚至数学公式，而 PDF 书签是纯文本，对命令和公式的处理很困难，有出错的风险。
+\texttt{hyperref} 宏包已经为我们处理了许多常见命令，如 \LaTeX 和字体命令 \mintinline{LaTeX}{\textbf} 等，对于
+未被处理的命令或数学公式，就要在章节标题中使用如下命令，分别提供 \LaTeX 代码和 PDF 书签可用的纯文本：
+\begin{minted}{LaTeX}
+    \texorpdfstring{LaTeX code}{PDF bookmark text}
+\end{minted}
+
+比如在章节名称里使用公式 $E=mc^2$，而书签使用字符 \texttt{E=mc\textasciicircum 2}：
+\begin{minted}{LaTeX}
+    \section{质能公式 \texorpdfstring{$E=mc^2$}{E=mc\textasciicircum 2}}
+\end{minted}
 
 
 
