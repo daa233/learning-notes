@@ -192,4 +192,116 @@ Piet van Oostrm 写的 \texttt{fancyhdr} 宏包提供了一些简单的命令，
 步骤~\ref{item:make_pdf} 之间执行 \\ \mintinline{LaTeX}{makeindex -s gglo.ist name.gls name.glo}。还要
 确保在执行步骤~\ref{item:make_pdf} 之前再运行一遍 \texttt{.dtx} 文件。
 
+\section{使用颜色}
+\LaTeX 原生不支持颜色，它依赖 \texttt{color} 或者 \texttt{xcolor} 宏包。
+
+\subsection{颜色的表达方式}
+调用 \texttt{color} 或者 \texttt{xcolor} 宏包后，我们就可以使用如下命令切换颜色：
+\begin{minted}{LaTeX}
+    \color[color-mode]{code}
+    \color{color-name}
+\end{minted}
+
+颜色的表达方式有两种，其一是使用色彩模型和色彩代码，代码用 0 $sim$ 1 的数字代表成分的比例。\texttt{color} 宏包支持
+\texttt{rgb}、\texttt{cmyk} 和 \texttt{gray} 模型，\texttt{xcolor} 支持更多的模型如 \texttt{hsb} 等。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \large\heiti
+    {\color[gray]{0.6} 60\% 灰色} \\
+    {\color[rgb]{0, 1, 1} 青色}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \large\heiti
+    {\color[gray]{0.6} 60\% 灰色} \\
+    {\color[rgb]{0, 1, 1} 青色}
+\end{quote}
+
+其二是直接用名称代表颜色，前提是已经定义好了颜色名称（没定义的话会报错）。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \large\heiti
+    {\color{red} 红色}
+    {\color{blue} 蓝色}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \large\heiti
+    {\color{red} 红色}
+    {\color{blue} 蓝色}
+\end{quote}
+
+\texttt{color} 宏包仅定义了 8 种颜色名称，包括 \texttt{{\color{black} black}}、\texttt{{\color{red} red}}、
+\texttt{{\color{green} green}}、\texttt{{\color{blue} blue}}、\colorbox{black}{\textcolor{white}{white}}、
+\texttt{{\color{cyan} cyan}}、\texttt{{\color{magenta} magenta}}、\texttt{{\color{yellow} yellow}}。
+
+\texttt{xcolor} 宏包补充了一些颜色，还包括了 \texttt{{\color{darkgray} darkgray}}、
+\texttt{{\color{gray} gray}}、\texttt{{\color{lightgray} lightgray}}、\texttt{{\color{brown} brown}}、
+\texttt{{\color{olive} olive}}、\texttt{{\color{orange} orange}}、\texttt{{\color{lime} lime}}、
+\texttt{{\color{purple} purple}}、\texttt{{\color{teal} teal}}、\texttt{{\color{violet} violet}}、
+\texttt{{\color{pink} pink}}，总共有 19 种颜色。
+
+\texttt{xcolor} 还支持将颜色通过表达式混合或互补。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \large\heiti
+    {\color{red!40} 40\% 红色} \\
+    {\color{blue} 蓝色 \color{blue!50!black} 蓝黑 \color{black} 黑色} \\
+    {\color{-red} 红色的互补色}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \large\heiti
+    {\color{red!40} 40\% 红色} \\
+    {\color{blue} 蓝色 \color{blue!50!black} 蓝黑 \color{black} 黑色} \\
+    {\color{-red} 红色的互补色}
+\end{quote}
+
+我们还可以通过命令自定义颜色名称，注意这里的 \emph{color-mode} 是必选参数：
+\mintinline{LaTeX}{\definecolor{color-name}{color-mode}{code}}。
+
+如果调用 \texttt{color} 或 \texttt{xcolor} 宏包时指定 \texttt{dvipsnames} 选项，就有额外的 68 种颜色名称
+可用。\texttt{xcolor} 宏包还支持通过指定其它选项载入更多颜色名称。
+
+\subsection{带颜色的文本和盒子}
+原始的 \mintinline{LaTeX}{\color} 命令类似于字体命令 \mintinline{LaTeX}{\bfseries}，它使之后排版的内容全部
+指定的颜色，所以直接使用时通常要加花括号分组。\texttt{color} / \texttt{xcolor} 宏包都定义了一些方便用户使用的带
+颜色元素。
+
+输入带颜色的文本可以用类似 \mintinline{LaTeX}{\textbf} 的命令：
+\begin{minted}{LaTeX}
+    \textcolor[color-mode]{code}{text}
+    \textcolor{color-name}{text}
+\end{minted}
+
+以下命令构造一个带背景色的盒子，\emph{material} 为盒子中的内容：
+\begin{minted}{LaTeX}
+    \colorbox[color-mode]{code}{material}
+    \colorbox{color-name}{material}
+\end{minted}
+
+以下命令构造一个带有背景色和有色边框的盒子，\emph{fcode} 或 \emph{fcolor-name} 用于设置边框颜色：
+\begin{minted}{LaTeX}
+    \heiti
+    文字用 \textcolor{red}{红色} 强调 \\
+    \colorbox[gray]{0.95}{浅灰色背景} \\
+    \fcolorbox{blue}{yellow}{\textcolor{blue}{蓝色边框+文字，黄色背景}}
+\end{minted}
+
+\begin{quote}
+    \heiti
+    文字用 \textcolor{red}{红色} 强调 \\
+    \colorbox[gray]{0.95}{浅灰色背景} \\
+    \fcolorbox{blue}{yellow}{\textcolor{blue}{蓝色边框+文字，黄色背景}}
+\end{quote}
+
+
+
+
 \end{document}
