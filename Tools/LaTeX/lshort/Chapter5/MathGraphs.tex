@@ -1,0 +1,72 @@
+%-*- coding: UTF-8 -*-
+% MathGraphs.tex
+%
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{a4paper, centering, scale=0.8}
+\usepackage{minted}
+\usepackage{float}
+\usepackage{hyperref}
+
+\title{\heiti 第5章 \quad 数学插图}
+\author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
+\date{\today}
+
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{概述}
+除了排版文字，\LaTeX 也支持用代码表示图形。不同的扩展已经极大地丰富了 \LaTeX 的图形功能，TikZ 就是其中之一。一些特
+殊的绘图，如交换图、树状图甚至分子式和电路图也能够通过代码绘制，不过过于复杂，这里只介绍 TikZ。
+
+\LaTeX 提供了原始的 \texttt{picture} 环境，能够绘制一些基本的图形如点、线、矩形、圆等等。不过受制于 \LaTeX 本身，
+它的绘图功能极为有限，效果也不够美观。
+
+现在流行的绘图代码有以下几种：
+\begin{itemize}
+    \item PSTricks \\ 以 PostScript 语言的功能为基础的绘图宏包，具有优秀的绘图能力。它对老式的
+    \texttt{latex + dvips} 编译命令支持最好，而现在的几种编译命令下使用起来都不够方便。
+    \item TikZ \& pgf \\ 德国的 Till Tantau 在开发著名的 \LaTeX 幻灯片文档类 \texttt{beamer} 时一并开发了绘
+    图宏包 \texttt{pgf}，目的是令其能够在 \texttt{pdflatex} 或 \texttt{xelatex} 等不同的编译命令下都能使用。
+    \texttt{TikZ} 是在 \texttt{pgf} 基础上封装的一个宏包，采用了类似 METAPOST 的语法，提供了方便的绘图命令。
+    \item METAPOST \& Asymptote \\ METAPOST 脱胎于高德纳为 \TeX{} 配套开发的字体生成程序 METAFONT，具有优秀
+    的绘图能力，并能够调用 \TeX{} 引擎向图片中插入文字和公式。Asymptote 在 METAPOST 的基础上更进一步，具有一定的
+    类似 C 语言的编程能力，支持三维图形的绘制。
+\end{itemize}
+
+它们往往需要把代码写在单独的文件里，用特定的工具去编译，也可以借助特殊的宏包在 \LaTeX 代码里直接使用。
+
+\section{\texttt{picture} 环境}
+\subsection{基本命令}
+\texttt{picture} 环境可以通过以下命令创建：
+\begin{minted}{LaTeX}
+    \begin{picture}(x,y)...\end{picture}
+    或
+    \begin{picture}(x,y)(x0,y0)...\end{picture}
+\end{minted}
+
+数字 \emph{x}、\emph{y}、\emph{x0}、\emph{y0} 和 \mintinline{LaTeX}{\unitlength} 有关。
+\mintinline{LaTeX}{\unitlength} 默认值是 \texttt{1pt}，可以通过
+\mintinline{LaTeX}{\setlength{\unitlength}{1.2cm}} 命令设置。
+
+大多数的绘图命令有两种形式：
+\begin{minted}{LaTeX}
+    \put{x,y}{object}
+    或
+    \multiput(x,y)(x_delta, y_delta){n}{object}
+\end{minted}
+
+但是贝塞尔曲线（B\'ezier curves）是个例外，通过
+\mintinline{LaTeX}{\qbezier(x_1, y_1)(x_2, y_2)(x_3, y_3)} 命令绘制。
+
+
+
+
+
+
+\end{document}
