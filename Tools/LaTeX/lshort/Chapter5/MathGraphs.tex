@@ -7,6 +7,7 @@
 \usepackage{minted}
 \usepackage{float}
 \usepackage{amsmath}
+\usepackage{tikz}
 \usepackage{hyperref}
 
 \title{\heiti 第5章 \quad 数学插图}
@@ -603,6 +604,369 @@ $(-1.2384, 0)$。图中十字标出的是真实垂曲线上的点，和近似的
 两条贝塞尔曲线的控制点是由公式~\eqref{eq:bezier} 计算得到的。正半支曲线由 $P_1 = (0, 0)$，$m_1 = 1$，
 $P_2 = (2, \tanh2)$，$m_2 = 1 / \cosh ^2 2$ 决定。
 
+\section{TikZ 绘图语言}
+在导言区调用 \texttt{tikz} 宏包，就可以用以下命令和环境使用 TikZ 的绘图功能了：
+\begin{minted}{LaTeX}
+    \tikz[...]<tikz code>
+    \tikz[...]{<tikz code 1>; <tikz code 2>; ...}
+    \begin{tikzpicture}[...]
+        <tikz code 1>;
+        <tikz code 2>;
+        ...
+    \end{tikzpicture}
+\end{minted}
+
+前一种用法为 \mintinline{LaTeX}{\tikz} 单条绘图命令，以分号结束，一般用于在文字之间插入简单的图形；后两种用法较为
+常见，使用多条绘图命令，可以在 \texttt{figure} 等浮动体中使用。
+
+\subsection{TikZ 坐标和路径}
+TikZ 用直角坐标系或者极坐标系描述点的位置。
+\begin{itemize}
+    \item 直角坐标下，点的位置写作 $(x, y)$，坐标 \emph{x} 和 \emph{y} 可以用 \LaTeX 支持的任意单位表示，缺省
+    值为 \texttt{cm}；
+    \item 极坐标下，点的位置写作 $(\theta : r)$。$\theta$ 为极角，单位是度。
+\end{itemize}
+
+我们还可以为某个点命令：\mintinline{LaTeX}{\coordinate(A) at (x, y)}，然后就可以使用 $(A)$ 作为点的位置了：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) -- (30 : 1);   % 极坐标(30 : 1)
+        \draw (1, 0) -- (2, 1);
+        \coordinate (S) at (0, 1);
+        \draw (S) -- (1, 1);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) -- (30 : 1);   % 极坐标(30 : 1)
+    \draw (1, 0) -- (2, 1);
+    \coordinate (S) at (0, 1);
+    \draw (S) -- (1, 1);
+\end{tikzpicture}
+\newline
+
+坐标的表示形式还包括“垂足”形式：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \coordinate (S) at (2, 2);
+        \draw[gray] (-1, 2) -- (S);
+        \draw[gray] (2, -1) -- (S);
+        \draw[red] (0, 0) -- (0, 0 -| S);
+        \draw[blue] (0, 0) -- (0, 0 |- S);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \coordinate (S) at (2, 2);
+    \draw[gray] (-1, 2) -- (S);
+    \draw[gray] (2, -1) -- (S);
+    \draw[red] (0, 0) -- (0, 0 -| S);
+    \draw[blue] (0, 0) -- (0, 0 |- S);
+\end{tikzpicture}
+\newline
+
+TikZ 最基本的路径为两点之间连线，如 $(x_1, y_1) -- (x_2, y_2)$，可以连用表示多个连线（折线）。连续使用折线时，可
+以使用 \texttt{cycle} 令路径回到起点，生成闭合的路径：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) -- (1, 1) -- (2, 0) -- cycle;
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) -- (1, 1) -- (2, 0) -- cycle;
+\end{tikzpicture}
+\newline
+
+矩形、圆和椭圆：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) rectangle (1.5, 1);
+        \draw (2.5, 0.5) circle[radius = 0.5];
+        \draw (4.5, 0.5) ellipse[x radius = 1, y radius = 0.5];
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) rectangle (1.5, 1);
+    \draw (2.5, 0.5) circle[radius = 0.5];
+    \draw (4.5, 0.5) ellipse[x radius = 1, y radius = 0.5];
+\end{tikzpicture}
+\newline
+
+直角、圆弧、椭圆弧：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) |- (1, 1);
+        \draw (1, 0) -| (2, 1);
+        \draw (4, 0) arc (0 : 135 : 1);
+        \draw (6, 0) arc (0 : 135 : 1 and 0.5);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) |- (1, 1);
+    \draw (1, 0) -| (2, 1);
+    \draw (4, 0) arc (0 : 135 : 1);
+    \draw (6, 0) arc (0 : 135 : 1 and 0.5);
+\end{tikzpicture}
+\newline
+
+正弦、余弦曲线（四分之一个周期）：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) sin (1.57, 1);
+        \draw (0, 1) sin (1.57, 0);
+        \draw (2, 1) cos (3.57, 0);
+        \draw (2, 0) cos (3.57, 1);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) sin (1.57, 1);
+    \draw (0, 1) sin (1.57, 0);
+    \draw (2, 1) cos (3.57, 0);
+    \draw (2, 0) cos (3.57, 1);
+\end{tikzpicture}
+\newline
+
+抛物线（parabola），用 \texttt{bend} 控制顶点：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) parabola (1, 2);
+        \draw (2, 0) parabola bend (2.25, -0.25) (3, 2);
+        \draw (4, 0) parabola bend (4.75, 2.25) (5, 2);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) parabola (1, 2);
+    \draw (2, 0) parabola bend (2.25, -0.25) (3, 2);
+    \draw (4, 0) parabola bend (4.75, 2.25) (5, 2);
+\end{tikzpicture}
+\newline
+
+二次和三次贝塞尔曲线，分别使用一个和两个控制点：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) .. controls (2, 1) and (3, 1) .. (3, 0);
+        \draw (4, 0) .. controls (5, 1) .. (5, 0);
+        \draw[help lines] (0, 0) -- (2, 1) -- (3, 1) -- (3, 0)
+            (4, 0) -- (5, 1) -- (5, 0);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) .. controls (2, 1) and (3, 1) .. (3, 0);
+    \draw (4, 0) .. controls (5, 1) .. (5, 0);
+    \draw[help lines] (0, 0) -- (2, 1) -- (3, 1) -- (3, 0)
+        (4, 0) -- (5, 1) -- (5, 0);
+\end{tikzpicture}
+\newline
+
+网格、函数图像，网格可用 \texttt{step} 参数控制网格大小，函数图像用 \texttt{domain} 参数控制定义域：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw[help lines, step = 0.5] (-2, -2) grid (2, 2);
+        \draw[->] (-2.5, 0) -- (2.5, 0);
+        \draw[->] (0, -2.5) -- (0, 2.5);
+        \draw[domain = -2 : 2] plot(\x, {\x * \x -2});
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw[help lines, step = 0.5] (-2, -2) grid (2, 2);
+    \draw[->] (-2.5, 0) -- (2.5, 0);
+    \draw[->] (0, -2.5) -- (0, 2.5);
+    \draw[domain = -2 : 2] plot(\x, {\x * \x -2});
+\end{tikzpicture}
+\newline
+
+\subsection{TikZ 绘图命令和参数}
+除了 \mintinline{LaTeX}{\draw} 命令之外，TikZ 还提供了 \mintinline{LaTeX}{\fill} 命令来填充图形，
+\mintinline{LaTeX}{\filldraw} 命令同时则同时填充和描边。除了矩形、圆等现成的闭合图形外，
+\mintinline{LaTeX}{\fill} 和 \mintinline{LaTeX}{\filldraw} 命令也能够填充人为构造的闭合路径。
+
+\begin{minted}{LaTeX}
+    \draw[...] <path>;
+    \fill[...] <path>;
+    \filldraw[...] <path>;
+\end{minted}
+
+绘图参数可作为可选参数用在 \texttt{tikzpicture} 环境或 \mintinline{LaTeX}{\tikz} 命令时，参数会影响到所有具体
+的绘图命令；用在单个绘图命令 \mintinline{LaTeX}{\draw}、\mintinline{LaTeX}{filldraw} 等时，只对这个命令起效。
+
+TikZ 还提供了 \texttt{scope} 环境，令一些绘图参数在局部起效：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) rectangle (2.5, 2.5);
+        \begin{scope}[fill=gray, scale=0.5]
+            \filldraw (0, 0) rectangle (2.5, 2.5);
+        \end{scope}
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) rectangle (2.5, 2.5);
+    \begin{scope}[fill=gray, scale=0.5]
+        \filldraw (0, 0) rectangle (2.5, 2.5);
+    \end{scope}
+\end{tikzpicture}
+
+TikZ 有很多绘图参数，这些参数令 TikZ 能够绘制丰富多彩的图像，一些参数见表\ref{tab:tikz_draw_params}。
+
+\begin{table}[H]
+\caption{TikZ 常用的一些绘图参数}
+\label{tab:tikz_draw_params}
+\begin{center}
+    \begin{itemize}
+        \item \texttt{color=<color>} \\ 为线条（\mintinline{LaTeX}{\draw}）或填充
+        （\mintinline{LaTeX}{\fill}）指定颜色，\emph{color} 使用颜色名或是 \texttt{xcolor} 的混合颜色语法。
+        往往可以不写 \texttt{color=} 直接写颜色名称。
+        \item \texttt{color=<color>} / \texttt{draw=<color>} \\ 分别给 \mintinline{LaTeX}{\filldraw}
+        指定填充和描边的颜色。也可给 \mintinline{LaTeX}{\fill} 和 \mintinline{LaTeX}{\draw} 命令使用。不带
+        参数直接使用 \texttt{fill} 和 \texttt{draw}，相当于用默认颜色。
+        \item \texttt{line width=<length>} \\ 指定线条粗细为 \emph{width}。默认普通线宽为 0.4pt。
+        \item \texttt{thin / semithick / thick / ...} \\ 指定线条粗细为预定义的某个类型，默认为
+        \texttt{thin}。总共有其中预定义的类型：\texttt{ultra thin}、\texttt{very thin}、\texttt{thin}、
+        \texttt{thin}、\texttt{semithick}、\texttt{thick}、\texttt{very thick}、\texttt{ultra thick}。
+        \item \texttt{help lines} \\ 指定线条为辅助线，相当于 \texttt{line width=0.2pt, gray}。
+        \item \texttt{solid / dashed / dotted / dash dot / dash dot dot / ...} \\ 指定线条类型（实线、
+        虚线等）。
+        \item \texttt{rounded corners} \\ 将路径转向处绘制成圆角。可写成
+        \texttt{rounded corners=<radius>} 使用给定的半径。
+        \item \texttt{-> / -< / -to / -latex / -stealth / ...} \\ 指定路径终点的箭头种类。
+        \item \texttt{<- / >- / to- / latex- / -stealth / ...} \\ 指定路径起点的箭头种类。起点和终点的箭头
+        可以搭配，如 \texttt{<->} 或者 \texttt{latex-to} 等。
+        \item \texttt{scale=<scale>} \\ 指定整个图像或某个路径的缩放比例。
+        \item \texttt{xshift=<length> / yshift=<length>} \\ 指定整个图像或某个路径相对于原位置的水平/垂直
+        位移。
+        \item \texttt{rotate=<angle>} \\ 指定整个图像或某个路径旋转一定角度。
+    \end{itemize}
+\end{center}
+\end{table}
+
+
+
+\subsection{TikZ 文字结点}
+TikZ 用 \mintinline{LaTeX}{\node} 命令绘制文字结点：
+\begin{minted}{LaTeX}
+    \node[options] (name) at (coordinate) {text};
+\end{minted}
+
+其中，\emph{name} 为结点命令，类似 \mintinline{LaTeX}{\coordinate}；\texttt{at (coordinate)} 指定结点的位
+置。这两者和前面的 \emph{options} 都可以省略，只有 \texttt{text} 是必填的。
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \node (A) at (0, 0) {A};
+        \node (B) at (1, 0) {B};
+        \node (C) at (60 : 1) {C};
+        \draw (A) -- (B) -- (C) -- (A);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \node (A) at (0, 0) {A};
+    \node (B) at (1, 0) {B};
+    \node (C) at (60 : 1) {C};
+    \draw (A) -- (B) -- (C) -- (A);
+\end{tikzpicture}
+
+表~\ref{tab:tikz_draw_params} 中的参数可用于 \mintinline{LaTeX}{\node} 命令的配置。除此之外，
+\mintinline{LaTeX}{\node} 还有一些特定的参数，见表~\ref{tab:tikz_node_params}。
+
+\begin{table}[H]
+\caption{TikZ 结点使用的一些绘图参数}
+\label{tab:tikz_node_params}
+\begin{center}
+    \begin{itemize}
+        \item \texttt{anchor=<position>} \\ 指定结点的某个角落 \emph{position} 位于给定的位置
+        \emph{coordinate}。参数 \emph{position} 用 \texttt{center}、\texttt{north}、
+        \texttt{north west} 等形式表示。
+        \item \texttt{centered / above / below / left / right / above left / ...} \\ 指定结点相对于
+        \emph{coordinate} 的位置，\texttt{anchor=<position>} 的等效写法。\texttt{above} 相当于
+        \texttt{anchor=south}，以此类推。带参数的形式 \texttt{above=<length>} 指定结点相对于
+        \emph{coordinate} 的距离。
+        \item \texttt{shape=<shape>} \\ 结点的形状，默认可用 \texttt{rectangle} 和 \texttt{circle}，可省
+        略 \texttt{shape=} 直接写。在导言区使用命令 \mintinline{LaTeX}{\usetikzlibrary}{shapes.geometric}
+        可用更多的形状。
+        \item \texttt{inner sep=<length> / outer sep=<length>} \\ 结点边界向外和向内的额外距离。
+        \item \texttt{minimum size=<length> / minimum height=<length> / minimum width=<length>} \\
+        结点的最小大小/高度/宽度。
+        \item \texttt{text=<color>} \\ 结点文字的颜色。
+        \item \texttt{node font=<font command>} \\ 结点文字的字体，形如 \mintinline{LaTeX}{\bfseries}
+        或 \mintinline{LaTeX}{\itshape} 等。
+    \end{itemize}
+\end{center}
+\end{table}
+
+\mintinline{LaTeX}{\node} 命令不仅可以为文字结点的位置命名，在 \mintinline{LaTeX}{\draw} 等命令中还可以使用某
+个结点的相对位置，以“东南西北”的方式命名：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (0, 0) circle[radius=1];
+        \fill (0, 0) circle[radius=2pt];
+        \node[draw] (P) at (15 : 2) {center};
+        \draw[dotted] (0, 0) -- (P.west);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (0, 0) circle[radius=1];
+    \fill (0, 0) circle[radius=2pt];
+    \node[draw] (P) at (15 : 2) {center};
+    \draw[dotted] (0, 0) -- (P.west);
+\end{tikzpicture}
+\newline
+
+另一种用法是在 \mintinline{LaTeX}{\draw} 等命令的路径中使用 \texttt{node}，不仅可以对某个位置标记结点，还能够对
+线标记：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw (2, 1.5) node[above] {$A$} -- node[above left] {$c$}
+            (0, 0) node[left] {$B$} -- node[below] {$a$}
+            (2.5, 0) node[right] {$C$} -- node[above right] {$b$} cycle; % cycle 令路径回到起点
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw (2, 1.5) node[above] {$A$} -- node[above left] {$c$}
+        (0, 0) node[left] {$B$} -- node[below] {$a$}
+        (2.5, 0) node[right] {$C$} -- node[above right] {$b$} cycle; % cycle 令路径回到起点
+\end{tikzpicture}
+\newline
+
+除了 \mintinline{LaTeX}{\node} 命令之外，\mintinline{LaTeX}{coordinate} 也可以通过参数为某个位置添加文
+字（label）。下面是一个较为复杂的例子，综合前面的各种路径、形状、文字结点和参数设置：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \draw[-stealth, line width=0.2pt] (-0.5, 0) -- (4.5, 0);
+        \draw[-stealth, line width=0.2pt] (0, -0.5) -- (0, 2.5);
+        \coordinate (a) at (0.5, 1.9);
+        \coordinate (b) at (4, 1.2);
+        \coordinate[label=below:$a$] (a0) at (a |- 0, 0);
+        \coordiante[label=below:$b$] (b0) at (b |- 0, 0);
+        \filldraw[fill=gray!20, draw, thick]
+            (a0) -- (a) .. controls (1, 2.8) and (2.7, 0.4) .. (b) -- (b0) -- cycle;
+        \node[above right, outer sep=0.2cm, rounded corners, fill=green!20, draw=gray,
+            text=blue!60!black, scale=0.6]
+            at (b) {$\displaystyle \int_a^b {f(x)\,\mathrm{d}x} = F(b) - F(a)$};
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \draw[-stealth, line width=0.2pt] (-0.5, 0) -- (4.5, 0);
+    \draw[-stealth, line width=0.2pt] (0, -0.5) -- (0, 2.5);
+    \coordinate (a) at (0.5, 1.9);
+    \coordinate (b) at (4, 1.2);
+    \coordinate[label=below:$a$] (a0) at (a |- 0, 0);
+    \coordinate[label=below:$b$] (b0) at (b |- 0, 0);
+    \filldraw[fill=gray!20, draw, thick]
+        (a0) -- (a) .. controls (1, 2.8) and (2.7, 0.4) .. (b) -- (b0) -- cycle;
+    \node[above right, outer sep=0.2cm, rounded corners, fill=green!20, draw=gray,
+        text=blue!60!black, scale=0.6]
+        at (b) {$\displaystyle \int_a^b {f(x)\,\mathrm{d}x} = F(b) - F(a)$};
+\end{tikzpicture}
 
 
 \end{document}
