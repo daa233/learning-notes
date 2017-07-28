@@ -968,5 +968,147 @@ TikZ 用 \mintinline{LaTeX}{\node} 命令绘制文字结点：
         at (b) {$\displaystyle \int_a^b {f(x)\,\mathrm{d}x} = F(b) - F(a)$};
 \end{tikzpicture}
 
+\subsection{TikZ 其他的一些示例}
+弧和扇形：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \clip (-0.4, -0.8) rectangle (7.2, 4.8);
+        \draw[step=1cm, gray, very thin] (-5.6, -5.6) grid (13.6, 13.6);
+        \draw (-6.0, 0) -- (10.0, 0);
+        \draw (0, -6.0) -- (0, 6.0);
+        \draw (0, 0) circle (4cm);
+        \filldraw[fill=green!20!white, draw=green!50!black]
+            (0, 0) -- (12mm, 0mm) arc (0 : 30 : 12mm) -- cycle;
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \clip (-0.4, -0.8) rectangle (7.2, 4.8);
+    \draw[step=1cm, gray, very thin] (-5.6, -5.6) grid (13.6, 13.6);
+    \draw (-6.0, 0) -- (10.0, 0);
+    \draw (0, -6.0) -- (0, 6.0);
+    \draw (0, 0) circle (4cm);
+    \filldraw[fill=green!20!white, draw=green!50!black]
+        (0, 0) -- (12mm, 0mm) arc (0 : 30 : 12mm) -- cycle;
+\end{tikzpicture}
+\newline
+
+简单的维恩图（Venn diagram）：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}
+        \node[circle, draw, minimum size=3cm, label=120:{economics}]
+            at (0, 0) {};
+        \node[circle, draw, minimum size=3cm, label=60:{psychology}]
+            at (1, 0) {};
+        \node (i) at (0.5, -1) {};
+        \node at (0.6, -2.5) {behavioral economics}
+            edge[->, thick, out=60, in=-50] (i);
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}
+    \node[circle, draw, minimum size=3cm, label=120:{economics}]
+        at (0, 0) {};
+    \node[circle, draw, minimum size=3cm, label=60:{psychology}]
+        at (1, 0) {};
+    \node (i) at (0.5, -1) {};
+    \node at (0.6, -2.5) {behavioral economics}
+        edge[->, thick, out=60, in=-50] (i);
+\end{tikzpicture}
+\newline
+
+\texttt{foreach} 循环：
+\begin{minted}{LaTeX}
+    \begin{tikzpicture}[scale=0.8]
+        \tikzstyle{v}=[circle, minimum size=2mm, inner sep=0pt, draw]
+        \foreach \i in {1, ..., 8}
+            \foreach \j in {1, ..., 3}
+                \node[v] (G-\i-\j) at (\i, \j) {};
+        \foreach \i in {1, ..., 8}
+            \foreach \j/\o in {1/2, 2/3}
+                \draw[->] (G-\i-\j) -- (G-\i-\o);
+        \foreach \i/\n in {1/2, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8}
+            \foreach \j/\o in {1/2, 2/3} {
+                \draw[->] (G-\i-\j) -- (G-\n-\o);
+                \draw[->] (G-\n-\j) -- (G-\i-\o);
+            }
+    \end{tikzpicture}
+\end{minted}
+
+\begin{tikzpicture}[scale=0.8]
+    \tikzstyle{v}=[circle, minimum size=2mm, inner sep=0pt, draw]
+    \foreach \i in {1, ..., 8}
+        \foreach \j in {1, ..., 3}
+            \node[v] (G-\i-\j) at (\i, \j) {};
+    \foreach \i in {1, ..., 8}
+        \foreach \j/\o in {1/2, 2/3}
+            \draw[->] (G-\i-\j) -- (G-\i-\o);
+    \foreach \i/\n in {1/2, 2/3, 3/4, 4/5, 5/6, 6/7, 7/8}
+        \foreach \j/\o in {1/2, 2/3} {
+            \draw[->] (G-\i-\j) -- (G-\n-\o);
+            \draw[->] (G-\n-\j) -- (G-\i-\o);
+        }
+\end{tikzpicture}
+\newline
+
+如果在 \texttt{tikzpicture} 环境前使用 \mintinline{LaTeX}{\usetikzlibrary} 命令，name 就可以启用更多的附加功能，可以画出更特殊的形
+状，就像下面的有些弯曲的盒子：
+\begin{minted}{LaTeX}
+    \usetikzlibrary{decorations.pathmorphing}
+    \begin{tikzpicture}[decoration={bent, aspect=.3}]
+        \draw[decorate, fill=lightgray] (0, 0) rectangle (5.5, 4);
+        \node[circle, draw] (A) at (.5, .5) {A};
+        \node[circle, draw] (B) at (5, 3.5) {B};
+        \draw[->, decorate] (A) -- (B);
+        \draw[->, decorate] (B) -- (A);
+    \end{tikzpicture}
+\end{minted}
+
+\usetikzlibrary{decorations.pathmorphing}
+\begin{tikzpicture}[decoration={bent, aspect=.3}]
+    \draw[decorate, fill=lightgray] (0, 0) rectangle (5.5, 4);
+    \node[circle, draw] (A) at (.5, .5) {A};
+    \node[circle, draw] (B) at (5, 3.5) {B};
+    \draw[->, decorate] (A) -- (B);
+    \draw[->, decorate] (B) -- (A);
+\end{tikzpicture}
+\newline
+
+带圈的文字结点图：
+\begin{minted}{LaTeX}
+    \usetikzlibrary{positioning}
+    \begin{tikzpicture}[xscale=6, yscale=8, >=stealth]
+        \tikzstyle{v}=[circle, minimum size=1mm, draw, thick]
+        \node[v] (a) {$1$};
+        \node[v] (b) [right=of a] {$2$};
+        \node[v] (c) [below=of a] {$2$};
+        \node[v] (d) [below=of b] {$1$};
+        \draw[thick, ->] (a) to node {} (c);
+        \draw[thick, ->] (a) to node {} (d);
+        \draw[thick, ->] (b) to node {} (d);
+    \end{tikzpicture}
+\end{minted}
+
+\usetikzlibrary{positioning}
+\begin{tikzpicture}[xscale=6, yscale=8, >=stealth]
+    \tikzstyle{v}=[circle, minimum size=1mm, draw, thick]
+    \node[v] (a) {$1$};
+    \node[v] (b) [right=of a] {$2$};
+    \node[v] (c) [below=of a] {$2$};
+    \node[v] (d) [below=of b] {$1$};
+    \draw[thick, ->] (a) to node {} (c);
+    \draw[thick, ->] (a) to node {} (d);
+    \draw[thick, ->] (b) to node {} (d);
+\end{tikzpicture}
+\newline
+
+甚至可以用 TikZ 来画一些语法图，就好像是排版书籍时用 Pascal 语言编写输出的一样。但是代码比上面的例子要复杂很多，
+\texttt{pgf} 宏包的文档里有一些介绍。
+
+如果必须要画一些数值数据或者数学方程的图像，可以用 \texttt{pgfplot} 宏包，它提供了你所有在画图时需要的东西，甚至可以
+调用 \texttt{gnuplot} 命令验证它画出的函数图像都没问题。
+
+此外，在 \TeX ample.net 上有一些关于 TikZ/PGF 的工具，所以不需要把所有的代码都敲一遍。
+
 
 \end{document}
