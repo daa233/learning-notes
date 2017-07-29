@@ -566,7 +566,7 @@
 点的斜率为 $m = 3.6269$。再次利用公式~\eqref{eq:bezier}，可以计算得到中间控制点，分别是 $(1.2384, 0)$ 和
 $(-1.2384, 0)$。图中十字标出的是真实垂曲线上的点，和近似的点误差很小，少于百分之一。
 
-上面的示例也展示如何使用 \mintinline{LaTeX}{\begin{picture}} 命令的可选参数：
+上面的示例也展示了如何使用 \mintinline{LaTeX}{\begin{picture}} 命令的可选参数：
 \begin{minted}{LaTeX}
     \begin{picture}(4.3, 3.6)(-2.5, -0.25)
 \end{minted}
@@ -794,7 +794,7 @@ TikZ 最基本的路径为两点之间连线，如 $(x_1, y_1) -- (x_2, y_2)$，
 \end{minted}
 
 绘图参数可作为可选参数用在 \texttt{tikzpicture} 环境或 \mintinline{LaTeX}{\tikz} 命令时，参数会影响到所有具体
-的绘图命令；用在单个绘图命令 \mintinline{LaTeX}{\draw}、\mintinline{LaTeX}{filldraw} 等时，只对这个命令起效。
+的绘图命令；用在单个绘图命令 \mintinline{LaTeX}{\draw}、\mintinline{LaTeX}{\filldraw} 等时，只对这个命令起效。
 
 TikZ 还提供了 \texttt{scope} 环境，令一些绘图参数在局部起效：
 \begin{minted}{LaTeX}
@@ -888,8 +888,8 @@ TikZ 用 \mintinline{LaTeX}{\node} 命令绘制文字结点：
         \texttt{anchor=south}，以此类推。带参数的形式 \texttt{above=<length>} 指定结点相对于
         \emph{coordinate} 的距离。
         \item \texttt{shape=<shape>} \\ 结点的形状，默认可用 \texttt{rectangle} 和 \texttt{circle}，可省
-        略 \texttt{shape=} 直接写。在导言区使用命令 \mintinline{LaTeX}{\usetikzlibrary}{shapes.geometric}
-        可用更多的形状。
+        略 \texttt{shape=} 直接写。在环境前使用 \mintinline{LaTeX}|\usetikzlibrary{shapes.geometric}|
+        命令可用更多的形状。
         \item \texttt{inner sep=<length> / outer sep=<length>} \\ 结点边界向外和向内的额外距离。
         \item \texttt{minimum size=<length> / minimum height=<length> / minimum width=<length>} \\
         结点的最小大小/高度/宽度。
