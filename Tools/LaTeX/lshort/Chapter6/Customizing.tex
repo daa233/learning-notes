@@ -25,7 +25,7 @@
 这一章的内容可以帮我们实现这一目标，让我们编写可重复利用的模块——宏包和文档类，并在其中自己定义命令和环境，让 \LaTeX 产
 生不同于默认的输出。
 
-\section{自定义命令、环境和宏包}
+\section{自定义命令、环境、宏包和文档类}
 \subsection{定义新命令}
 定义新命令：
 \begin{minted}{LaTeX}
@@ -118,6 +118,112 @@
 上面示例中的 \mintinline{LaTeX}{\rule}、\mintinline{LaTeX}{\stretch} 和 \mintinline{LaTeX}{\hspace} 命
 令后面会介绍。
 
+\subsection{多余的空格}
+在定义一个新环境的时候，很容易会有多余的空格“悄悄溜进来”。这样的小瑕疵有些时候却很致命，例如我们想创建一个没有缩进的标
+题环境、并且希望紧跟这个环境后面的段落也不要缩进的时候。\mintinline{LaTeX}{\ignorespaces} 命令会忽略环境开始部分
+的所有空格。想在环境结束后不留空格有点麻烦，可以用 \mintinline{LaTeX}{\ignorespacesafterend} 命令，它的作用是在
+环境的‘end’之后执行 \mintinline{LaTeX}{\ignorespaces}。
+示例代码：
+\begin{minted}{LaTeX}
+    \newenvironment{simple}
+        {\noindent}
+        {\par\noindent} % \par ends the paragraph
+    % in the document body:
+    \begin{simple}
+        See the space \\ to the left.
+    \end{simple}
+    Same \\ here.
+
+    \newenvironment{correct}
+        {\noindent\ignorespaces}
+        {\par\noindent\ignorespacesafterend}
+    % in the document body:
+    \begin{correct}
+        No space \\ to the left
+    \end{correct}
+    Same \\ here.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \newenvironment{simple}
+        {\noindent}
+        {\par\noindent} % \par ends the paragraph
+    % in the document body:
+    \begin{simple}
+        See the space \\ to the left.
+    \end{simple}
+    Same \\ here.
+
+    \newenvironment{correct}
+        {\noindent\ignorespaces}
+        {\par\noindent\ignorespacesafterend}
+    % in the document body:
+    \begin{correct}
+        No space \\ to the left
+    \end{correct}
+    Same \\ here.
+\end{quote}
+
+\subsection{\LaTeX 的命令行参数}
+如果用的是类 Unix 操作系统，就可能会用 Makefile 来构建 \LaTeX 项目，然后就可以用不同的命令行参数使使同一份文档编译
+出不同的版本。如果在文档中加入下面的代码：
+\begin{minted}{LaTeX}
+    \usepackage{ifthen}
+    \ifthenelse{\equal{\blackandwhite}{true}}{
+        % "black and white" mode; do something...
+    }{
+        % "color" mode; do something different...
+    }
+\end{minted}
+
+然后利用下面的命令调用 \LaTeX：
+\begin{minted}{LaTeX}
+    latex '\newcommand{blackandwhite}{true}\input{test.tex}'
+\end{minted}
+
+首先 \mintinline{LaTeX}{\blackandwhite} 命令会被定义，然后真实的文件会被读取。如果将
+\mintinline{LaTeX}{\blackandwhite}设置为 false，文档就会输出彩色版本。
+
+\subsection{定义新宏包}
+如果定义了很多的新环境和新命令，文档的导言区就会很长。这时，就可以定义一个 \LaTeX 宏包来包含所有新环境和新命令的定义。
+需要时，再在文档中通过 \mintinline{LaTeX}{\usepackage} 命令调用。
+
+如果想要自定义一个宏包，基本的工作是要将原来写在文档导言区的很长的内容拷贝到一个 \texttt{.sty} 文件中，并且需要在文件
+最前面加上 \mintinline{LaTeX}|\ProviedesPackage{package name}| 命令，这个命令可以在多次包含宏包的问题提示错
+误。其中，\emph{package name} 要和我们定义的宏包名相同。
+
+示例代码：
+\begin{minted}{LaTeX}
+    % Demo Package by Tobias Oetiker
+    \ProvidesPackage{demopack}
+    \newcommand{\tnss}{The not so Short Introduction to \LaTeXe}
+    \newcommand{\txsit}[1]{The \emph{#1} Short Introduction to \LaTeXe}
+    \newenvironment{king}{\begin{quote}}{\end{quote}}
+\end{minted}
+
+如果想进一步把各种宏包的功能汇总到一个文件里，而不是在文档的导言区罗列一大堆宏包的话，\LaTeX 允许我们在自己编写的宏包
+中调用其他宏包，命令为 \mintinline{LaTeX}{\RequirePackage}，用法和 \mintinline{LaTeX}{\usepackage} 一致：
+\begin{minted}{LaTeX}
+    \RequirePackage[options]{package name}
+\end{minted}
+
+\subsection{定义新的文档类}
+再进一步，如果想编写自己的文档类，如论文模板等，问题就稍稍麻烦一些了。首先，要把自定义的文档类文件以 \texttt{.cls} 作
+为扩展名，开头使用 \mintinline{LaTeX}{\ProvidesClass} 命令：
+\begin{minted}{LaTeX}
+    \ProvidesClass{class name}
+\end{minted}
+
+同样地，\emph{class name} 也要和文档类的文件名一致。
+
+但是有了上述命令和之前学到的一些命令，还不足以完成一个文档类的编写。因为诸如 \mintinline{LaTeX}{\chapter}、
+\mintinline{LaTeX}{\section} 等等许多命令都是在文档类中定义的。事实上，许多时候我们只需要像调用宏包那样调用一个基
+本的文档类，这样可以省去许多不必要的麻烦。在文档类中使用其他文档类的命令是 \mintinline{LaTeX}{\LoadClass}，用法和
+\mintinline{LaTeX}{\documentclass} 十分相像：
+\begin{minted}{LaTeX}
+    \LoadClass[options]{package name}
+\end{minted}
 
 
 \end{document}
