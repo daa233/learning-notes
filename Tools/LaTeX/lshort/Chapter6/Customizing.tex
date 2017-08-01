@@ -225,5 +225,210 @@
     \LoadClass[options]{package name}
 \end{minted}
 
+\section{字体和字号}
+\subsection{改变字体的命令}
+\LaTeX 默认会根据文档的逻辑结构（章节、脚注等）自动选择适当的字体和字号。但是如果我们想自己手动地改变它们，这时就
+可以用表~\ref{tab:fonts} 和表~\ref{tab:sizes}。每种字体的真实大小是由文档类和它的设置决定的。
+表~\ref{tab:pointsizes} 展示了这些命令的绝对磅值，是由标准文档类定义的。
+
+示例代码：
+\begin{minted}{LaTeX}
+    {\small The smal and \textbf{bold} Romans ruled}
+    {\Large all of great big \textit{Italy}.}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    {\small The smal and \textbf{bold} Romans ruled}
+    {\Large all of great big \textit{Italy}.}
+\end{quote}
+
+\LaTeXe 的一个重要特点是字体的属性是独立的。意思是，如果一段文字事先被设置了粗体或斜体，后来又改变了它的字号或者字体，
+它会在原来粗体或斜体设置的基础上变化。
+
+在数学模式中，使用改变字体命令可以暂时地退出数学模式，并且输入一些正常的字体。如果想换成另一种数学排版字体，需要使用到
+表~\ref{tab:mathfonts} 中的一些命令。
+
+\begin{table}[!bp]
+\centering
+\caption{字体命令} \label{tab:fonts}
+%
+% Alan suggested not to tell about the other form of the command
+% eg \verb|\sffamily| or \verb|\bfseries|. This seems a good thing to me.
+%
+\begin{tabular}{@{}rl@{\qquad}rl@{}}
+\mintinline{LaTeX}|\textrm{...}|        &      \textrm{roman}&
+\mintinline{LaTeX}|\textsf{...}|        &      \textsf{sans serif}\\
+\mintinline{LaTeX}|\texttt{...}|        &      \texttt{typewriter}\\[6pt]
+\mintinline{LaTeX}|\textmd{...}|        &      \textmd{medium}&
+\mintinline{LaTeX}|\textbf{...}|        &      \textbf{bold face}\\[6pt]
+\mintinline{LaTeX}|\textup{...}|        &       \textup{upright}&
+\mintinline{LaTeX}|\textit{...}|        &       \textit{italic}\\
+\mintinline{LaTeX}|\textsl{...}|        &       \textsl{slanted}&
+\mintinline{LaTeX}|\textsc{...}|        &       \textsc{Small Caps}\\[6pt]
+\mintinline{LaTeX}|\emph{...}|          &            \emph{emphasized} &
+\mintinline{LaTeX}|\textnormal{...}|    &    \textnormal{document} font
+\end{tabular}
+\end{table}
+
+\begin{table}[!bp]
+\centering
+\caption{字号命令} \label{tab:sizes}
+\begin{tabular}{@{}ll}
+\mintinline{LaTeX}|\tiny|      & \tiny        tiny font \\
+\mintinline{LaTeX}|\scriptsize|   & \scriptsize  very small font\\
+\mintinline{LaTeX}|\footnotesize| & \footnotesize  quite small font \\
+\mintinline{LaTeX}|\small|        &  \small            small font \\
+\mintinline{LaTeX}|\normalsize|   &  \normalsize  normal font \\
+\mintinline{LaTeX}|\large|        &  \large       large font
+\end{tabular}%
+\qquad\begin{tabular}{ll@{}}
+\mintinline{LaTeX}|\Large|        &  \Large       larger font \\[5pt]
+\mintinline{LaTeX}|\LARGE|        &  \LARGE       very large font \\[5pt]
+\mintinline{LaTeX}|\huge|         &  \huge        huge \\[5pt]
+\mintinline{LaTeX}|\Huge|         &  \Huge        largest
+\end{tabular}
+\end{table}
+
+\begin{table}[!tbp]
+\centering
+\caption{标准文档类中字号的绝对磅值} \label{tab:pointsizes}
+\begin{tabular}{lrrr}
+\multicolumn{1}{c}{size} &
+\multicolumn{1}{c}{10pt (default) } &
+           \multicolumn{1}{c}{11pt option}  &
+           \multicolumn{1}{c}{12pt option}\\
+\verb|\tiny|       & 5pt  & 6pt & 6pt\\
+\verb|\scriptsize| & 7pt  & 8pt & 8pt\\
+\verb|\footnotesize| & 8pt & 9pt & 10pt \\
+\verb|\small|        & 9pt & 10pt & 11pt \\
+\verb|\normalsize| & 10pt & 11pt & 12pt \\
+\verb|\large|      & 12pt & 12pt & 14pt \\
+\verb|\Large|      & 14pt & 14pt & 17pt \\
+\verb|\LARGE|      & 17pt & 17pt & 20pt\\
+\verb|\huge|       & 20pt & 20pt & 25pt\\
+\verb|\Huge|       & 25pt & 25pt & 25pt\\
+\end{tabular}
+\end{table}
+
+\begin{table}[!bp]
+\centering
+\caption{数学字体} \label{tab:mathfonts}
+\begin{tabular}{@{}ll@{}}
+\mintinline{LaTeX}|\mathrm{...}|&     $\mathrm{Roman\ Font}$\\
+\mintinline{LaTeX}|\mathbf{...}|&     $\mathbf{Boldface\ Font}$\\
+\mintinline{LaTeX}|\mathsf{...}|&     $\mathsf{Sans\ Serif\ Font}$\\
+\mintinline{LaTeX}|\mathtt{...}|&     $\mathtt{Typewriter\ Font}$\\
+\mintinline{LaTeX}|\mathit{...}|&     $\mathit{Italic\ Font}$\\
+\mintinline{LaTeX}|\mathcal{...}|&    $\mathcal{CALLIGRAPHIC\ FONT}$\\
+\mintinline{LaTeX}|\mathnormal{...}|& $\mathnormal{Normal\ Font}$\\
+\end{tabular}
+\end{table}
+
+和字体命令相结合，花括号能够限定字体命令的作用范围。
+
+示例代码：
+\begin{minted}{LaTeX}
+    He likes {\LARGE large and {\small small} letters}.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    He likes {\LARGE large and {\small small} letters}.
+\end{quote}
+
+字体命令还有可能会改变行间距，但是只有当段落在字体命令作用范围内结束时这种情况才会发生。注意下面两个示例中
+\mintinline{LaTeX}{\par} 的位置，以及它们行间距的不同。
+
+示例代码 1：
+\begin{minted}{LaTeX}
+    {\Large Don't read this! It is not true.\\ You can believe me!\par}
+\end{minted}
+
+示例输出 1：
+\begin{quote}
+    {\Large Don't read this! It is not true.\\ You can believe me!\par}
+\end{quote}
+
+示例代码 2：
+\begin{minted}{LaTeX}
+    {\Large This is not true either.\\ But remember I am a liar.}\par
+\end{minted}
+
+示例输出 2：
+\begin{quote}
+    {\Large This is not true either.\\ But remember I am a liar.}\par
+\end{quote}
+
+如果想改变一整段文字的字号的话，可以使用字体命令对应的字体环境，这样可以避免一些眼花缭乱的花括号。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \begin{Large}
+        This is not true.\\ But then again, what is these days \ldots
+    \end{Large}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \begin{Large}
+        This is not true.\\ But then again, what is these days \ldots
+    \end{Large}
+\end{quote}
+
+\subsection{Danger, Will Robinson, Danger}
+正如本节开始时提到的那样，在文档中到处使用指定字体的命令是危险的，这不符合 \LaTeX 的逻辑结构。如果想在文档中的许多
+地方用某种格式来排版特定的信息，我们应该使用 \mintinline{LaTeX}{\newcommand} 命令来定义一个“逻辑封装命令”来改变字
+体。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \newcommand{\oops}[1]{\textbf{#1}}
+    % in the document body:
+    Do not \oops{enter} this room, it's occupied by \oops{machines} of unknown purpose.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \newcommand{\oops}[1]{\textbf{#1}}
+    % in the document body:
+    Do not \oops{enter} this room, it's occupied by \oops{machines} of unknown purpose.
+\end{quote}
+
+需要注意告诉 \LaTeX 去强调（\emph{emphasize}）某些文字和使某些文字使用不同字体的区别。\mintinline{LaTeX}{\emph}
+命令是可以知道上下文的，但是具体的字体设置命令是绝对的，不会因上下文的不同而发生变化。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \textit{You can also \emph{emphasize} text if it is set in italics,}
+    \textsf{in a \emph{sans-serif} font,}
+    \texttt{or in \emph{typewriter} style.}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \textit{You can also \emph{emphasize} text if it is set in italics,}
+    \textsf{in a \emph{sans-serif} font,}
+    \texttt{or in \emph{typewriter} style.}
+\end{quote}
+
+\subsection{建议}
+\begin{minted}{LaTeX}
+  \underline{\textbf{Remember\Huge!}} \textit{The}
+  \textsf{M\textbf{\LARGE O} \texttt{R}\textsl{E}} fonts \Huge you
+  \tiny use \footnotesize \textbf{in} a \small \texttt{document},
+  \large \textit{the} \normalsize more \textsc{readable} and
+  \textsl{\textsf{beautiful} it bec\large o\Large m\LARGE e\huge s}.
+\end{minted}
+
+\begin{quote}
+  \underline{\textbf{Remember\Huge!}} \textit{The}
+  \textsf{M\textbf{\LARGE O} \texttt{R}\textsl{E}} fonts \Huge you
+  \tiny use \footnotesize \textbf{in} a \small \texttt{document},
+  \large \textit{the} \normalsize more \textsc{readable} and
+  \textsl{\textsf{beautiful} it bec\large o\Large m\LARGE e\huge s}.
+\end{quote}
+
+
 
 \end{document}
