@@ -11,6 +11,12 @@
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
 \date{\today}
 
+% Define a newcommand to show visible space
+\newcommand\Vtextvisiblespace[1][.3em]{%
+  \mbox{\kern.06em\vrule height 1ex}%
+  \vbox{\hrule width#1}%
+  \hbox{\vrule height 1ex}}
+
 
 \begin{document}
 \maketitle
@@ -428,6 +434,147 @@
   \large \textit{the} \normalsize more \textsc{readable} and
   \textsl{\textsf{beautiful} it bec\large o\Large m\LARGE e\huge s}.
 \end{quote}
+
+\section{间距（Spacing）}
+\subsection{行间距（Line Spacing）}
+如果想要大一点的行间距，可以在文档的导言区加入 \mintinline{LaTeX}|\linespread{factor}| 命令。例如，使用
+\mintinline{LaTeX}|\linespread{1.3}| 命令扩大到1.5倍行距，使用 \mintinline{LaTeX}|\linespread{1.6}| 扩
+大到双倍行距。通常行间距不会扩大，所以 \emph{factor} 的值默认为1。
+
+需要注意，\mintinline{LaTeX}{\linespread} 命令的效果会很明显，所以轻易不要使用。如果非要用它改变行距的话，可以用
+下面的命令：
+\begin{minted}{LaTeX}
+    \setlength{\baselineskip}{1.5\baselineskip}
+\end{minted}
+
+示例代码：
+\begin{minted}{LaTeX}
+    {\setlength{\baselineskip}{1.5\baselineskip}
+    This paragraph is typeset with the baseline skip set to 1.5 of what it
+    was before. Note the par command at the end of the paragraph.\par}
+
+    This paragraph has a clear purpose, it shows that after the curly brace
+    has been closed, everything is back to normal.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    {\setlength{\baselineskip}{1.5\baselineskip}
+    This paragraph is typeset with the baseline skip set to 1.5 of what it
+    was before. Note the par command at the end of the paragraph.\par}
+
+    This paragraph has a clear purpose, it shows that after the curly brace
+    has been closed, everything is back to normal.
+\end{quote}
+
+\subsection{段落格式}
+在 \LaTeX 中，有两个参数可以影响段落的布局。在导言区中加入以下命令可以改变这两个参数：
+\begin{minted}{LaTeX}
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\end{minted}
+上面的两个命令将段落缩进设置为0，并增加了段间距。
+
+命令中的 \texttt{plus} 和 \texttt{minus} 会告诉 \TeX{}，如果有必要的话，允许它根据指定的长度压缩或扩张段间距。
+
+在欧洲大陆，经常是段首不缩进、段落之间留有空隙。但是需要留意的是，这也会对目录产生影响，目录的各行会变得更加稀松。为
+了避免这种情况，可以将上面的两个命令从导言区移动到文档正文的 \mintinline{LaTeX}{\tableofcontents} 命令之后，或者
+干脆就不要用这两个命令，因为大多数的专业书籍都是使用段首缩进、段落之间不留空隙的。
+
+如果想让一个段首没有缩进的段落进行缩进，可以在段落开头添加 \mintinline{LaTeX}{\indent} 命令。显然，这个命令只有在
+\mintinline{LaTeX}{\parindent} 没有设置为0时才会生效。
+
+如果想创建一个段首不缩进的段落，可以在段落开头使用 \mintinline{LaTeX}{\noindent} 命令。这个命令通常用在文档起始处
+直接进入正文而没有使用 \mintinline{LaTeX}{\section} 命令的情况。
+
+\subsection{水平间距}
+\LaTeX 会自动决定词句之间的间距。如果想要添加额外的水平间距，使用 \mintinline{LaTeX}|\hspace{length}| 命令。
+
+如果在行首或行末也需要额外的间距，这时要换成 \mintinline{LaTeX}{\hspace*} 命令。\emph{length} 是间距的长度，最
+简单的写法就是一个数值加一个单位。常用的单位见表~\ref{tab:length_units}。
+
+\begin{table}[tbp]
+\centering
+\caption{\TeX{} 中常用的长度单位} \label{tab:length_units}
+\begin{tabular}{@{}ll@{}}
+\texttt{mm} & millimetre $\approx 1/25$~inch \quad \Vtextvisiblespace[1mm]  \\
+\texttt{cm} & centimetre = 10~mm  \quad \Vtextvisiblespace[1cm]             \\
+\texttt{in} & inch $=$ 25.4~mm \quad \Vtextvisiblespace[1in]                    \\
+\texttt{pt} & point $\approx 1/72$~inch $\approx \frac{1}{3}$~mm  \quad\Vtextvisiblespace[1pt]\\
+\texttt{em} & approx width of an `M' in the current font \quad \Vtextvisiblespace[1em]\\
+\texttt{ex} & approx height of an `x' in the current font \quad \Vtextvisiblespace[1ex]
+\end{tabular}
+\end{table}
+
+示例代码：
+\begin{minted}{LaTeX}
+    This\hspace{1.5cm}is a space of 1.5 cm.
+\end{minted}
+
+示例输出：
+\begin{quote}
+    This\hspace{1.5cm}is a space of 1.5 cm.
+\end{quote}
+
+\mintinline{LaTeX}|\stretch{n}| 命令会产生一个特殊的有弹性的橡胶间距，它会伸展到将所在行的所有空隙占满。如果一行
+内使用了多个 \mintinline{LaTeX}|\hspace{\stretch{n}}| 命令，它们根据自己的伸展优先级来按比例分配这一行的所有空
+隙。
+
+示例代码：
+\begin{minted}{LaTeX}
+    x\hspace{\stretch{1}}x\hspace{\stretch{3}}x
+\end{minted}
+
+示例输出：
+\begin{quote}
+    x\hspace{\stretch{1}}x\hspace{\stretch{3}}x
+\end{quote}
+
+在文本中间添加水平间距时，我们希望间距的大小和当前的字号大小是一致的。这时就可以使用文本相关的单位 \texttt{em} 和
+\texttt{ex}。
+
+示例代码：
+\begin{minted}{LaTeX}
+    {\Large{}big\hspace{1em}y}\\
+    {\tiny{}tin\hspace{1em}y}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    {\Large{}big\hspace{1em}y}\\
+    {\tiny{}tin\hspace{1em}y}
+\end{quote}
+
+\subsection{垂直间距}
+段落之间、章节之间的间距是 \LaTeX 自动控制的。如果有必要，可以通过 \mintinline{LaTeX}|\vspace{length}| 命令
+来添加额外的垂直间距。
+
+一般来说，这个命令应该放在两个空行之间。如果这个命令需要用在一页的开头或结尾，这时要换成
+\mintinline{LaTeX}{\vspace*} 命令。
+
+\mintinline{LaTeX}{\stretch} 命令配合 \mintinline{LaTeX}{\pagebreak} 命令，可以容易地排版出一页中的最后一行
+文字，或者用来使某一页的文字垂直居中。
+
+示例代码：
+\begin{minted}{LaTeX}
+    Some text \ldots
+
+    \vspace{\stretch{1}}
+    This goes onto the last line of the page.\pagebreak
+\end{minted}
+
+示例输出：
+\begin{quote}
+    Some text \ldots
+
+    \vspace{\stretch{1}}
+    This goes onto the last line of the page.\pagebreak
+\end{quote}
+
+同一段落或表格内两行之间的额外间距可以通过 \mintinline{LaTeX}|\\[length]| 命令指定。
+
+通过 \mintinline{LaTeX}{\bigskip} 和 \mintinline{LaTeX}{\smallskip} 命令可以插入一个预定义好的固定垂直间距。
+
 
 
 
