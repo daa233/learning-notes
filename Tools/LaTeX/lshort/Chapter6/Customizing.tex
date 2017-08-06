@@ -599,8 +599,8 @@
 
 \LaTeX 提供了两种命令来改变页面布局的参数。通常需要在文档的导言区使用这些命令：
 \begin{minted}{LaTeX}
-    \setlength{parameter}{length}       // 给某个参数设定一个具体的值
-    \addtolength{parameter}{length}     // 在某个参数值的基础上增加一定值
+    \setlength{parameter}{length}       % 给某个参数设定一个具体的值
+    \addtolength{parameter}{length}     % 在某个参数值的基础上增加一定值
 \end{minted}
 
 实际上，第二个命令比 \mintinline{LaTeX}{\setlength} 要常用，因为它是在已有设置的基础上改动的。
@@ -611,9 +611,9 @@
 
 下面的三个命令可以让我们决定文本字符串的宽度、高度、深度：
 \begin{minted}{LaTeX}
-    \settowidth{variable}{text}
-    \settoheight{variable}{text}
-    \settowidth{variable}{text}
+    \settowidth{variable}{text}  % the width of the box
+    \settoheight{variable}{text} % the length between the baseline and the top of the box
+    \settodepth{variable}{text}  % the length between the baseline and the bottom of the box
 \end{minted}
 
 示例代码：
@@ -650,9 +650,103 @@ $c$ -- is the hypotenuse of the triangel and feels lonely
 $d$ -- finally does not show up here at all. Isn't that puzzling?
 \end{vardesc}
 
+\section{盒子（Boxes）}
+\LaTeX 通过盒子来构建页面。首先，每个字母都是一个小盒子，和其他的字母连接起来成为单词。单词又和单词连接在一起成为句
+子，但是单词和单词之间的连接是有弹性的，它们之间的空隙可以根据特定的情境来压缩或扩张。
 
+这是一种非常简单的说法，但是却说明了盒子是 \TeX{} 的操作单位。并不仅仅只有字母才能作为盒子，我们几乎可以将任何东西都放
+入盒子，包括一些其他的盒子。\LaTeX 在处理时，就会把每个盒子作为一个字母。
 
+之前已经遇到了一些盒子，例如 \texttt{tabular} 环境 和 \mintinline{LaTeX}{\includegraphics} 命令，都会产生盒
+子。这意味着我们可以简单地将两个表格或两张图片并排排版，只要确保它们组合在一起后的宽度不超过文本宽度就行了。
 
+我们还可以选定某一个段落，用 \mintinline{LaTeX}|\parbox[pos]{width}{text}| 命令或
+\mintinline{LaTeX}|\begin{minipage}[pos]{width} text \end{minipage}| 环境将其放入盒子。其中，\emph{pos}
+参数可以设置为 \texttt{c}、\texttt{t} 或 \texttt{b} 来控制盒子的垂直对齐方式。\emph{width} 参数用于指定盒子的
+宽度。\texttt{minipage} 和 \mintinline{LaTeX}{\parbox} 的主要区别是，\texttt{parbox} 中不能使用所有的命令
+和环境，但是 \texttt{minipage} 中几乎可以任何东西。
 
+\mintinline{LaTeX}{\mbox} 命令只处理水平对齐的内容。它只是把一些盒子打包成另一个盒子，也可以用来防止某两个词被
+\LaTeX 打断。由于盒子中可以嵌套盒子，这些水平方向的盒子有很高的灵活性。
+\begin{minted}{LaTeX}
+    \mbox{text}
+    \makebox[width][pos]{text}
+\end{minted}
+\emph{width} 决定了盒子外框的大小。除了长度表达式以外，还可以在 \emph{width} 参数中使用
+\mintinline{LaTeX}{\width}、\mintinline{LaTeX}{\height}、\mintinline{LaTeX}{\depth} 和
+\mintinline{LaTeX}{\totalheight}，这些值都会从排版的文字获得。\emph{pos} 参数可以是 \texttt{c}(center)、
+\texttt{l}(flushleft) 或 \texttt{s}(spread the text to fill the box)。
+
+\mintinline{LaTeX}{\framebox} 和 \mintinline{LaTeX}{\makebox} 很像，但是它会在文本外面画出一个方框。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \makebox[\textwidth]{c e n t r a l} \par
+    \makebox[\textwidth][s]{s p r e a d} \par
+    \framebox[1.1\width]{Guess I'm framed now!} \par
+    \framebox[0.8\width][r]{Bummer, I am too wide} \par
+    \framebox[1cm][l]{never mind, so am I}
+    Can you read this?
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \makebox[\textwidth]{c e n t r a l} \par
+    \makebox[\textwidth][s]{s p r e a d} \par
+    \framebox[1.1\width]{Guess I'm framed now!} \par
+    \framebox[0.8\width][r]{Bummer, I am too wide} \par
+    \framebox[1cm][l]{never mind, so am I}
+    Can you read this?
+\end{quote}
+
+前面是如何控制盒子的水平方向特性，而下面的命令可以设置盒子的垂直方向特性。
+\begin{minted}{LaTeX}
+    \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
+\end{minted}
+在前三个参数中，都可以使用 \mintinline{LaTeX}{\width}、\mintinline{LaTeX}{\height}、
+\mintinline{LaTeX}{\depth} 和 \mintinline{LaTeX}{\totalheight} 命令，从而对盒子中 \emph{text} 产生影响。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \raisebox{0pt}[0pt][0pt]{\Large\textbf{Aaaa\raisebox{-0.3ex}{a}%
+    \raisebox{-0.7ex}{aa}%
+    \raisebox{-1.2ex}{r}%
+    \raisebox{-2.2ex}{g}%
+    \raisebox{-4.5ex}{h}}}
+    she shouted, but not even the next one in line noticed that something
+    terrible had happened to her.
+\end{minted}
+
+\begin{quote}
+    \raisebox{0pt}[0pt][0pt]{\Large\textbf{Aaaa\raisebox{-0.3ex}{a}%
+    \raisebox{-0.7ex}{aa}%
+    \raisebox{-1.2ex}{r}%
+    \raisebox{-2.2ex}{g}%
+    \raisebox{-4.5ex}{h}}}
+    she shouted, but not even the next one in line noticed that something
+    terrible had happened to her.
+\end{quote}
+
+\section{Rules}
+通常情况下我们用 \mintinline{LaTeX}|\rule[lift]{width}{height}| 来生成一个黑盒子，这在画水平线和垂直线时非常
+有用。注意在代码中，如果在行末紧跟着 \mintinline{LaTeX}{%}，表明这一行未结束，换行就不会产生空格。
+
+示例代码：
+\begin{minted}{LaTeX}
+    \rule{3mm}{.1pt}%
+    \rule[-1mm]{5mm}{1cm}%
+    \rule{3mm}{.1pt}%
+    \rule[1mm]{1cm}{5mm}%
+    \rule{3mm}{.1pt}
+\end{minted}
+
+示例输出：
+\begin{quote}
+    \rule{3mm}{.1pt}%
+    \rule[-1mm]{5mm}{1cm}%
+    \rule{3mm}{.1pt}%
+    \rule[1mm]{1cm}{5mm}%
+    \rule{3mm}{.1pt}
+\end{quote}
 
 \end{document}
