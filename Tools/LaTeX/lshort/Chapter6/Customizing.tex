@@ -5,6 +5,7 @@
 \usepackage{geometry}
 \geometry{a4paper, centering, scale=0.8}
 \usepackage{minted}
+\usepackage{graphicx}   % 为了使用插图功能
 \usepackage{hyperref}
 
 \title{\heiti 第6章 \quad \LaTeX 的私人订制}
@@ -574,6 +575,82 @@
 同一段落或表格内两行之间的额外间距可以通过 \mintinline{LaTeX}|\\[length]| 命令指定。
 
 通过 \mintinline{LaTeX}{\bigskip} 和 \mintinline{LaTeX}{\smallskip} 命令可以插入一个预定义好的固定垂直间距。
+
+\section{页面布局（Page Layout）}
+\LaTeXe 允许我们在 \mintinline{LaTeX}{\documentclass} 命令中指定纸张的大小。然后它会自动地选择合适的文本间距，
+但是有时候我们可能会对它的默认值不满意，这时我们可以通过 tools 宏集中的 \texttt{layouts} 宏包来自定义。
+图~\ref{fig:layout} 展示了所有可以被自定义的参数。
+
+\begin{figure}[!tbp]  % figure是插图使用的浮动体环境
+    \centering
+    \includegraphics[scale=0.6]{layout.jpg}
+    \caption{\zihao{-5}\kaishu \emph{lshort} 一书中的页面布局参数。可以尝试 \texttt{layout} 宏包来打印我们
+    自己文档的页面布局。}
+    \label{fig:layout}
+\end{figure}
+
+\emph{等一下！} 当你欣喜万分，想“不如把这么窄的页面变宽”的时候，先冷静一下。\LaTeX 中大多数东西之所以是那个样子，是
+有它们合理的理由的。
+
+的确，和 MS Word 的页面相比，\LaTeX 的页面显得有些窄。但是如果看一下我们喜欢的书籍，并数一数每一行大概有多少字符。然
+后你会发现一般每一行的字符数不会超过 66，同样地，\LaTeX 默认的页面布局每一行一般也不超过 66 个字符。经验表明，当一行
+文字太长时，阅读起来会变得困难。这是因为一行文字如果太长，人们从这一行的末尾移动到下一行的开头会比较费劲。这也是为什么
+报纸要排版成多个竖栏。所以，当我们增加页面的宽度的时候，要考虑到这会使读者的阅读变得困难。
+
+\LaTeX 提供了两种命令来改变页面布局的参数。通常需要在文档的导言区使用这些命令：
+\begin{minted}{LaTeX}
+    \setlength{parameter}{length}       // 给某个参数设定一个具体的值
+    \addtolength{parameter}{length}     // 在某个参数值的基础上增加一定值
+\end{minted}
+
+实际上，第二个命令比 \mintinline{LaTeX}{\setlength} 要常用，因为它是在已有设置的基础上改动的。
+
+\subsection{更有趣的长度}
+在写 \LaTeX 文档的时候，最好尽可能地避免使用绝对长度。尽量使用一些别的页面元素的长度来替代绝对长度，例如我们想让图片的
+宽度铺满页面，就可以使用 \mintinline{LaTeX}{\textwidth} 命令。
+
+下面的三个命令可以让我们决定文本字符串的宽度、高度、深度：
+\begin{minted}{LaTeX}
+    \settowidth{variable}{text}
+    \settoheight{variable}{text}
+    \settowidth{variable}{text}
+\end{minted}
+
+示例代码：
+\begin{minted}{LaTeX}
+    \newenvironment{vardesc}[1]{
+        \settowidth{\parindent}{#1:\ }
+        \makebox[0pt][r]{#1:\ }}{}
+
+    \begin{displaymath}
+    a^2 + b^2 = c^2
+    \end{displaymath}
+
+    \begin{vardesc}{Where}$a$, $b$ -- are adjacent to the right angle of a right-angled triangle.
+
+    $c$ -- is the hypotenuse of the triangel and feels lonely
+
+    $d$ -- finally does not show up here at all. Isn't that puzzling?
+    \end{vardesc}
+\end{minted}
+
+示例输出：
+\newenvironment{vardesc}[1]{
+    \settowidth{\parindent}{#1:\ }
+    \makebox[0pt][r]{#1:\ }}{}
+
+\begin{displaymath}
+a^2 + b^2 = c^2
+\end{displaymath}
+
+\begin{vardesc}{Where}$a$, $b$ -- are adjacent to the right angle of a right-angled triangle.
+
+$c$ -- is the hypotenuse of the triangel and feels lonely
+
+$d$ -- finally does not show up here at all. Isn't that puzzling?
+\end{vardesc}
+
+
 
 
 
