@@ -26,8 +26,8 @@
 
 \newpage
 
-之前学到的一些命令看似都够用了，但是它们的输出的效果有时并不是特别好看。而且有的时候，\LaTeX 提供的命令或环境并不能满足我们
-的要求。试想：我要如何制作一个简单但像样的毕业论文/书籍/简历模板，每次都可以直接套用，而不是再在导言区写一堆代码？
+之前学到的一些命令看似都够用了，但是它们的输出的效果有时并不是特别好看。而且有的时候，\LaTeX 提供的命令或环境并不能满
+足我们的要求。试想：我要如何制作一个简单但像样的毕业论文/书籍/简历模板，每次都可以直接套用，而不是再在导言区写一堆代码？
 
 这一章的内容可以帮我们实现这一目标，让我们编写可重复利用的模块——宏包和文档类，并在其中自己定义命令和环境，让 \LaTeX 产
 生不同于默认的输出。
@@ -48,14 +48,14 @@
 \begin{minted}{LaTeX}
     \newcommand{\tnss}{The not so Short Introduction to \LaTeXe}
     % in the document body:
-    This is "\tnss" \ldots{} "\tnss"
+    This is ``\tnss'' \ldots{} ``\tnss''
 \end{minted}
 
 示例输出1：
 \begin{quote}
     \newcommand{\tnss}{The not so Short Introduction to \LaTeXe}
     % in the document body:
-    This is "\tnss" \ldots{} "\tnss"
+    This is ``\tnss'' \ldots{} ``\tnss''
 \end{quote}
 
 示例 2 定义了包含参数的命令。使用定义的命令的时候，在 \texttt{\#1} 的位置指定参数。如果需要定义更多的参数，使用
@@ -128,8 +128,9 @@
 \subsection{多余的空格}
 在定义一个新环境的时候，很容易会有多余的空格“悄悄溜进来”。这样的小瑕疵有些时候却很致命，例如我们想创建一个没有缩进的标
 题环境、并且希望紧跟这个环境后面的段落也不要缩进的时候。\mintinline{LaTeX}{\ignorespaces} 命令会忽略环境开始部分
-的所有空格。想在环境结束后不留空格有点麻烦，可以用 \mintinline{LaTeX}{\ignorespacesafterend} 命令，它的作用是在
-环境的‘end’之后执行 \mintinline{LaTeX}{\ignorespaces}。
+的所有空格。想在环境结束后不留空格有点麻烦，可以用 \linebreak[6] \mintinline{LaTeX}{\ignorespacesafterend} 命令，它的作用是在
+环境的“end”之后执行 \mintinline{LaTeX}{\ignorespaces}。
+
 示例代码：
 \begin{minted}{LaTeX}
     \newenvironment{simple}
@@ -190,7 +191,7 @@
 \end{minted}
 
 首先 \mintinline{LaTeX}{\blackandwhite} 命令会被定义，然后真实的文件会被读取。如果将
-\mintinline{LaTeX}{\blackandwhite}设置为 false，文档就会输出彩色版本。
+\mintinline{LaTeX}{\blackandwhite} 设置为 false，文档就会输出彩色版本。
 
 \subsection{定义新宏包}
 如果定义了很多的新环境和新命令，文档的导言区就会很长。这时，就可以定义一个 \LaTeX 宏包来包含所有新环境和新命令的定义。
@@ -439,8 +440,8 @@
 \section{间距（Spacing）}
 \subsection{行间距（Line Spacing）}
 如果想要大一点的行间距，可以在文档的导言区加入 \mintinline{LaTeX}|\linespread{factor}| 命令。例如，使用
-\mintinline{LaTeX}|\linespread{1.3}| 命令扩大到1.5倍行距，使用 \mintinline{LaTeX}|\linespread{1.6}| 扩
-大到双倍行距。通常行间距不会扩大，所以 \emph{factor} 的值默认为1。
+\linebreak[6] \mintinline{LaTeX}|\linespread{1.3}| 命令扩大到1.5倍行距，使用 \mintinline{LaTeX}|\linespread{1.6}| 扩
+大到双倍行距。通常不需要扩大行间距，所以 \emph{factor} 的值默认为1。
 
 需要注意，\mintinline{LaTeX}{\linespread} 命令的效果会很明显，所以轻易不要使用。如果非要用它改变行距的话，可以用
 下面的命令：
@@ -499,7 +500,7 @@
 \caption{\TeX{} 中常用的长度单位} \label{tab:length_units}
 \begin{tabular}{@{}ll@{}}
 \texttt{mm} & millimetre $\approx 1/25$~inch \quad \Vtextvisiblespace[1mm]  \\
-\texttt{cm} & centimetre = 10~mm  \quad \Vtextvisiblespace[1cm]             \\
+\texttt{cm} & centimetre $=$ 10~mm  \quad \Vtextvisiblespace[1cm]             \\
 \texttt{in} & inch $=$ 25.4~mm \quad \Vtextvisiblespace[1in]                    \\
 \texttt{pt} & point $\approx 1/72$~inch $\approx \frac{1}{3}$~mm  \quad\Vtextvisiblespace[1pt]\\
 \texttt{em} & approx width of an `M' in the current font \quad \Vtextvisiblespace[1em]\\
@@ -626,7 +627,8 @@
     a^2 + b^2 = c^2
     \end{displaymath}
 
-    \begin{vardesc}{Where}$a$, $b$ -- are adjacent to the right angle of a right-angled triangle.
+    \begin{vardesc}{Where}$a$, $b$ -- are adjacent to the right angle of a
+        right-angled triangle.
 
     $c$ -- is the hypotenuse of the triangel and feels lonely
 
@@ -643,7 +645,8 @@
 a^2 + b^2 = c^2
 \end{displaymath}
 
-\begin{vardesc}{Where}$a$, $b$ -- are adjacent to the right angle of a right-angled triangle.
+\begin{vardesc}{Where}$a$, $b$ -- are adjacent to the right angle of a
+    right-angled triangle.
 
 $c$ -- is the hypotenuse of the triangel and feels lonely
 
@@ -660,7 +663,7 @@ $d$ -- finally does not show up here at all. Isn't that puzzling?
 之前已经遇到了一些盒子，例如 \texttt{tabular} 环境 和 \mintinline{LaTeX}{\includegraphics} 命令，都会产生盒
 子。这意味着我们可以简单地将两个表格或两张图片并排排版，只要确保它们组合在一起后的宽度不超过文本宽度就行了。
 
-我们还可以选定某一个段落，用 \mintinline{LaTeX}|\parbox[pos]{width}{text}| 命令或
+我们还可以选定某一个段落，用 \mintinline{LaTeX}|\parbox[pos]{width}{text}| 命令或 \linebreak[7]
 \mintinline{LaTeX}|\begin{minipage}[pos]{width} text \end{minipage}| 环境将其放入盒子。其中，\emph{pos}
 参数可以设置为 \texttt{c}、\texttt{t} 或 \texttt{b} 来控制盒子的垂直对齐方式。\emph{width} 参数用于指定盒子的
 宽度。\texttt{minipage} 和 \mintinline{LaTeX}{\parbox} 的主要区别是，\texttt{parbox} 中不能使用所有的命令
@@ -704,7 +707,8 @@ $d$ -- finally does not show up here at all. Isn't that puzzling?
     \raisebox{lift}[extend-above-baseline][extend-below-baseline]{text}
 \end{minted}
 在前三个参数中，都可以使用 \mintinline{LaTeX}{\width}、\mintinline{LaTeX}{\height}、
-\mintinline{LaTeX}{\depth} 和 \mintinline{LaTeX}{\totalheight} 命令，从而对盒子中 \emph{text} 产生影响。
+\mintinline{LaTeX}{\depth} 和 \mintinline{LaTeX}{\totalheight} 命令，从而对盒子中的 \emph{text} 产生影
+响。
 
 示例代码：
 \begin{minted}{LaTeX}
@@ -729,7 +733,7 @@ $d$ -- finally does not show up here at all. Isn't that puzzling?
 
 \section{Rules}
 通常情况下我们用 \mintinline{LaTeX}|\rule[lift]{width}{height}| 来生成一个黑盒子，这在画水平线和垂直线时非常
-有用。注意在代码中，如果在行末紧跟着 \mintinline{LaTeX}{%}，表明这一行未结束，换行就不会产生空格。
+有用。注意在代码中，如果在行末紧跟着 \texttt{\%}，表明这一行未结束，换行就不会产生空格。
 
 示例代码：
 \begin{minted}{LaTeX}
