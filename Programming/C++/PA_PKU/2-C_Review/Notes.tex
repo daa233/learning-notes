@@ -372,5 +372,199 @@ Array subscripting
     \item \texttt{*E} 相当于把 \texttt{E} 的管辖范围下降了一个级别
 \end{itemize}
 
+\subsection{指针与函数}
+\subsubsection{指针变量做函数参数}
+示例代码：
+\begin{minted}{C++}
+    void Rank(int *q1, int *q2)
+    {
+        int temp;
+        if (*q1 < *q2) {
+            temp = *q1;
+            *q1 = *q2;
+            *q2 = temp;
+        }
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a, b, *p1, *p2;
+        cin >> a >> b;
+        p1 = &a;
+        p2 = &b;
+        Rank(p1, p2);
+        cout << a << " " << b << endl;
+        return 0;
+    }
+\end{minted}
+
+之前学过的是，调用函数时，它会把是实参的值复制一份给形参。在上面的示例中，调用 \linebreak[6]
+\texttt{Rank(int *q1, int *q2)} 函数，\texttt{p1} 和 \texttt{p2} 的值会复制给 \texttt{q1} 和
+\texttt{q2}，但由于 \texttt{p1}、\texttt{p2} 中存储的分别是变量 \texttt{a} 和 \texttt{b} 的地址，所以这之后
+\texttt{q1} 和 \texttt{q2} 会分别指向变量 \texttt{a} 和 \texttt{b}。
+
+\subsubsection{数组名作为函数参数}
+示例代码：
+\begin{minted}{C++}
+    void sum(int *p, int n)
+    {
+        int total = 0;
+        for (int i = 0; i < n; i++) {
+            total += *p++;
+        }
+        cout << total << endl;
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        sum(a, 10);
+        return 0;
+    }
+\end{minted}
+
+通过上面的示例可以看出，可以将数组名作为实参，赋值给指针类型的形参。下面是多维数组名做函数参数的情况。
+
+示例代码：
+\begin{minted}{C++}
+    int maxValue(int (*p)[4])
+    {
+        int max = p[0][0];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (p[i][j] > max) {
+                    max = p[i][j];
+                }
+            }
+        }
+        return max;
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a[3][4] = {{1, 3, 5, 7}, {9, 11, 13, 15}, {2, 4, 6, 8}};
+        cout << "The max value is " << maxValue(a) << endl;
+        return 0;
+    }
+\end{minted}
+
+在多维数组作为函数参数时，函数的形参写作指针比较麻烦，例如上面的 \texttt{(*p)[4]}。这时可以考虑将“数组名”作为形参。
+
+示例代码：
+\begin{minted}{C++}
+    // Sum all elements to the last element, but will change the array.
+    int sum(int array[], int n)
+    {
+        for (int i = 0; i < 10 - 1; i++) {
+            *(array + 1) = *array + *(array + 1);
+            array++;    // Attention!
+        }
+        return *array;
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        cout << sum(a, 10) << endl;
+        return 0;
+    }
+\end{minted}
+
+前面学到数组名不是变量，不能进行 ++/- - 操作，但是上面的示例是可以正确运行的。因为 C++ 编译器会将形参数组名作为指针
+变量来处理。
+
+在编写程序时，将变量地址或数组名传递给一个函数是很危险的，需要谨慎操作，必要时可以对指针的功能加以限制。
+
+\subsubsection{如何“限制”指针的功能}
+符号常量声明语句：
+\begin{itemize}
+    \item 方式一：\texttt{const} 数据类型 常量名 = 常量值;
+    \item 方式二：数据类型 \texttt{const} 常量名 = 常量值;
+\end{itemize}
+
+定义一个指向符号常量的指针：\mintinline{C++}{const int *p;}
+
+示例代码：
+\begin{minted}{C++}
+    int a = 256;
+    const int *p = &a;
+    *p = 257;   // error: read-only variable is not assignable
+    cout << *p << endl;
+\end{minted}
+
+在上面的代码中，把 \texttt{p} 定义为了一个指向符号常量的指针，它所指向的内容是不能被修改的。
+
+在指针或数组名作为函数形参时，如果不希望函数改变指针所指向的内容或数组的内容，可以在定义时在该形参前加 \texttt{const}
+限定符。
+
+如果 \texttt{p} 是一个指向符号常量的指针，我们就不可以修改它指向的内容，但我们可以改变 \texttt{p} 本身的值，使它指
+向其他内容。
+
+示例代码：
+\begin{minted}{C++}
+const int c = 78;
+const int d = 28;
+int e = 18;
+const int *pi = &c;
+// *pi = 58;                // error: read-only variable is not assignable
+pi = &d;                    // pi can be re-assigned value, now pi points to d
+// *pi = 68;                // error: read-only variable is not assignable
+pi = &e;                    // now pi points to e
+// *pi = 88;                // error: read-only variable is not assignable
+\end{minted}
+
+\subsubsection{指针做函数返回值}
+返回指针类型的函数：\mintinline{C++}{int *function(int x, int y);}
+
+示例代码：
+\begin{minted}{C++}
+    int *get(int arr[][4], int n, int m)
+    {
+        it *pt;
+        pt = *(arr + n - 1) + m - 1;
+        return(pt);
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a[4][4] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+        int *p;
+        p = get(a, 2, 3);
+        cout << *p << endl;
+        return 0;
+    }
+\end{minted}
+
+当我们从一个函数中返回一个指针，而指针指向的是一个临时变量（局部变量），这将是非常危险的，我们需要确保函数返回的是一个
+处于生命周期中的变量的地址。例如，可以返回全局变量的地址，而非局部变量的地址。但是使用全局变量会破坏程序的结构性，这时
+可以使用静态局部变量。
+
+一个函数中的静态局部变量的值在函数调用结束后不消失而保留原值。即其占用的存储单元不释放，在下一次该函数调用时，仍可以继
+续使用该变量。其生存周期是定义该变量开始，一直到整个程序结束。跟静态局部变量相对应的是动态局部变量，也就是普通的局部变
+量，它们的有效范围是从定义该变量开始到函数结尾。
+
+使用关键字 \texttt{static} 定义静态局部变量：\mintinline{C++}{static int value = 20;}
+
+示例代码：
+\begin{minted}{C++}
+    void fun()
+    {
+        int a = 0;
+        static int b = 0;
+
+        a = a + 1;
+        b = b + 1;
+
+        cout << "a = " << a << endl;
+        cout << "b = " << b << endl;
+    }
+
+    int main(int argc, char const *argv[]) {
+        for (int i = 0; i < 5; i++) {
+            fun();
+            cout << "Call again!" << endl;
+        }
+        return 0;
+    }
+\end{minted}
+
+运行上面的代码后，最后一次输出 \texttt{a = 1}、\texttt{b = 5}。虽然 \texttt{fun()} 函数被调用了多次，但
+\mintinline{C++}{static int b = 0;} 这个定义静态局部变量 \texttt{b} 的语句仅被执行了一次。
+
 
 \end{document}
