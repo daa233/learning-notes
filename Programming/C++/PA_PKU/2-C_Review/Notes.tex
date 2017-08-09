@@ -566,5 +566,220 @@ pi = &e;                    // now pi points to e
 运行上面的代码后，最后一次输出 \texttt{a = 1}、\texttt{b = 5}。虽然 \texttt{fun()} 函数被调用了多次，但
 \mintinline{C++}{static int b = 0;} 这个定义静态局部变量 \texttt{b} 的语句仅被执行了一次。
 
+\section{结构体与链表}
+\subsection{结构体}
+我们经常希望用一组变量来描述同一个“事物”，可以将这一组变量“捆绑”起来构造一个新的数据类型，称为结构体。
+
+示例代码：
+\begin{minted}{C++}
+    struct student {
+        int id;
+        char name[20];
+        char sex;
+        int age;
+        int score;
+        char address[30];
+    };  // 注意大括号后的“;”
+\end{minted}
+
+结构体一种数据类型，如果要使用结构体，就要使用它来定义变量。
+
+\subsubsection{定义结构体变量的方式}
+\begin{enumerate}
+    \item 直接用已生命的结构体类型定义变量名：\\
+    \mintinline{C++}{student student1, student2;}
+    \item 在声明类型的同时定义变量：
+\begin{minted}{C++}
+struct student {
+    int id;
+    char name[20];
+    char sex;
+    int age;
+    int score;
+    char address[30];
+} student1, student2;   // 注意最后的“;”
+\end{minted}
+\end{enumerate}
+
+\subsubsection{结构体变量的初始化和赋值}
+结构体变量的初始化和数组的初始化很相似：
+\begin{minted}{C++}
+    struct student {
+        int id_num;
+        char name[10];
+    };
+
+    student mike = {123, {'m', 'i', 'k', 'e', '\0'}};
+\end{minted}
+
+赋值时，相当于把一个结构体变量的值复制了一份给另一个结构体变量。
+
+\subsubsection{结构体作为函数参数、函数返回值}
+结构体变量名作为函数参数时，是把结构体变量复制了一份给函数的形参，这与数组名作为函数参数时不同。
+
+结构体变量作为函数返回值时，相当于复制了一份给调用者。
+
+\subsubsection{指向结构体的指针}
+定义指向结构体变量的指针：
+\begin{minted}{C++}
+    student mike = {123, {'m', 'i', 'k', 'e', '\0'}};
+    student *one = &mike;
+    cout << (*one).id_num << " " << (*one).name << endl;    // Right.
+    cout << one->id_num << " " << one->name;                // Right. '->' 为指向运算符
+
+    // error: member reference type 'student' is not a pointer;
+    // cout << mike->id_num << " " << mike->name;
+\end{minted}
+
+指向结构体的指针作为函数参数时，函数就拿到了结构体的地址，可以改变结构体的内容，这和普通类型变量的情况是一致的。
+
+\subsubsection{结构体数组}
+结构体数组和普通类型的数组也是一样的，数组名是指向数组首元素的指针：
+\begin{minted}{C++}
+    student myClass[3] = {
+        123, {'m', 'i', 'k', 'e', '\0'},
+        133, {'t', 'o', 'm', '\0'},
+        143, {'j', 'a', 'c', 'k', '\0'}
+    };
+    student *one = myClass;
+    cout << one->id_num << " " << one->name << endl;    // 123 mike
+    one++;
+    cout << one->id_num << " " << one->name << endl;    // tom
+\end{minted}
+
+综上，结构体数据类型的特性与普通数据类型的特性是一致的。
+
+\subsection{链表}
+在使用结构体数组时会有一些缺点，例如我们想在数组中间插入一个结构体时，为了保持结构体的次序，我们必须把这之后结构体整体
+向后移动。而链表这种数据结构可以很好地解决这个问题，使得各个结构体之间的连接非常灵活。
+
+\subsubsection{链表的结构}
+\begin{itemize}
+    \item 链表头：指向第一个链表结点的指针
+    \item 链表结点：链表中的每一个元素，包括：
+    \begin{itemize}
+        \item 当前节点的数据
+        \item 下一个结点的地址
+    \end{itemize}
+    \item 链表尾：不再指向其他结点的结点，其地址部分放一个 \texttt{NULL}，表示链表到此结束。
+\end{itemize}
+
+\subsubsection{动态创建链表}
+动态地申请内存空间：
+\begin{minted}{C++}
+    // 申请一块内存空间来存放一个 int，初始值为 1024，并返回指向该内存空间的指针 pint
+    int *pint = new int(1024);
+    // 释放 pint 指向的内存
+    delete pint;
+
+    // 申请一块内存用来存放大小为 4 的 int型数组，并返回指向该数组的指针 pia
+    int *pia = new int[4];
+    // 释放 pia 所指向的数组的内存
+    delete[] pia;
+\end{minted}
+
+\pagebreak[6]
+动态地创建链表结点：
+\begin{minted}{C++}
+    struct student {
+        int id;
+        student *next;
+    };
+
+    student *head;
+    head = new student;
+\end{minted}
+
+创建链表的步骤：
+\begin{enumerate}
+    \item 建立头结点 \texttt{head}，新建临时的指针 \texttt{temp} 也指向 \texttt{head}，用于创建后续结点。
+    \begin{minted}{C++}
+    head = new student;
+    student *temp = head;
+    \end{minted}
+    \item 判断是否还要创建结点。
+    \begin{itemize} \label{step:create_list_node}
+        \item 如果需要创建新结点，新申请内存创建一个新的结点，并利用 \texttt{temp} 指针将前一个结点的
+        \texttt{next} 指针指向新结点，最后将 \texttt{temp} 指向新结点，以便于以后再创建新结点。
+    \begin{minted}{C++}
+    temp->next = new student;
+    temp = temp->next;
+    \end{minted}
+        创建完成后，返回步骤~\ref{step:create_list_node}。
+
+        \item 如果不需要再创建结点，执行步骤~\ref{step:creat_list_end}。
+    \end{itemize}
+    \item \label{step:creat_list_end} 将最后一个结点的 \texttt{next} 指针置为 \texttt{NULL}。
+    \begin{minted}{C++}
+    temp->next = NULL;
+    \end{minted}
+\end{enumerate}
+
+\subsubsection{链表的操作}
+在链表创建完成后，我们可能需要对链表进行各种操作，包括遍历链表元素、删除结点、插入结点等。
+
+链表元素的遍历，即依次访问链表的所有元素：
+\begin{minted}{C++}
+    student *pointer = create();
+    while (pointer->next != NULL) {
+        cout << pointer->id << endl;
+        pointer = pointer->next;
+    }
+\end{minted}
+
+删除链表中的结点时，需要分不同的情况进行讨论：
+\begin{itemize}
+    \item 删除头结点
+    \begin{minted}{C++}
+    temp = head;
+    head = head->next;
+    delete temp;
+    \end{minted}
+    \item 删除中间结点和末尾结点
+    \begin{minted}{C++}
+    follow->next = temp->next;
+    delete temp;
+    \end{minted}
+\end{itemize}
+
+在链表中插入一个结点也需要分情况讨论。在向链表中插入新结点时需要格外小心，因为插入结点的操作有严格的顺序，必须先让新结
+点指向后续结点，然后再让前一结点指向新结点。反之，后续结点将会丢失。例如将结点 \texttt{unit} 插入链表：
+\begin{itemize}
+    \item 在最前面插入结点
+    \begin{minted}{C++}
+    unit->next = head;
+    head = unit;
+    \end{minted}
+    \item 在中间插入结点
+    \begin{minted}{C++}
+    unit->next = temp;
+    follow->next = unit;
+    \end{minted}
+    \item 在末尾插入结点
+    \begin{minted}{C++}
+    temp->next = unit;
+    unit->next = NULL;
+    \end{minted}
+\end{itemize}
+
+\subsubsection{双向链表}
+前面讨论的链表都是单向链表，在这样的链表中，每个结点只包含一个指向其后继结点的指针。除了单向链表外，双向链表也很常用。在
+双向链表中，每个结点除了数据区域外，还包含两个指针（\texttt{next}、\texttt{ahead}），分别指向其后继结点和前趋结点。
+
+由于涉及两个指针域，双向链表的删除结点和插入结点操作要比单向链表稍复杂一些。
+
+删除双向链表的 \texttt{temp} 结点：
+\begin{minted}{C++}
+    temp->ahead->next = temp->next;
+    temp->next->ahead = temp->ahead;
+\end{minted}
+
+在双向链表中 \texttt{temp} 结点之后插入 \texttt{unit} 结点：
+\begin{minted}{C++}
+    unit->next = temp->next;
+    unit->ahead = temp->ahead;
+    temp->next->ahead = unit;
+    temp->next = unit;
+\end{minted}
 
 \end{document}
