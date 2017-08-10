@@ -678,6 +678,10 @@ struct student {
     delete[] pia;
 \end{minted}
 
+在创建链表和对链表进行操作时，经常需要用到 \texttt{new} 来动态分配内存。什么时候需要用 \texttt{new}，什么时候不需
+要用呢？这主要是看我们是否真的需要一块新的内存。有时候只是新建一个指针 \texttt{temp} 就能解决问题，并不需要申请内存
+空间。
+
 \pagebreak[6]
 动态地创建链表结点：
 \begin{minted}{C++}
