@@ -1,0 +1,180 @@
+%-*- coding: UTF-8 -*-
+% Notes.tex
+%
+\documentclass[UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{a4paper, centering, scale=0.8}
+\usepackage{minted}
+
+\title{\heiti 《程序设计与算法》——《C++ 程序设计》学习笔记}
+\author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{函数指针}
+\subsection{函数指针的定义}
+程序运行期间，每个函数都会占用一段连续的内存空间。而函数名就是该函数所占内存区域的起始地址（也称“入口地址”）。将入口地
+址赋给一个指针变量，那该指针就指向了这个函数，这种指向函数的指针变量称为“函数指针”。我们可以通过函数指针来调用函数。
+
+定义函数指针：类型名 (*指针变量名)(参数类型1, 参数类型2, ...)
+
+例如：\mintinline{C++}{int (*pf)(int, char);} 表示 \texttt{pf} 是一个函数指针，它所指向的函数返回类型是
+\texttt{int}，该函数应有两个参数，第一个是 \texttt{int} 类型，第二个是 \texttt{char} 类型。
+
+\subsection{函数指针和 qsort 库函数}
+为什么要定义函数指针呢？干嘛不直接用函数名来调用？
+
+如果要对数组排序，需要知道：
+\begin{itemize}
+    \item 数组的起始地址
+    \item 数组元素的个数
+    \item 每个元素的大小（由此可以算出每个元素的地址）
+    \item 元素谁在前谁在后的规则
+\end{itemize}
+
+C 语言快速排序库函数可以对任意类型的数组进行排序：
+\begin{minted}{C++}
+    void qsort(void *base, int nelem, usigned int width,
+        int (*pfCompare)(const viod *, cont void *));
+\end{minted}
+
+\begin{itemize}
+    \item \texttt{base}: 待排数组的起始地址
+    \item \texttt{nelem}: 带排序数组的元素个数
+    \item \texttt{width}: 待排序数组的每个元素的大小（以字节为单位）
+    \item \texttt{pfCompare}: 比较函数（程序员自己编写）的地址
+\end{itemize}
+
+\begin{minted}{C++}
+    int compare(const void *elem1, const void *elem2);    // 比较函数
+\end{minted}
+比较函数的编写规则：
+\begin{enumerate}
+    \item 如果 \texttt{*elem1} 应该排在 \texttt{*elem2} 前面，则函数返回值是负整数
+    \item 如果 \texttt{*elem1} 和 \texttt{*elem2} 哪个排在前面都行，那么函数返回 0
+    \item 如果 \texttt{*elem1} 应该排在 \texttt{*elem2} 后面，则函数返回值是正整数
+\end{enumerate}
+
+一个比较函数的示例：
+\begin{minted}{C++}
+    int myCompare(const void *elem1, const void *elem2)
+    {
+        unsigned int *p1, *p2;
+        p1 = (unsigned int *) elem1;    // 只写“*elem1” 非法，编译器不知道其类型和大小
+        p2 = (unsigned int *) elem2;
+        return (*p1 % 10) - (*p2 % 10); // 个位数小的排在前面
+    }
+\end{minted}
+
+\section{命令行参数}
+将用户在命令行窗口输入可执行文件名的方式启动程序时，跟在可执行文件后面的那些字符串，称为“命令行参数”。命令行参数可以有
+多个，以空格分隔。
+
+\begin{minted}{C++}
+    int main(int argc, char *argv[])
+    {
+        ...
+    }
+\end{minted}
+
+\texttt{argc}: 代表程序启动时，命令行参数的个数。执行程序本身的文件名是第一个命令行的参数。
+\texttt{argv}: 指针数组，其中的每个元素都是一个 \texttt{char *} 类型的指针，该指针指向存放命令行参数的字符串。
+
+\begin{minted}{C++}
+    int main(int argc, char const *argv[]) {
+        for (int i = 0; i < argc; i++) {
+            cout << argv[i] << " ";
+        }
+        cout << endl;
+        return 0;
+    }
+\end{minted}
+
+如果参数中包含空格，需要将参数用 \texttt{"..."} 引起来
+
+输入：\mintinline{bash}{./CmdArguments hello world "hello world"}
+
+输出：\mintinline{bash}{./CmdArguments hello world hello world}
+
+\section{位运算}
+位运算：对于整数类型（\texttt{int}、\texttt{char}、\texttt{long} 等）变量中的某一位（bit），或者若干位进行操作。
+
+C/C++ 语言提供了六种位运算符来进行位运算操作：
+\begin{itemize}
+    \item \texttt{\&} 按位与（双目）
+    \item \texttt{|} 按位或（双目）
+    \item \texttt{\^{}} 按位异或（双目）
+    \item \texttt{$\sim$} 按位非（取反）（单目）
+    \item \texttt{<<} 左移（双目）
+    \item \texttt{>>} 右移（双目）
+\end{itemize}
+
+\subsection{按位与 \texttt{\&}}
+通常用按位与来将某变量中的某些位清 0 且同时保留其他位不变。
+\begin{minted}{C++}
+    n = n & 0xffffff00; // 将 int 类型的 n 的低 8 位全部置 0
+    n &= 0xffffff00;
+    n &= 0xff00;        // 将 short 类型的 n 的低 8 位全部置 0
+\end{minted}
+
+也可以用按位与来获取某变量中的某一位。例如我们想判断 \texttt{int} 型变量 \texttt{n} 的右数第 7 位是否为 1，只需看
+表达式 \mintinline{C++}{n & 0x80} 的值是否等于 \texttt{0x80} 即可。
+
+\subsection{按位或 \texttt{|}}
+按位或通常用来将某变量中的某些位置 1 且保持其他位不变。
+\begin{minted}{C++}
+    n |= 0xff;  // 将 int 型变量 n 的低 8 位全置成1
+\end{minted}
+
+\subsection{按位异或 \texttt{\^{}}}
+按位异或运算通常用来将某变量中的某些位取反，且保持其他位不变。
+\begin{minted}{C++}
+    n ^= 0xff;  // 将 int 型变量 n 的低 8 位取反
+\end{minted}
+
+异或运算的特点：如果 $a$ \^{} $b = c$，那么 $c$ \^{} $b = a$，$c$ \^{} $a = b$。（穷举法可证）
+
+可以利用此规律用来进行最简单的加密和解密。
+
+另外异或运算还能实现不通过临时变量，就能交换两个变量的值：
+\begin{minted}{C++}
+    int a = 5, b = 7;
+    a = a ^ b;
+    b = b ^ a;
+    a = a ^ b;
+\end{minted}
+
+\subsection{按位非 \texttt{$\sim$}}
+按位非运算符 \texttt{$\sim$} 是单目运算符，其功能是将操作数中的二进制位 0 变成 1，1 变成 0。
+
+\subsection{左移 \texttt{<<}}
+表达式 \mintinline{C++}{a << b} 的值是将 \texttt{a} 各二进制位全部左移 \texttt{b} 位后得到的值。左移时，高位
+丢弃，低位补 0。注意 \texttt{<<} 是双目运算符，这里是一个表达式，\texttt{a} 的值不因运算而改变。
+
+实际上，左移 1 位，就等于是乘 2，左移 n 位，就等于乘 $2^n$。而左移操作比乘法操作快得多。
+
+\subsection{右移\texttt{>>}}
+表达式 \mintinline{C++}{a >> b} 的值是：将 \texttt{a} 各二进制位全部右移 \texttt{b} 位后得到的值。右移时，移
+出最右边的位就被丢弃。同样地，\texttt{a} 的值不因右移运算而改变。
+
+对于无符号数，右移时高位补 0。对于有符号数，如 \texttt{long}、\texttt{int}、\texttt{short}、\texttt{char}
+类型变量，在右移时，符号位（即最高位）将一起移动，并且大多数 C/C++ 编译器规定，如果原符号位为 1，则右移时最高位就补充
+1，原符号位为 0，则右移时高位就补充 0。
+
+实际上，右移 n 位，就相当于左操作数除以 $2^n$。但是有时候不能除尽，需要将结果往小里取整。
+
+思考题：有两个 \texttt{int} 型的变量 \texttt{a} 和 \texttt{n}（\texttt{0 <= n <= 31}），要求写一个表达式，
+使该表达式的值和 \texttt{a} 的第 \texttt{n} 位相同。
+
+答案：\mintinline{C++}{(a >> n) & 1} \qquad 如果 \texttt{n} 不为 31，答案还可以是
+\mintinline{C++}{(a & (1 << n)) >> n}
+
+
+
+
+
+
+
+\end{document}
