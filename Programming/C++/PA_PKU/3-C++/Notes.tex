@@ -5,6 +5,7 @@
 \usepackage{geometry}
 \geometry{a4paper, centering, scale=0.8}
 \usepackage{minted}
+\usepackage{hyperref}
 
 \title{\heiti 《程序设计与算法》——《C++ 程序设计》学习笔记}
 \author{\kaishu Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -13,8 +14,12 @@
 \begin{document}
 \maketitle
 
-\section{函数指针}
-\subsection{函数指针的定义}
+\tableofcontents
+\newpage
+
+\section{C 语言中的高级内容——从 C 走进 C++}
+\subsection{函数指针}
+\subsubsection{函数指针的定义}
 程序运行期间，每个函数都会占用一段连续的内存空间。而函数名就是该函数所占内存区域的起始地址（也称“入口地址”）。将入口地
 址赋给一个指针变量，那该指针就指向了这个函数，这种指向函数的指针变量称为“函数指针”。我们可以通过函数指针来调用函数。
 
@@ -23,7 +28,7 @@
 例如：\mintinline{C++}{int (*pf)(int, char);} 表示 \texttt{pf} 是一个函数指针，它所指向的函数返回类型是
 \texttt{int}，该函数应有两个参数，第一个是 \texttt{int} 类型，第二个是 \texttt{char} 类型。
 
-\subsection{函数指针和 qsort 库函数}
+\subsubsection{函数指针和 qsort 库函数}
 为什么要定义函数指针呢？干嘛不直接用函数名来调用？
 
 如果要对数组排序，需要知道：
@@ -50,6 +55,7 @@ C 语言快速排序库函数可以对任意类型的数组进行排序：
 \begin{minted}{C++}
     int compare(const void *elem1, const void *elem2);    // 比较函数
 \end{minted}
+
 比较函数的编写规则：
 \begin{enumerate}
     \item 如果 \texttt{*elem1} 应该排在 \texttt{*elem2} 前面，则函数返回值是负整数
@@ -68,7 +74,7 @@ C 语言快速排序库函数可以对任意类型的数组进行排序：
     }
 \end{minted}
 
-\section{命令行参数}
+\subsection{命令行参数}
 将用户在命令行窗口输入可执行文件名的方式启动程序时，跟在可执行文件后面的那些字符串，称为“命令行参数”。命令行参数可以有
 多个，以空格分隔。
 
@@ -98,7 +104,7 @@ C 语言快速排序库函数可以对任意类型的数组进行排序：
 
 输出：\mintinline{bash}{./CmdArguments hello world hello world}
 
-\section{位运算}
+\subsection{位运算}
 位运算：对于整数类型（\texttt{int}、\texttt{char}、\texttt{long} 等）变量中的某一位（bit），或者若干位进行操作。
 
 C/C++ 语言提供了六种位运算符来进行位运算操作：
@@ -111,7 +117,7 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
     \item \texttt{>>} 右移（双目）
 \end{itemize}
 
-\subsection{按位与 \texttt{\&}}
+\subsubsection{按位与 \texttt{\&}}
 通常用按位与来将某变量中的某些位清 0 且同时保留其他位不变。
 \begin{minted}{C++}
     n = n & 0xffffff00; // 将 int 类型的 n 的低 8 位全部置 0
@@ -122,13 +128,13 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
 也可以用按位与来获取某变量中的某一位。例如我们想判断 \texttt{int} 型变量 \texttt{n} 的右数第 7 位是否为 1，只需看
 表达式 \mintinline{C++}{n & 0x80} 的值是否等于 \texttt{0x80} 即可。
 
-\subsection{按位或 \texttt{|}}
+\subsubsection{按位或 \texttt{|}}
 按位或通常用来将某变量中的某些位置 1 且保持其他位不变。
 \begin{minted}{C++}
     n |= 0xff;  // 将 int 型变量 n 的低 8 位全置成1
 \end{minted}
 
-\subsection{按位异或 \texttt{\^{}}}
+\subsubsection{按位异或 \texttt{\^{}}}
 按位异或运算通常用来将某变量中的某些位取反，且保持其他位不变。
 \begin{minted}{C++}
     n ^= 0xff;  // 将 int 型变量 n 的低 8 位取反
@@ -146,16 +152,16 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
     a = a ^ b;
 \end{minted}
 
-\subsection{按位非 \texttt{$\sim$}}
+\subsubsection{按位非 \texttt{$\sim$}}
 按位非运算符 \texttt{$\sim$} 是单目运算符，其功能是将操作数中的二进制位 0 变成 1，1 变成 0。
 
-\subsection{左移 \texttt{<<}}
+\subsubsection{左移 \texttt{<<}}
 表达式 \mintinline{C++}{a << b} 的值是将 \texttt{a} 各二进制位全部左移 \texttt{b} 位后得到的值。左移时，高位
 丢弃，低位补 0。注意 \texttt{<<} 是双目运算符，这里是一个表达式，\texttt{a} 的值不因运算而改变。
 
 实际上，左移 1 位，就等于是乘 2，左移 n 位，就等于乘 $2^n$。而左移操作比乘法操作快得多。
 
-\subsection{右移\texttt{>>}}
+\subsubsection{右移\texttt{>>}}
 表达式 \mintinline{C++}{a >> b} 的值是：将 \texttt{a} 各二进制位全部右移 \texttt{b} 位后得到的值。右移时，移
 出最右边的位就被丢弃。同样地，\texttt{a} 的值不因右移运算而改变。
 
@@ -171,10 +177,470 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
 答案：\mintinline{C++}{(a >> n) & 1} \qquad 如果 \texttt{n} 不为 31，答案还可以是
 \mintinline{C++}{(a & (1 << n)) >> n}
 
+\subsection{引用}
+\subsubsection{引用的定义}
+定义：\mintinline{C++}{类型名 &引用名 = 某变量名;}
+\begin{minted}{C++}
+    int n = 4;
+    int &r = n; // r 引用了 n，r 的类型是 int &
+\end{minted}
+某个变量的引用，等价于这个变量，相当于该变量的别名。
 
+示例代码：
+\begin{minted}{C++}
+    int n = 7;
+    int &r = n;
+    r = 4;
+    cout << r << endl;  // 4
+    cout << n << endl;  // 4
+    n = 5;
+    cout << r << endl;  // 5
+\end{minted}
 
+注意：
+\begin{itemize}
+    \item 定义引用时一定要将其初始化成引用某个变量
+    \item 初始化后，它就一直引用该变量，不会再引用别的变量了
+    \item 引用只能引用变量，不能引用常量和表达式
+\end{itemize}
 
+\subsubsection{引用的简单示例}
+交换两个变量的值：
+\begin{minted}{C++}
+    void swapByReference(int &a, int &b)
+    {
+        int temp;
+        temp = a;
+        a = b;
+        b = temp;
+    }
+    int main(int argc, char const *argv[]) {
+        int n1 = 3, n2 = 5;
+        swapByReference(n1, n2);
+        cout << n1 << " " << n2 << endl;    // 5 3
+        return 0;
+    }
+\end{minted}
 
+引用作为函数的返回值：
+\begin{minted}{C++}
+    int n = 4;
+
+    int &setValue()
+    {
+        return n;
+    }
+
+    int main(int argc, char const *argv[]) {
+        setValue() = 40;
+        cout << n << endl;
+        return 0;
+    }
+\end{minted}
+
+常引用：
+\begin{minted}{C++}
+    int n = 100;
+    const int &r = n;
+    // r = 200; // error: cannot assign to variable 'r' with const-qualified type 'const int &'
+    n = 300;    // OK
+    cout << n << endl;  // 300
+    return 0;
+\end{minted}
+
+\mintinline{C++}{const T &} 和 \mintinline{C++}{T &} 是不同的类型，分别是常引用和非常引用。
+
+常引用和非常引用的转换：
+\begin{itemize}
+    \item \mintinline{C++}{const T} 类型的引用或 \mintinline{C++}{T} 类型的变量可以用来初始化
+    \mintinline{C++}{const T &} 类型的引用。
+    \item \mintinline{C++}{const T} 类型的常变量和 \mintinline{C++}{const T &} 类型的引用则不能用来初始化
+    \mintinline{C++}{T &} 类型的引用，除非进行强制类型转换。
+\end{itemize}
+
+\subsection{\mintinline{C++}{const} 关键字的用法}
+\subsubsection{定义常量}
+\begin{minted}{C++}
+    const int MAX_VAL = 23;
+    const double PI = 3.14;
+    const char *SCHOOL_NAME = "Ocean University of China";
+\end{minted}
+
+\mintinline{C++}{#define} 也可以用来定义常量，但应该多使用 \mintinline{C++}{const}，少用
+\mintinline{C++}{#define}，因为 \mintinline{C++}{const} 是有类型的，便于类型检查。
+
+\subsubsection{定义常量指针}
+不可以通过常量指针修改其指向的内容：
+\begin{minted}{C++}
+    int n, m;
+    const int *p = &n;
+    // *p = 5;  // error: read-only variable is not assignable
+    n = 4;      // OK
+    p = &m;     // OK
+\end{minted}
+
+不能把常量指针赋给非常量指针（除非强制类型转换），反过来可以：
+\begin{minted}{C++}
+    const int *p1;
+    int *p2;
+    p1 = p2;    // OK
+    p2 = p1;    // error: assigning to 'int *' from incompatible type 'const int *'
+    p2 = (int *)p1; // OK, cast type
+\end{minted}
+
+函数参数为常量指针时，可避免函数内部不小心改变参数指针所指地方的内容：
+\begin{minted}{C++}
+    void myPrintf(const char *p)
+    {
+        // error: no matching function for call to 'strcpy'
+        // note: candidate function not viable: 1st argument ('const char *') would lose const qualifier
+        // char    *strcpy(char *__dst, const char *__src);
+        // strcpy(p, "this");
+        cout << p << endl;
+    }
+\end{minted}
+
+\subsubsection{定义常引用}
+不能通过常引用修改其引用的变量：
+\begin{minted}{C++}
+    int n;
+    const int &r = n;
+    // r = 5;  // error: cannot assign to variable 'r' with const-qualified type 'const int &'
+\end{minted}
+
+注意：被引用的变量的值可以通过其他方式改变。
+
+\subsection{动态内存分配}
+\subsubsection{用 \mintinline{C++}{new} 运算符实现动态内存分配}
+第一种用法，分配一个变量：
+\begin{minted}{C++}
+    P = new T;
+\end{minted}
+
+其中，\texttt{T} 是任意类型名，\texttt{P} 是类型为 \texttt{T *} 的指针。动态分配出一片大小为
+\mintinline{C++}{sizeof(T)} 字节的内存空间，并且将该内存空间的起始地址赋值给 \texttt{P}。比如：
+\begin{minted}{C++}
+    int *pn;
+    pn = new int;
+    *pn = 5;
+\end{minted}
+
+第二种用法，分配一个数组：
+\begin{minted}{C++}
+    P = new T[N];
+\end{minted}
+其中，\texttt{T} 是任意类型名，\texttt{P} 是类型为 \texttt{T *} 的指针，\texttt{N} 为要分配的数组元素的个数，
+可以是整型表达式。动态分配出一片大小为 \mintinline{C++}{N * sizeof(T)} 字节的内存空间，并且将该内存空间的起始地
+址赋值给 \texttt{P}。
+
+动态分配数组示例：
+\begin{minted}{C++}
+    int *pn;
+    int i =5;
+    pn = new int[i * 20];
+    pn[0] = 20;
+    pn[100] = 30;   // 编译没错，运行时有可能导致数组越界报错。gcc/g++ 不检查数组越界。
+    return 0;
+\end{minted}
+
+\mintinline{C++}{new T} 和 \mintinline{C++}{new T[n]} 这两个表达式的返回值类型都是 \texttt{T *}。
+
+\subsubsection{用 \mintinline{C++}{delete} 运算符释放动态分配的内存}
+
+用 \mintinline{C++}{new} 动态分配的内存空间，一定要用 \mintinline{C++}{delete} 运算符进行释放：
+\mint{C++}{delete pointer;  // pointer 必须指向 new 出来的空间}
+
+一片动态分配的内存空间不能被 \mintinline{C++}{delete} 两次，否则运行时会报出异常。
+
+用 \mintinline{C++}{delete} 释放动态分配的数组时，要加上 \texttt{[]}：
+\mint{C++}{delete[] pointer;  // pointer 必须指向 new 出来的数组}
+
+\subsection{内联函数、函数重载和函数缺省参数}
+\subsubsection{内联函数}
+函数调用是有时间开销的。如果函数本身只有几条语句，执行非常快，而且函数被反复执行很多次，相比之下调用函数所产生的这个开
+销就会显得比较大。
+
+为了减少哦函数调用的开销，引入了内联函数机制。编译器处理对内联函数的调用语句时，是将整个函数的代码插入到调用语句处，而
+不会产生调用函数的语句。
+
+在函数定义前加 \mintinline{C++}{inline} 关键字，即可定义内联函数：
+\begin{minted}{C++}
+    inline int max(int a, int b)
+    {
+        if (a > b) {
+            return a;
+        }
+        return b;
+    }
+\end{minted}
+
+以上面的代码为例，\texttt{max} 函数本身就比较简单，如果它被反复多次执行的话，调用 \texttt{max} 函数的产生的额外开
+销和 \texttt{max} 函数本身执行时的开销是相当的，所以可以将其定义为内联函数来减少调用它的时间开销。通过
+\mintinline{C++}{inline} 声明，编译器首先在函数调用处使用函数本身语句替换了函数调用语句，然后编译替换后的代码，运
+行时不需要跳转到内存其他地址去执行函数调用，也不需要保留函数调用时的现场数据。通过将函数声明为内联，可以将函数的定义放
+在头文件内，在类内部定义的函数会默认声明为内联函数。
+
+但是由于代码的扩展，内联函数可能会增大可执行程序的体积；如果内联函数发生了改动，需要重新编译代码。而内联声明只是对编译
+器的一种建议，编译器会自己决定是否采用内联措施，这取决于函数是否符合内联的有利条件。如果函数体非常大，编译器将会忽略内
+联声明，将内联函数作为普通函数来处理。
+
+\subsubsection{函数重载}
+一个或多个函数，名字相同，然而参数个数或参数类型不相同，这叫做函数的重载。
+
+以下三个函数是重载关系：
+\begin{minted}{C++}
+    int Max(double f1, double f2);
+    int Max(int n1, int n2);
+    int Max(int n1, int n2, int n3);
+\end{minted}
+
+函数重载使得函数命名变得简单。编译器根据调用语句中的实参个数和类型判断应该调用哪个函数，有时会出现二义性的错误。C 语言
+里是没有函数重载的，函数命名不能相同。
+
+\begin{minted}{C++}
+    Max(3.4, 2.5);  // 调用 int Max(double f1, double f2)
+    Max(2, 4);      // 调用 int Max(int n1, int n2)
+    Max(1, 2, 3);   // 调用 int Max(int n1, int n2, int n3)
+    Max(3, 2.4);    // error: call to 'Max' is ambiguous
+\end{minted}
+
+如果两个函数函数名和参数都一样，只是返回值不同，这时不能重载，编译时会报错:
+\begin{minted}{C++}
+    int Max(double f1, double f2) {}
+    // error: functions that differ only in their returntype cannot be overloaded
+    // double Max(double f1, double f2) {}
+\end{minted}
+
+\subsubsection{函数的缺省参数}
+C++ 中，定义函数的时候可以让最右边的连续若干个参数有缺省值，那么调用函数的时候，若相应位置不写参数，参数就是缺省值。
+
+\begin{minted}{C++}
+    void func(int x1, int x2 = 2, int x3 = 3) {}
+    // error: missing default argument on parameter 'x2'
+    // void func(int x1 = 1, int x2, int x3 = 3) {}
+    // when call the function func
+    func(10);       // OK, same as func(10, 2, 3);
+    func(10, 8);    // OK, same as func(10, 8, 3);
+    // func(10, , 8);  // error. 只能最右边的连续若干个参数缺省
+\end{minted}
+
+函数可缺省的目的在于提高程序的可扩充性。即如果某个写好的函数要添加新的参数，而原来那些调用该函数的语句，未必需要使用新
+增的参数，那么为了避免对原先那些函数调用语句的修改，就可以使用缺省参数。
+
+\section{浅谈面向对象的程序设计}
+\subsection{面向对象的基本概念}
+结构化程序设计：
+\begin{itemize}
+    \item 复杂的大问题 $\rightarrow$ 层层分解/模块化 $\rightarrow$ 若干子问题
+    \item 自顶向下，逐步求精
+\end{itemize}
+
+程序 = 数据结构（变量） + 算法（函数）
+
+在结构化程序设计中，数据结构与算法没有直观的联系，会遇到四大问题：理解难、修改难、查错难、重用难。
+
+软件设计的目标是更快、更正确、更经济，所以业界需要面向对象。
+
+面向对象的程序设计方法继承了结构化程序设计的优点，同时又克服了结构化程序设计中的一些不足，它的设计思路更加接近于我们的
+现实生活。
+
+面向对象的程序 = 类 + 类 + ... + 类
+
+面向对象的程序设计中的基本概念：
+\begin{description}
+    \item[抽象] 归纳出一类事物的共同属性（数据结构）和行为（函数）
+    \item[封装] 将数据结构和算法对应地捆绑在一起
+    \item[继承]
+    \item[多态]
+\end{description}
+
+\subsection{面向对象的程序设计语言的发展历程}
+早起程序设计语言的历史：
+\begin{itemize}
+    \item ALGOL 60: 1960 年
+    \item CPL: 1963 年
+    \item BCPL: 1967 年
+    \item B: 1970 年
+    \item C: 1973 年
+\end{itemize}
+
+面向对象的程序设计语言的历史：
+\begin{itemize}
+    \item Simula 67: 1967 年
+    \item Smalltalk: 1971 年
+    \item C++: 1983 年
+    \item Java: 1995 年
+    \item C\#: 2003 年
+\end{itemize}
+
+C++ 标准的发展：
+\begin{itemize}
+    \item C++2.0: 1989 年
+    \item ANSI C++: 1994 年
+    \item C++98: 1998 年，加入 STL（Standard Template Library）泛型设计
+    \item C++03: 2003 年
+    \item \emph{Libraray Technical Report 1}(TR1): 2005 年
+    \item C++11: 2011 年
+\end{itemize}
+
+常用的 C++ 编译器
+\begin{itemize}
+    \item GCC
+    \item Visual C++
+    \item Dev C++
+    \item Eclipse
+    \item Borland C++Builder
+\end{itemize}
+
+\section{类和对象}
+\subsection{类的定义}
+类包含成员变量和成员函数，二者统称为类的成员。可以将类看作是带有函数的结构体。
+
+类的定义：
+\begin{minted}{C++}
+    class 类名 {
+        访问范围说明符：
+            成员变量1
+            成员变量2
+            ...
+            成员函数声明1
+            成员函数声明2
+        访问范围说明符：
+            更多成员变量
+            更多成员函数声明
+            ...
+    };
+\end{minted}
+
+以抽象出的矩形类 \texttt{CRectangle} 为例：
+\begin{minted}{C++}
+    class CRectangle {
+        public:
+            int w;
+            int h;
+            void Init(int w_, int h_) {
+                w = w_;
+                h = h_;
+            }
+            int Area() {
+                return w * h;
+            }
+            int Perimeter() {
+                return 2 * (w + h);
+            }
+    };  // 必须有分号
+\end{minted}
+
+在程序中使用类来创建对象：
+\begin{minted}{C++}
+    int main() {
+        int w, h;
+        CRectangle r;   // r 是一个对象
+        cin >> w >> h;
+        r.Init(w, h);
+        cout << r.Area() << endl << r.Perimeter() << endl;
+        return 0;
+    }
+\end{minted}
+
+类定义的变量 $\rightarrow$ 类的实例 $\rightarrow$ “对象”
+
+每个对象都有自己的存储空间，对象的大小是所有成员变量的大小之和。一个对象的某个成员变量被改变，不会影响到其他的对象。
+
+对象之间可以用 “=” 进行赋值，不能使用“==”、“!=”、“>”、“<”等进行比较，除非这些运算符经过了重载。
+
+\subsection{访问类的成员变量和成员函数}
+\subsubsection{访问类的成员变量和成员函数的三种常用方式}
+用法1：对象名.成员名
+\begin{minted}{C++}
+    CRectangle r1, r2;
+    r1.w = 5;
+    r2.Init(3, 4);
+\end{minted}
+
+用法2：指针->成员名
+\begin{minted}{C++}
+    CRectangle r1, r2;
+    CRectangle *p1 = &r1;
+    CRectangle *p2 = &r2;
+    p1->w = 5;
+    p2->Init(3, 4);
+\end{minted}
+
+用法3：引用名.成员名
+\begin{minted}{C++}
+    CRectangle r2;
+    CRectangle &rr = r2;
+    rr.w = 5;
+    rr.Init(3, 4);  // rr 的值变了，r2 的值也变了
+\end{minted}
+
+另一种输出结果的方式：
+\begin{minted}{C++}
+    void printRectangle(CRectangle &r) {
+        cout << r.Area() << ", " << r.Perimeter();
+    }
+    CRectangle r3;
+    r3.Init(3, 4);
+    printRectangle(r3);
+\end{minted}
+
+成员函数体和类的定义可以分开写：
+\begin{minted}{C++}
+    // CRectangle.h
+    class CRectangle {
+        public:
+            int w, h;
+            int Area();
+            int Perimeter();
+            void Init(int w_, int h_);
+    };
+
+    // CRectangle.cpp
+    int CRectangle::Area() {
+        return w * h;
+    }
+    int CRectangle::Perimeter() {
+        return 2 * (w + h);
+    }
+    void CRectangle::Init(int w_, int h_) {
+        w = w_;
+        h = h_;
+    }
+\end{minted}
+
+\subsubsection{类成员的可访问范围}
+类成员的可访问范围由以下三种关键字确定：
+\begin{itemize}
+    \item \mintinline{C++}{private}: 指定私有成员，只能在成员函数内被访问
+    \item \mintinline{C++}{public}: 指定公有成员，可以在任何地方被访问
+    \item \mintinline{C++}{protected}: 指定保护成员（后面讲“继承”时会讲到）
+\end{itemize}
+
+三种关键字出现的次数和先后次序都没有限制。如果没有指定，默认为私有成员（\mintinline{C++}{private}）。
+\begin{minted}{C++}
+    class Man {
+            int nAge;           // private
+            char szName[20];    // private
+        public:
+            void SetName(char *name) {
+                strcpy(szName, name);   // OK
+            }
+    }
+\end{minted}
+
+类的成员函数内部，可以访问：
+\begin{itemize}
+    \item 当前对象的全部属性、函数
+    \item 同类其它对象的全部属性、函数
+\end{itemize}
+
+类的成员函数以外的地方：
+\begin{itemize}
+    \item 只能访问该类对象的公有成员
+\end{itemize}
+
+设置私有成员的目的是强制对成员变量的访问一定要通过成员函数进行，从而有效地将私有成员隐藏起来。
 
 
 \end{document}
