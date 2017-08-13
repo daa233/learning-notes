@@ -642,5 +642,293 @@ C++ 标准的发展：
 
 设置私有成员的目的是强制对成员变量的访问一定要通过成员函数进行，从而有效地将私有成员隐藏起来。
 
+\subsection{内联成员函数和重载成员函数}
+\subsubsection{内联成员函数}
+前面已经学到了内联函数。它是指一类特殊的函数，其自身的语句非常的少，运行起来也非常快，在这种情况下，由于函数调用会
+产生一定的调用语句，那么当函数需要被反复调用时，就会产生非常大的调用开销。如果将其定义为内联函数，编译器会将此函数的定
+义插入到调用的地方，就不会产生额外的调用开销了。成员函数也可以被定义为内联函数，称为内联成员函数。
+
+定义内联成员函数的两种方式：
+\begin{itemize}
+    \item \mintinline{C++}{inline} + 成员函数
+    \item 整个函数体出现在类定义内部
+\end{itemize}
+
+\begin{minted}{C++}
+    class A {
+        inline void func1();
+        void func2() {
+            // definition
+        }
+    };
+
+    void A::func1() {}
+\end{minted}
+
+\subsubsection{重载成员函数}
+类的成员函数也可以重载、带缺省参数。
+
+两个重载函数的返回类型可以不一样，如 \mintinline{C++}|int func(int x) {}| 和
+\mintinline{C++}|void func(){}| 是重载关系。但是如果两个函数仅在返回类型上有区别，那就会报重复定义的错误。
+
+缺省参数既可以在函数声明时定义，也可以在函数实现时定义，但二者不能同时定义。
+
+\begin{minted}{C++}
+    class Location {
+    private:
+        int x;
+        int y;
+    public:
+         void init(int x = 0, int y = 0);   // 可以在声明或实现时定义默认参数，但不能二者同时定义
+         void value_x(int val) {x = val;}
+         int value_x() {return x;}          // 重载函数返回类型可以不一样
+    };
+
+    void Location::init(int X, int Y) {
+        x = X;
+        y = Y;
+    }
+
+    int main(int argc, char const *argv[]) {
+        Location A;
+        A.init(5);
+        A.value_x(5);
+        cout << A.value_x() << endl;
+        A.value_x();
+        cout << A.value_x() << endl;
+        return 0;
+    }
+\end{minted}
+
+\subsection{构造函数}
+\subsubsection{构造函数的基本概念}
+构造函数是成员函数的一种，名字与类名相同，可以有参数，但不能有返回值（\texttt{void} 也不行）。构造函数的作用是对对象
+进行初始化，如给成员变量赋初值。
+
+如果定义类时没写构造函数，则编译器生成一个默认的无参数的构造函数，不做任何操作。如果定义了构造函数，则编译器不生成默认
+的无参构造函数。一个类可以定义多个构造函数。对象生成时构造函数自动被调用。对象一旦生成，就再也不能在其上执行构造函数。
+
+为什么需要构造函数：
+\begin{enumerate}
+    \item 构造函数执行必要的初始化工作，有了构造函数就不用专门再写初始化函数，也不用担心忘记调用初始化函数。
+    \item 有时对象没被初始化就使用，会导致程序出错。
+\end{enumerate}
+
+例如，定义了一个类 \mintinline{C++}{Complex}，但没有定义构造函数。在生成对象时，会调用默认的构造函数：
+\begin{minted}{C++}
+    class Complex {
+    private:
+        double real, imag;
+    public:
+        void set(double r, double i);
+    };  // 编译器自动生成默认构造函数
+
+    int main(int argc, char const *argv[]) {
+        Complex c1;                 // 默认构造函数被调用
+        Complex *pc = new Complex;  // 默认构造函数被调用
+        return 0;
+    }
+\end{minted}
+
+如果定义了构造函数，编译器就不会生成默认的无参构造函数了：
+\begin{minted}{C++}
+    class Complex {
+    private:
+        double real, imag;
+    public:
+        Complex(double r, double i = 0);    // 构造函数也需要声明
+        void set(double r, double i);
+    };
+
+    Complex::Complex(double r, double i) {
+        real = r;
+        imag = i;
+    }
+
+
+    int main(int argc, char const *argv[]) {
+        // error: no matching constructor for initialization of 'Complex'
+        // Complex c1;
+        // error: no matching constructor for initialization of 'Complex'
+        // Complex *pc = new Complex;
+        Complex c1(2);                      // OK
+        Complex c2(2, 4), c3(3, 5);         // OK
+        Complex *pc = new Complex(3, 4);    // OK
+        return 0;
+    }
+\end{minted}
+
+一个类可以有多个构造函数，多个构造函数之间是重载的关系。
+
+构造函数最好是 \mintinline{C++}{public} 的，\mintinline{C++}{private} 构造函数不能直接用来初始化对象。
+
+\subsubsection{构造函数在数组中的使用}
+\begin{minted}{C++}
+    class CSample {
+    private:
+        int x;
+    public:
+        CSample() {
+            cout << "CSample constructor 1 is called." << endl;
+        }
+        CSample(int n) {
+            x = n;
+            cout << "CSample constructor 2 is called." << endl;
+        }
+    };
+
+    class Test {
+    public:
+        Test(int n) {
+            cout << "Test constructor 1 is called." << endl;
+        }
+        Test(int n, int m) {
+            cout << "Test constructor 2 is called." << endl;
+        }
+        Test() {
+            cout << "Test constructor 3 is called." << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        CSample array1[2];  // 对象数组
+        // CSample constructor 1 is called.
+        // CSample constructor 1 is called.
+        cout << "step 1" << endl;
+        CSample array2[2] = {4, 5}; // 等同于 CSample array2[2] = {CSample(4), CSample(5)};
+        // CSample constructor 2 is called.
+        // CSample constructor 2 is called.
+        cout << "step 2" << endl;
+        CSample array3[2] = {3};
+        // CSample constructor 2 is called.
+        // CSample constructor 1 is called.
+        cout << "step 3" << endl;
+        CSample *array4 = new CSample[2];
+        // CSample constructor 1 is called.
+        // CSample constructor 1 is called;
+        delete[] array4;
+
+        Test testArray1[3] = {1, Test(1, 2)};
+        // Test constructor 1 is called
+        // Test constructor 2 is called
+        // Test constructor 3 is called
+        Test testArray2[3] = {Test(2, 3), Test(1, 2), 1};
+        // Test constructor 2 is called
+        // Test constructor 2 is called
+        // Test constructor 1 is called
+        Test *pArray[3] = {new Test(4), new Test(1, 2)}; // pArray[3] 是指针数组，不是对象数组
+        // Test constructor 1 is called
+        // Test constructor 2 is called
+        // pArray[2] 是一个未初始化的指针
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{复制（拷贝）构造函数}
+复制构造函数只有一个参数，即对同类对象的引用。形如 \mintinline{C++}{X::X(X &)} 或
+\mintinline{C++}{X::X(const X &)} 二者中的一种，后者能以常量对象作为参数。
+
+如果没有定义复制构造函数，那么编译器会生成默认的复制构造函数。
+\begin{minted}{C++}
+    class Complex {
+    private:
+        double real;
+        double imag;
+    };
+
+    int main(int argc, char const *argv[]) {
+        Complex c1;     // 调用缺省无参构造函数
+        Complex c2(c1); // 调用缺省的复制构造函数，将 c2 初始化成和 c1 一样
+        return 0;
+    }
+\end{minted}
+
+如果定义自己的复制构造函数，那么默认的复制构造函数将不存在，因为复制构造函数只能有一个。
+\begin{minted}{C++}
+    class Complex {
+    private:
+        double real;
+        double imag;
+    public:
+        Complex() {}    // 复制构造函数也是构造函数，一旦定义了，默认的无参构造函数会消失
+        Complex(const Complex &c) {
+            real = c.real;
+            imag = c.imag;
+            cout << "Complex copy constructor is called." << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        Complex c1;     // 调用自定义无参构造函数
+        Complex c2(c1); // 调用自定义的复制构造函数
+        // Complex copy constructor is called.
+        return 0;
+    }
+\end{minted}
+
+不允许有形如 \mintinline{C++}{X::X(X)} 的复制构造函数，它的参数应该是引用，而不是对象:
+\begin{minted}{C++}
+    class CSample {
+        CSample(CSample c) {
+        }   // 错误，不允许这样的构造函数
+    };
+\end{minted}
+
+复制构造函数起作用的三种情况：
+\begin{enumerate}
+    \item 当用一个对象去初始化同类的另一个对象时。
+    \begin{minted}{C++}
+    Complex c2(c1);
+    Complex c2 = c1;    // 同上，初始化语句，非赋值语句
+    \end{minted}
+    \item 如果函数有一个参数是类 A 的对象，那么该函数被调用时，类 A 的复制构造函数将被调用。
+    \begin{minted}{C++}
+    class A {
+    public:
+        A() {};
+        A(A &a) {
+            cout << "A copy constructor is called." << endl;
+        }
+    };
+    void Func1(A a1) {}
+    int main() {
+        A a2;
+        Func1(a2);   // 由于是自定义复制构造函数，实参 a2 和形参 a1 不一定相等
+        // A copy constructor is called.
+        return 0;
+    }
+    \end{minted}
+    \item 如果函数的返回值是类 A 的对象时，则函数返回时，A 的复制构造函数被调用。
+    \begin{minted}{C++}
+    class B {
+    public:
+        int v;
+        B(int n) {v = n;}
+        B(const B &a) {
+            v = 5;
+            cout << "B copy constructor is called." << endl;
+        }
+    };
+
+    B Func2() {
+        B b(4);
+        return b;
+    }
+
+    int main(int argc, char const *argv[]) {
+        cout << Func2().v << endl;
+        // B copy constructor is called.
+        // 5
+        return 0;
+    }
+    \end{minted}
+    注意：某些编译器如 G++ 会针对返回值进行优化，导致返回对象时不会调用复制构造函数，编译时可以加上
+    \mintinline{C++}{-fno-elide-constructors} 参数来关闭这项优化。
+    \footnote{《C++返回值为对象时复制构造函数不执行怎么破》https://www.kancloud.cn/digest/bugkiller/163413}
+\end{enumerate}
+
+
+
+
 
 \end{document}
