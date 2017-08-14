@@ -62,5 +62,6 @@ int main(int argc, char const *argv[]) {
     cout << Func2().v << endl;
     // B copy constructor is called.
     // 5
+    // Note: If compile with G++, add `-fno-elide-constructors` argument
     return 0;
 }

@@ -927,6 +927,335 @@ C++ 标准的发展：
     \footnote{《C++返回值为对象时复制构造函数不执行怎么破》https://www.kancloud.cn/digest/bugkiller/163413}
 \end{enumerate}
 
+\subsubsection{类型转换构造函数}
+对于一个类 \texttt{X} 来说，当它的某个构造函数只有一个参数，且该参数又不是 \mintinline{C++}{const X &} 类型时，
+这个构造函数就称为类型转换构造函数。
+
+类型转换构造函数的目的是将一个其他类型的数据转换成一个类的对象。类型转换构造函数只有一个参数(C++11 之前)，不是复制构造
+函数。
+
+\begin{minted}{C++}
+    class Complex {
+    public:
+        double real, imag;
+        Complex(int i) {    // 类型转换构造函数
+            cout << "Int constructor of Complex is called." << endl;
+            real = i;
+            imag = 0;
+        }
+        Complex(double r, double i) {
+            cout << "Constructor of Complex is called." << endl;
+            real = r;
+            imag = i;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        Complex c1(7, 8);
+        // Constructor of Complex is called.
+        Complex c2 = 12;    // 注意这里的 = 是初始化，不是赋值
+        // Int constructor of Complex is called.
+        c1 = 9; // OK. 9 被自动转换成一个临时的 Complex 对象，然后赋值给 c1
+        // Int constructor of Complex is called.
+        return 0;
+    }
+\end{minted}
+
+\subsection{析构函数}
+\subsubsection{析构函数的定义}
+析构函数也是成员函数的一种，负责处理消亡的对象。在对象消亡时，析构函数会自动被调用，做一些如释放分配的内存空间等善后工
+作。
+
+析构函数的函数名与类名相同，不过函数名前面有个 $\sim$，没有参数和返回值。一个类最多有一个析构函数。
+
+定义类时如果没有写析构函数，编译器会生成缺省析构函数。缺省析构函数不涉及释放用户申请的内存释放等清理工作。如果定义了析
+构函数，则编译器不生成缺省析构函数。
+
+\begin{minted}{C++}
+    class String {
+    private:
+        char *p;
+    public:
+        String() {
+            p = new char[10];
+        }
+        ~String();
+    };
+
+    String::~String() {
+        delete[] p;
+    }
+\end{minted}
+
+\subsubsection{析构函数和数组}
+当对象数组的生命周期结束时，对象数组的每个元素都会调用到析构函数。
+\begin{minted}{C++}
+    class Ctest {
+    public:
+        ~Ctest() {
+            cout << "Destructor of Ctest is called" << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        Ctest array[2];
+        cout << "End main" << endl;
+        // End main
+        // Destructor of Ctest is called
+        // Destructor of Ctest is called
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{析构函数和运算符 \mintinline{C++}{delete}}
+用 \mintinline{C++}{new} 运算新建对象会调用构造函数，类似地，用 \mintinline{C++}{delete} 运算释放对象会调用析
+构函数。
+\begin{minted}{C++}
+    Ctest *pTest;
+    pTest = new Ctest;  // 构造函数调用
+    delete pTest;       // 析构函数调用
+    // Destructor of Ctest is called
+\end{minted}
+
+但是，如果用 \mintinline{C++}{new} 新建的对象只能用 \mintinline{C++}{delete} 释放，不会自动调用析构函数。
+\begin{minted}{C++}
+    class A {
+    public:
+        A() {
+            cout << "Constructor of A is called." << endl;
+        }
+        ~A() {
+            cout << "Destructor of A is called." << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        A *p = new A[2];
+        // Constructor of A is called.
+        // Constructor of A is called.
+        A *p2 = new A;  // 用 new 创建的对象不会自动释放，不会调用析构函数
+        // Constructor of A is called.
+        A a;
+        // Constructor of A is called.
+        delete[] p;
+        // Destructor of A is called.
+        // Destructor of A is called.
+        // Destructor of A is called.
+        return 0;
+    }
+\end{minted}
+
+\subsection{静态成员变量和静态成员函数}
+静态成员：在声明前面加了 \mintinline{C++}{static} 关键字的成员。
+\begin{minted}{C++}
+    class CRectangle {
+    private:
+        int w, h;
+        static int nTotalArea;      // declare static member variable nTotalArea
+        static int nTotalNumber;    // declare static member variable nTotalNumber
+    public:
+        CRectangle(int w_, int h_);
+        ~CRectangle();
+        static void PrintTotal();   // declare static member function PrintTotal()
+    };
+\end{minted}
+
+静态成员属于整个类，不属于某些特定的对象。
+
+普通成员变量每个对象有各自的一份，而静态成员变量一共就一份，为所有对象共享。\mintinline{C++}{sizeof} 运算符计算一
+个对象所占的内存空间时，不会计算静态成员变量。也就是说，静态成员变量其实不是存储在对象内部的。
+
+普通成员函数必须具体作用于某个对象，而静态成员函数并不具体作用于某个对象，不需要通过对象就能访问。
+
+访问静态成员的方式（前提是有访问权限）：
+\begin{enumerate}
+    \item \mintinline{C++}{类名::成员名}（首选方式）
+    \begin{minted}{C++}
+    CRectangle::PrintTotal();
+    \end{minted}
+    \item \mintinline{C++}{对象名.成员名}
+    \begin{minted}{C++}
+    CRectangle r;
+    r.PrintTotal();
+    \end{minted}
+    \item \mintinline{C++}{指针->成员名}
+    \begin{minted}{C++}
+    CRectangle *p = &r;
+    p->PrintTotal();
+    \end{minted}
+    \item \mintinline{C++}{引用.成员名}
+    \begin{minted}{C++}
+    CRectangle &ref = r;
+    int n = ref.nTotalNumber;
+    \end{minted}
+\end{enumerate}
+
+静态成员变量本质上是全局变量，哪怕一个对象都不存在，类的静态成员变量也存在。静态成员函数本质上是全局函数。
+
+设置静态成员的这种机制的目的是将和某些类紧密相关的全局变量和函数写到类里面，看上去像一个整体，易于理解和维护。
+
+类里面涉及静态成员变量的语句仅仅是对静态成员变量的声明，不是定义。在使用静态成员变量的时候，需要在所有函数外面对静态成
+员变量进行定义，而且不管有没有访问权限，都可以选择是否对其进行初始化。
+\begin{minted}{C++}
+    // 定义静态变量，并初始化为0
+    int CRectangle::nTotalNumber = 0;
+    int CRectangle::nTotalArea = 0;
+\end{minted}
+
+为什么要这样设计呢？为什么不在类内定义它呢？这是由于遵循了每个要使用的静态对象都要定义且仅定义一次的原则。类的定
+义一般都会放在头文件（\texttt{.h}）里，但是静态变量的使用一般在源程序文件（\texttt{.cpp}）里，要使用就要在源程序文
+件内对其定义。而如果定义类的时候也定义静态变量，这就有可能导致多次定义的错误。
+\footnote{Why does a static data member need to be defined outside of the class?
+https://stackoverflow.com/questions/18749071/why-does-a-static-data-member-need-to-be-defined-outside-of-the-class}
+
+在静态成员函数中，不能访问非静态成员变量，也不能调用非静态成员函数。这是因为静态成员函数不是作用在某个特定的对象上的，
+非静态成员变量属于特定的对象。但是反过来，在非静态成员函数中是可以调用静态成员函数的。
+
+\subsection{成员对象、封闭类和初始化列表}
+\subsubsection{成员对象和封闭类的定义}
+成员对象：一个类的成员变量是另一个类的对象，这种成员变量就称为成员对象。
+
+封闭类：包含成员对象的类。
+\begin{minted}{C++}
+    class CTyre {
+    private:
+        int radius;
+        int width;
+    public:
+        // Member initializer lists. radius = r; width = w;
+        CTyre(int r, int w) : radius(r), width(w) {}
+    };
+
+    class CEngine {
+    };
+
+    class CCar {    // enclosing class
+    private:
+        int price;
+        CTyre tyre;
+        CEngine engine;
+    public:
+        CCar(int p, int tr, int tw);
+    };
+\end{minted}
+
+\subsubsection{成员初始化列表}
+前面 \mintinline{C++}|CTyre(int r, int w):radius(r), width(w) {}| 中用到了成员初始化列表。在介绍成员初始
+化列表之前，先补充一下 C++ 中的三种初始化变量的方式（注意是初始化，不是赋值）：
+\begin{enumerate}
+    \item 复制初始化
+    \begin{minted}{C++}
+    int nValue = 5; // copy initialization
+    \end{minted}
+    \item 直接初始化
+    \begin{minted}{C++}
+    int nValue(5);  // direct initialization
+    \end{minted}
+    \item 统一初始化（C++11）
+    \begin{minted}{C++}
+    int nValue{5};  // uniform initialization or brace initialization (C++11)
+    \end{minted}
+\end{enumerate}
+
+之前我们在写构造函数的时候，是利用赋值运算符通过赋值的方式进行的复制初始化。这不是推荐的方式，有些时候会比较低效。而且
+对于某些数据类型，例如 \mintinline{C++}{const} 和引用，必须在声明的时候就要初始化：
+\begin{minted}{C++}
+    class Something {
+    private:
+        const int m_value;
+    public:
+        Something() {
+            // error: constructor for 'Something' must explicitly initialize the const member
+            m_value = 1;
+        }
+    };
+
+    const int m_value; // error: const vars must be initialized with a value
+    m_value = 5; //  error: const vars can not be assigned to
+\end{minted}
+
+而我们有些时候并不想在声明类的成员常量时就指定一个值，而是想在创建对象并初始化的时候再指定。
+
+如果在前面的封闭类 \texttt{CCar} 中不定义构造函数，让编译器使用默认的构造函数。创建对象 \texttt{car} 并初始化时，
+对于成员对象 \texttt{car.engine}，编译器可以使用默认构造函数初始化，对于没有默认构造函数的成员对象
+\texttt{car.tyre} 就不知道该如何初始化了，所以就会报错。
+
+成员初始化列表可以解决上面的这些问题。
+
+定义构造函数时，添加成员初始化列表：
+\begin{minted}{C++}
+    类名::构造函数(参数表) : 成员变量1(参数表), 成员变量2(参数表), ... // 直接初始化成员变量
+    {
+        // 不需要在这里写赋值语句
+    }
+\end{minted}
+
+成员对象初始化列表中的参数：
+\begin{itemize}
+    \item 任意复杂的表达式
+    \item 函数/变量/表达式中的函数，变量必须有定义
+\end{itemize}
+
+利用成员初始化列表来初始化成员常量：
+\begin{minted}{C++}
+    class Something {
+    private:
+        const int m_value;
+
+    public:
+        Something(): m_value(5) {} // directly initialize our const member variable
+    };
+\end{minted}
+
+\subsubsection{封闭类的调用顺序}
+封闭类的对象遵循“先构造的后析构”的顺序。
+
+当封闭类对象生成时：
+\begin{enumerate}
+    \item 执行所有成员对象的构造函数
+    \item 执行封闭类的构造函数
+\end{enumerate}
+
+当封闭类的对象消亡时：
+\begin{enumerate}
+    \item 执行封闭类的析构函数
+    \item 执行成员对象的析构函数
+\end{enumerate}
+
+成员对象的构造函数调用顺序与成员对象在类中的声明一致，与其在成员初始化列表中出现的顺序无关。
+
+\subsection{友元}
+\subsubsection{友元函数}
+一个类的友元函数可以访问该类的私有成员。除此之外，友元函数和其他函数并无差别。友元函数可以是某个普通函数，也可以是某个
+类的成员函数。
+
+在一个类中，如果想把哪个函数定义为友元函数，直接写下它的函数原型，并在前面加上一个 \mintinline{C++}{friend} 关键字
+就可以了，在私有范围还是公有范围都不影响。
+\begin{minted}{C++}
+    class Accumulator {
+    private:
+        int m_value;
+    public:
+        Accumulator() { m_value = 0; }
+        void add(int value) { m_value += value; }
+
+        // Make the reset() function a friend of this class
+        friend void reset(Accumulator &accumulator);
+    };
+
+    // reset() is now a friend of the Accumulator class
+    void reset(Accumulator &accumulator) {
+        // And can access the private data of Accumulator objects
+        accumulator.m_value = 0;
+    }
+
+    int main() {
+        Accumulator acc;
+        acc.add(5); // add 5 to the accumulator
+        reset(acc); // reset the accumulator to 0
+        return 0;
+    }
+\end{minted}
 
 
 
