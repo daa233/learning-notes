@@ -12,7 +12,8 @@
 
 using namespace std;
 
-class CCar; // 提前声明 CCar 类，以便后面 CDriver 类使用
+// 提前声明 CCar 类，以便后面 CDriver 类使用
+class CCar; // 前置声明（forward declaration）
 
 class CDriver {
 public:

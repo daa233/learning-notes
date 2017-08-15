@@ -1111,7 +1111,7 @@ https://stackoverflow.com/questions/18749071/why-does-a-static-data-member-need-
 在静态成员函数中，不能访问非静态成员变量，也不能调用非静态成员函数。这是因为静态成员函数不是作用在某个特定的对象上的，
 非静态成员变量属于特定的对象。但是反过来，在非静态成员函数中是可以调用静态成员函数的。
 
-\subsection{成员对象、封闭类和初始化列表}
+\subsection{成员对象、封闭类和成员初始化列表}
 \subsubsection{成员对象和封闭类的定义}
 成员对象：一个类的成员变量是另一个类的对象，这种成员变量就称为成员对象。
 
@@ -1227,7 +1227,7 @@ https://stackoverflow.com/questions/18749071/why-does-a-static-data-member-need-
 \subsection{友元}
 \subsubsection{友元函数}
 一个类的友元函数可以访问该类的私有成员。除此之外，友元函数和其他函数并无差别。友元函数可以是某个普通函数，也可以是某个
-类的成员函数。
+类的成员函数。声明类的成员函数为友元函数时，要在该函数前加上类名和\mintinline{C++}{::}。
 
 在一个类中，如果想把哪个函数定义为友元函数，直接写下它的函数原型，并在前面加上一个 \mintinline{C++}{friend} 关键字
 就可以了，在私有范围还是公有范围都不影响。
@@ -1257,6 +1257,213 @@ https://stackoverflow.com/questions/18749071/why-does-a-static-data-member-need-
     }
 \end{minted}
 
+要注意的是，我们必须要把特定的对象传递给友元函数，这样友元函数才能操作其私有成员变量。友元函数无法访问相应类的对象的
+\mintinline{C++}{*this} 指针。一个函数可以同时作为多个类的友元函数。
+
+\subsubsection{友元类}
+可以将一个类声明为另一个类的友元，称为友元类。
+
+A 是 B 的友元类 $\Rightarrow$ A 的成员函数可以访问 B 的私有成员
+
+\begin{minted}{C++}
+    class CDriver;  // 前置声明
+
+    class CCar {
+    private:
+        int price;
+        friend class CDriver;   // 声明 CDriver 为友元类
+    };
+
+    class CDriver {
+    public:
+        CCar myCar;
+        void ModifyCar() {
+            // CDriver 是 CCar 的友元类，可以访问其私有成员
+            myCar.price += 1000;
+        }
+    };
+\end{minted}
+
+需要注意，对于一个类来说，其友元类虽然可以访问它的对象的私有成员，但是无法访问它的对象的 \mintinline{C++}{*this}
+指针。A 是 B 的友元类，并不意味着 B 也是 A 的友元类。友元类之间的关系不能传递，不能继承。
+
+一个类的友元函数和友元类破坏了它的封装性。如果这个类的某些细节需要改动，那友元也要跟着做出相应的改动。因此，要尽可能地
+限制使用友元函数和友元类。
+
+\subsection{\mintinline{C++}{this} 指针}
+C++ 语言刚诞生的时候是没有能直接将 C++ 语言编译成机器语言的编译器的，而是先翻译成 C 语言，然后再通过 C 的编译器将其
+编译成机器语言。C++ 语言编译成 C 语言，对象对应结构体，之后就会多一个 \mintinline{C++}{this} 指针。尽管现在已经有
+了 C++ 的直接编译器了，但是依然可以这么理解，即会多出一个 \mintinline{C++}{this} 指针，其作用是指向成员函数所作用
+的对象。
+
+C++ 代码：
+\begin{minted}{C++}
+    class CCar {
+    public:
+        int price;
+        void SetPrice(int p);
+    };
+    void CCar::SetPrice(int p) {
+        price = p;
+    }
+    int main() {
+        CCar car;
+        car.SetPrice(20000);
+        return 0;
+    }
+\end{minted}
+
+翻译后的 C 代码：
+\begin{minted}{C}
+    struct CCar {
+        int price;
+    };
+    void SetPrice(struct CCar *this, int p) {
+        this->price = p;
+    }
+    int main() {
+        struct CCar car;
+        SetPrice(&car, 20000);
+        return 0;
+    }
+\end{minted}
+
+非静态成员函数中可以直接使用 \mintinline{C++}{this} 来代表指向该函数作用的对象的指针。
+\begin{minted}{C++}
+    class Complex {
+    public:
+        double real, imag;
+        void Print() {
+            std::cout << real << "," << imag << std::endl;
+        }
+        Complex(double r, double i) : real(r), imag(i) {}
+        Complex AddOne() {
+            this->real++;
+            this->Print();
+            return *this;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        Complex c1(1, 1), c2(0, 0);
+        c2 = c1.AddOne();   // 2,1
+        return 0;
+    }
+\end{minted}
+
+比较下面代码中 A、B 类的不同，体会 \mintinline{C++}{this} 指针的作用。
+\begin{minted}{C++}
+    class A {
+    private:
+        int i;
+    public:
+        void Hello() {
+            std::cout << "Hello world!" << std::endl;
+        }
+    };
+
+    class B {
+    private:
+        int i;
+    public:
+        void Hello() {
+            std::cout << i << " Hello world!" << std::endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        A *p1 = NULL;
+        p1->Hello();    // Hello world!
+        B *p2 = NULL;
+        p2->Hello();    // Segmentation fault: 11
+        return 0;
+    }
+\end{minted}
+
+\mintinline{C++}{this} 指针并不占用对象的内存空间，不会影响 \mintinline{C++}{sizeof} 运算符的结果。它与对象并
+不存在包含关系，只是当对象调用函数时，对象被 \mintinline{C++}{this} 指针指向。\mintinline{C++}{this} 指针的存
+放位置跟编译器有关，可能是栈，也可能是寄存器，甚至是全局变量。
+
+静态成员函数并不具体作用于某个对象，因此静态成员函数中不能使用 \mintinline{C++}{this} 指针。普通成员函数的真实参数
+个数要比参数表中写的多一个 \mintinline{C++}{this} 指针，而静态成员函数的真实的参数个数就是程序中写出的参数个数。
+
+\subsection{常量对象、常量成员函数和常引用}
+\subsubsection{常量对象}
+如果不希望某个对象的值被改变，则定义该对象的时候可以在前面加上 \mintinline{C++}{const} 关键字。
+\begin{minted}{C++}
+    class Demo {
+    private:
+        int value;
+    public:
+        Demo(int v) : value(v) {}
+        void setValue(int v) {
+            value = v;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        const Demo obj(0); // const object
+
+        // error: member function 'setValue' not viable: 'this' argument has type
+        // 'const Demo', but function is not marked const
+        obj.setValue(1);
+        return 0;
+    }
+\end{minted}
+
+常量对象一旦通过构造函数完成了初始化，它的成员变量就不允许通过任何方式修改，不管是直接修改还是通过成员函数修改都不行。
+常量对象只可以调用其常量成员函数。
+
+\subsubsection{常量成员函数}
+在类的成员函数声明后面可以加 \mintinline{C++}{const} 关键字，则该成员函数成为常量成员函数。如果该常量成员函数需要
+在类外定义，则类内的声明后面和类外的定义后面都要加 \mintinline{C++}{const} 关键字。
+
+常量成员函数执行期间不应该修改其作用的对象。因此，在常量成员函数中可以访问但不能修改成员变量的值（静态成员变量除外），
+也不能调用同类的非常量成员函数（静态函数成员除外）。
+
+\begin{minted}{C++}
+    class Sample {
+    public:
+        int value;
+        Sample() {}
+        void getValue() const;
+        void func() {}
+    };
+
+    void Sample::getValue() const {
+        // error: cannot assign to non-static data member within const member
+        // function 'getValue'
+        value = 0;
+        // error: member function 'func' not viable: 'this' argument has type
+        // 'const Sample', but function is not marked const
+        func();
+    }
+
+    int main() {
+        const Sample o; // 大部分编译器需要为 Sample 类编写构造函数，然后才能
+        // error: cannot assign to variable 'o' with const-qualified type
+        // 'const Sample'
+        o.value = 100;
+        // error: member function 'func' not viable: 'this' argument has type
+        // 'const Sample', but function is not marked const
+        o.func();
+        o.getValue();   // OK
+        return 0;
+    }
+\end{minted}
+
+两个成员函数，名字和参数表都一样，但是一个是 \mintinline{C++}{const}，一个不是，它们是重载的关系，不是重复定义。
+
+\subsubsection{常引用}
+引用前面可以加 \mintinline{C++}{const} 关键字，成为常引用。不能通过常引用修改其引用的变量。
+\begin{minted}{C++}
+    class Sample {
+        ...
+    };
+    void printfObj(const Sample &o) {
+        ...
+    }
+\end{minted}
 
 
 
