@@ -55,12 +55,177 @@
     004 blue headquarter stops making warriors
  *
  * @author: Du Ang
- * @date: Aug. 15th, 2017
+ * @date: Aug. 16th, 2017
  */
 
 #include <iostream>
+#include <iomanip>
+#include <string>
+
+class Warrior {
+private:
+    std::string name;
+    int id;
+    int strength;
+    int attack;
+    int count;
+public:
+    Warrior(std::string typeName, int s, int c) : name(typeName), strength(s), count(c) {}
+    std::string getName() {
+        return name;
+    }
+    int increaseWarriorCount() {
+        return ++count;
+    }
+    int getWarriorStrength() {
+        return strength;
+    }
+};
+
+class Army {
+private:
+    std::string unit;   // red army for "red", blue army for "blue"
+    int M;              // Army HP
+    int totalWarriorCount;
+    Warrior dragon;
+    Warrior ninja;
+    Warrior iceman;
+    Warrior lion;
+    Warrior wolf;
+    std::string warriorMakingSequence[5];
+    // int warriorStrengthSequence[5];
+public:
+    Army(std::string unitName, int hp, int ds, int ns, int is, int ls, int ws)
+        : unit(unitName),
+        M(hp),
+        totalWarriorCount(0),
+        dragon("dragon", ds, 0),
+        ninja("ninja", ns, 0),
+        iceman("iceman", is, 0),
+        lion("lion", ls, 0),
+        wolf("wolf", ws, 0)
+    {
+        if (unit == "red") {
+            warriorMakingSequence[0] = iceman.getName();
+            warriorMakingSequence[1] = lion.getName();
+            warriorMakingSequence[2] = wolf.getName();
+            warriorMakingSequence[3] = ninja.getName();
+            warriorMakingSequence[4] = dragon.getName();
+        } else if (unit == "blue") {
+            warriorMakingSequence[0] = lion.getName();
+            warriorMakingSequence[1] = dragon.getName();
+            warriorMakingSequence[2] = ninja.getName();
+            warriorMakingSequence[3] = iceman.getName();
+            warriorMakingSequence[4] = wolf.getName();
+        } else {
+            exit(-1);
+        }
+    }
+    int makeWarrior(int t, int index);
+    int increaseWarriorCount(std::string name);
+    int getWarriorStrengthByName(std::string name);
+};
+
+int Army::makeWarrior(int t, int index) {
+    // judge the which kind warrior is going to make according to the army unit
+    if (index == -1) {
+        return -1;
+    } else {
+        for (int i = 0; i < 5; i++) {
+            int cursor = (index + i) % 5;
+            std::string warriorName = warriorMakingSequence[cursor];
+            int strength = getWarriorStrengthByName(warriorName);
+            int warriorCount = increaseWarriorCount(warriorName);
+            if (M >= strength) {
+                // std::cout << "M = "<< M << " strength = " << strength << std::endl;
+                M = M - strength;
+                std::cout << std::setfill('0') << std::setw(3);
+                std::cout << t << " " << unit << " " <<  warriorName << " "
+                << ++totalWarriorCount << " born with strength " << strength << ","
+                << warriorCount << " " << warriorName << " in " << unit
+                << " headquarter" << std::endl;
+                return cursor + 1;
+            } else {
+                continue;
+            }
+        }
+        std::cout << std::setfill('0') << std::setw(3);
+        std::cout << t << " " << unit << " headquarter stops making warriors" << std::endl;
+        return -1;  // can not make anymore
+    }
+}
+
+int Army::increaseWarriorCount(std::string name){
+    if (name == dragon.getName()) {
+        return dragon.increaseWarriorCount();
+    } else if (name == ninja.getName()) {
+        return ninja.increaseWarriorCount();
+    } else if (name == iceman.getName()) {
+        return iceman.increaseWarriorCount();
+    } else if (name == lion.getName()) {
+        return lion.increaseWarriorCount();
+    } else if (name == wolf.getName()) {
+        return wolf.increaseWarriorCount();
+    } else {
+        exit(-1);
+    }
+}
+
+int Army::getWarriorStrengthByName(std::string name) {
+    if (name == dragon.getName()) {
+        return dragon.getWarriorStrength();
+    } else if (name == ninja.getName()) {
+        return ninja.getWarriorStrength();
+    } else if (name == iceman.getName()) {
+        return iceman.getWarriorStrength();
+    } else if (name == lion.getName()) {
+        return lion.getWarriorStrength();
+    } else if (name == wolf.getName()) {
+        return wolf.getWarriorStrength();
+    } else {
+        exit(-1);
+    }
+}
 
 int main(int argc, char const *argv[]) {
+    // freopen("in.txt", "r", stdin);       // in.txt stores the sample input
+    // freopen("outb.txt", "w", stdout);    // outb.txt stores the output of this program
+    // And out.txt stores the sample out. Use diff out.txt outb.txt in terminal to compare.
 
+    int caseNum;
+    int M;
+    int dragonStrength;
+    int ninjaStrength;
+    int icemanStrength;
+    int lionStrength;
+    int wolfStrength;
+
+    std::cin >> caseNum;
+    for (int i = 1; i <= caseNum; i++) {
+        std::cin >> M;
+        std::cin >> dragonStrength >> ninjaStrength >> icemanStrength >> lionStrength
+                >> wolfStrength;
+        std::cout << "Case:" << i << std::endl;
+
+        Army redArmy("red", M, dragonStrength, ninjaStrength, icemanStrength, lionStrength,
+                    wolfStrength);
+        Army blueArmy("blue", M, dragonStrength, ninjaStrength, icemanStrength, lionStrength,
+                    wolfStrength);
+        int timeCount = 0;
+        int redIndex = 0;
+        int blueIndex = 0;
+        while (true) {
+            if (redIndex == -1 && blueIndex == -1) {
+                break;
+            } else {
+                redIndex = redArmy.makeWarrior(timeCount, redIndex);
+                blueIndex = blueArmy.makeWarrior(timeCount, blueIndex);
+                timeCount++;
+            }
+        }
+    }
+
+    // fclose(stdin);
+    // fclose(stdout);
     return 0;
 }
