@@ -270,7 +270,10 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
 \mintinline{C++}{#define}，因为 \mintinline{C++}{const} 是有类型的，便于类型检查。
 
 \subsubsection{定义常量指针}
-不可以通过常量指针修改其指向的内容：
+在声明一个指针的时候，在其类型前面加上 \mintinline{C++}{const} 限定符，这个指针就成为常量指针。
+
+当我们通过常量指针来访问它所指向的内容的时候，不管它指向的内容实际上是否为常量，常量指针都认为它是常量。因此，不可以通
+过常量指针修改其指向的内容：
 \begin{minted}{C++}
     int n, m;
     const int *p = &n;
@@ -279,7 +282,9 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
     p = &m;     // OK
 \end{minted}
 
-不能把常量指针赋给非常量指针（除非强制类型转换），反过来可以：
+不能把常量指针赋给非常量指针（除非强制类型转换），但反过来可以。因为常量指针认为自己指向的内容是常量，神圣不容修改，如果
+把这些内容的地址交给非常量指针，内容就有可能被修改，这太危险了，坚决不能给。非常量的指针指向的内容是可以被修改的，非常
+量指针要把这些内容给常量指针，常量指针就会说“可以啊，就算把地址给我也不会去修改它的”。
 \begin{minted}{C++}
     const int *p1;
     int *p2;
@@ -287,6 +292,16 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
     p2 = p1;    // error: assigning to 'int *' from incompatible type 'const int *'
     p2 = (int *)p1; // OK, cast type
 \end{minted}
+
+由于这个指针本身不是常量（指针常量），所以这个指针可以重新指向其他的内容：
+\begin{minted}{C++}
+    int value1 = 5;
+    const int *ptr = &value1;   // ptr points to a const int
+    int value2 = 6;
+    ptr = &value2;  // OK, ptr now points at some other const int
+\end{minted}
+
+总而言之，不允许非常量指针指向常量，也不允许通过常量指针来修改它所指向的内容。
 
 函数参数为常量指针时，可避免函数内部不小心改变参数指针所指地方的内容：
 \begin{minted}{C++}
@@ -298,6 +313,36 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
         // strcpy(p, "this");
         cout << p << endl;
     }
+\end{minted}
+
+\subsubsection{定义指针常量}
+我们也可以把某个指针本身定义为常量，称为指针常量。一个指针的值在初始化后就不能被改变，这个指针就称为指针常量。
+\begin{minted}{C++}
+    int value = 5;
+    int *const ptr = &value;
+\end{minted}
+
+和普通的常量一样，指针常量在声明的时候就要进行初始化为某个值。这就意味着，指针常量总是指向相同的地址。
+\begin{minted}{C++}
+    int value1 = 5;
+    int value2 = 6;
+    // OK, the const pointer is initialized to the address of value1
+    int *const ptr = &value1;
+    // not OK, a const pointer can not be changed
+    ptr = &value2;
+\end{minted}
+
+如果指针常量指向的是变量而不是常量，就可以通过指针常量来修改该变量的值。
+\begin{minted}{C++}
+    int value = 5;
+    int *const ptr = &value;    // ptr will always point to value
+    *ptr = 6;   // allowed, since ptr points to a non-const int
+\end{minted}
+
+可以同时声明一个指针既是常量指针也是指针常量。这时，既不能修改这个指针常量本身的值，也不能通过它修改它所指向的内容。
+\begin{minted}{C++}
+    int value = 5;
+    const int *const ptr = &value;
 \end{minted}
 
 \subsubsection{定义常引用}
