@@ -115,17 +115,17 @@ int main()
 
 用递归模拟连续发生的动作的方法：
 - 搞清楚连续发生的动作是什么
-    ``` {.C++}
+    ``` C++
         void move(int m, char x, char y, char z);
     ```
 - 搞清楚不同次动作之间的关系
-    ``` {.C++}
+    ``` C++
         move(m - 1, x, z, y);
         cout << "Move one plate from " << x << " to " << z << endl;
         move(m - 1, y, x, z);
     ```
 - 搞清楚边界条件是什么
-    ``` {.C++}
+    ``` C++
         if (m == 1) {
             cout << "Move one plate from " << x << " to " << z endl;
         }
@@ -136,18 +136,18 @@ int main()
 
 用递归自动分析的方法：
 - 先假设有一个函数能给出答案
-    ``` {.C++}
+    ``` C++
         count(int m, int n)
     ```
 - 在利用这个函数的前提下，分析如何解决问题
-    ``` {.C++}
+    ``` C++
         if (m < n)
             return count(m, m);
         else
             return count(m, n-1) + count(m-n, n);
     ```
 - 搞清楚最简单的情况下的答案是什么
-    ``` {.C++}
+    ``` C++
         if (m <= 1 || n <= 1)
             return 1;
     ```
@@ -166,7 +166,7 @@ int main()
 
 其中，`int` 是指针变量的基类型（指针变量指向的变量的类型），`*` 是指针运算符，表明了 `pointer` 的类型，`pointer` 是指针变量的名字。
 
-``` {.C++}
+``` C++
     int c = 76;
     int *pointer;   // 定义名字为 pointer 的指针变量
     pointer = &c;   // 将变量 c 的地址赋给 pointer。赋值后，pointer 指向 c
@@ -178,12 +178,12 @@ int main()
 ### 5.2 `&` 与 `*` 的运算优先级
 后置++/-- &gt; 前置++/- -、逻辑非（!）、\*、& &gt; 算术运算符 &gt; 关系运算符 &gt; &&、|| &gt; 赋值运算符
 
-- `&*pointer = &(*pointer)``
+- `&*pointer = &(*pointer)`
 - `*&a= *(&a)`
 - `(*pointer)++` 不等于 `*pointer++`
 
 ### 5.3 `pointer++` 的含义
-``` {.C++}
+``` C++
 #include <iostream>
 using namespace std;
 int main() {
@@ -221,7 +221,7 @@ int main() {
     - `a++` 是没有意义的，但 `p++` 会引起 `p` 变化。
     - `p` 可以指向数组最后一个元素以后的元素。
 - 指针做加减运算时一定要注意有效的范围
-    ``` {.C++}
+    ``` C++
         int a[5];
         int *iPtr = &a[1];
         iPtr--;     // now iPtr points to a[0]
@@ -275,7 +275,7 @@ Array subscripting
 ### 5.6 指针与函数
 #### 5.6.1 指针变量做函数参数
 示例代码：
-``` {.C++}
+``` C++
     void Rank(int *q1, int *q2)
     {
         int temp;
@@ -301,7 +301,7 @@ Array subscripting
 
 #### 5.6.2 数组名作为函数参数
 示例代码：
-``` {.C++}
+``` C++
     void sum(int *p, int n)
     {
         int total = 0;
@@ -322,7 +322,7 @@ Array subscripting
 
 示例代码：
 
-``` {.C++}
+``` C++
     int maxValue(int (*p)[4])
     {
         int max = p[0][0];
@@ -346,7 +346,7 @@ Array subscripting
 在多维数组作为函数参数时，函数的形参写作指针比较麻烦，例如上面的 `(*p)[4]`。这时可以考虑将“数组名”作为形参。
 
 示例代码：
-``` {.C++}
+``` C++
     // Sum all elements to the last element, but will change the array.
     int sum(int array[], int n)
     {
@@ -377,7 +377,7 @@ Array subscripting
 定义一个指向符号常量的指针：`const int *p;`
 
 示例代码：
-``` {.C++}
+``` C++
     int a = 256;
     const int *p = &a;
     *p = 257;   // error: read-only variable is not assignable
@@ -391,7 +391,7 @@ Array subscripting
 如果 `p` 是一个指向符号常量的指针，我们就不可以修改它指向的内容，但我们可以改变 `p` 本身的值，使它指 向其他内容。
 
 示例代码：
-``` {.C++}
+``` C++
 const int c = 78;
 const int d = 28;
 int e = 18;
@@ -407,7 +407,7 @@ pi = &e;                    // now pi points to e
 返回指针类型的函数：`int *function(int x, int y);`
 
 示例代码：
-``` {.C++}
+``` C++
     int *get(int arr[][4], int n, int m)
     {
         it *pt;
@@ -431,7 +431,7 @@ pi = &e;                    // now pi points to e
 使用关键字 `static` 定义静态局部变量：`static int value = 20;`
 
 示例代码：
-``` {.C++}
+``` C++
     void fun()
     {
         int a = 0;
@@ -461,7 +461,7 @@ pi = &e;                    // now pi points to e
 
 示例代码：
 
-``` {.C++}
+``` C++
     struct student {
         int id;
         char name[20];
@@ -478,7 +478,7 @@ pi = &e;                    // now pi points to e
 1. 直接用已生命的结构体类型定义变量名：\
     ` student student1, student2;`
 2. 在声明类型的同时定义变量：
-    ``` {.C++}
+    ``` C++
     struct student {
         int id;
         char name[20];
@@ -491,7 +491,7 @@ pi = &e;                    // now pi points to e
 
 #### 6.1.2 结构体变量的初始化和赋值
 结构体变量的初始化和数组的初始化很相似：
-``` {.C++}
+``` C++
     struct student {
         int id_num;
         char name[10];
@@ -509,7 +509,7 @@ pi = &e;                    // now pi points to e
 
 #### 6.1.4 指向结构体的指针
 定义指向结构体变量的指针：
-``` {.C++}
+``` C++
     student mike = {123, {'m', 'i', 'k', 'e', '\0'}};
     student *one = &mike;
     cout << (*one).id_num << " " << (*one).name << endl;    // Right.
@@ -523,7 +523,7 @@ pi = &e;                    // now pi points to e
 
 #### 6.1.5 结构体数组
 结构体数组和普通类型的数组也是一样的，数组名是指向数组首元素的指针：
-``` {.C++}
+``` C++
     student myClass[3] = {
         123, {'m', 'i', 'k', 'e', '\0'},
         133, {'t', 'o', 'm', '\0'},
@@ -550,7 +550,7 @@ pi = &e;                    // now pi points to e
 
 #### 6.2.2 动态创建链表
 动态地申请内存空间：
-``` {.C++}
+``` C++
     // 申请一块内存空间来存放一个 int，初始值为 1024，并返回指向该内存空间的指针 pint
     int *pint = new int(1024);
     // 释放 pint 指向的内存
@@ -565,7 +565,7 @@ pi = &e;                    // now pi points to e
 在创建链表和对链表进行操作时，经常需要用到 `new` 来动态分配内存。什么时候需要用 `new`，什么时候不需要用呢？这主要是看我们是否真的需要一块新的内存。有时候只是新建一个指针 `temp` 就能解决问题，并不需要申请内存 空间。
 
 动态地创建链表结点：
-``` {.C++}
+``` C++
     struct student {
         int id;
         student *next;
@@ -577,13 +577,13 @@ pi = &e;                    // now pi points to e
 
 创建链表的步骤：
 1. 建立头结点 `head`，新建临时的指针 `temp` 也指向 `head`，用于创建后续结点。
-    ``` {.C++}
+    ``` C++
         head = new student;
         student *temp = head;
     ```
 2. 判断是否还要创建结点。
     - 如果需要创建新结点，新申请内存创建一个新的结点，并利用 `temp` 指针将前一个结点的 `next` 指针指向新结点，最后将 `temp` 指向新结点，以便于以后再创建新结点。
-        ``` {.C++}
+        ``` C++
             temp->next = new student;
             temp = temp->next;
         ```
@@ -591,7 +591,7 @@ pi = &e;                    // now pi points to e
     - 如果不需要再创建结点，执行步骤 3。
 
 3. 将最后一个结点的 `next` 指针置为 `NULL`。
-    ``` {.C++}
+    ``` C++
         temp->next = NULL;
     ```
 
@@ -599,7 +599,7 @@ pi = &e;                    // now pi points to e
 在链表创建完成后，我们可能需要对链表进行各种操作，包括遍历链表元素、删除结点、插入结点等。
 
 链表元素的遍历，即依次访问链表的所有元素：
-``` {.C++}
+``` C++
     student *pointer = create();
     while (pointer->next != NULL) {
         cout << pointer->id << endl;
@@ -609,30 +609,30 @@ pi = &e;                    // now pi points to e
 
 删除链表中的结点时，需要分不同的情况进行讨论：
 - 删除头结点
-    ``` {.C++}
+    ``` C++
         temp = head;
         head = head->next;
         delete temp;
     ```
 - 删除中间结点和末尾结点
-    ``` {.C++}
+    ``` C++
         follow->next = temp->next;
         delete temp;
     ```
 
 在链表中插入一个结点也需要分情况讨论。在向链表中插入新结点时需要格外小心，因为插入结点的操作有严格的顺序，必须先让新结点指向后续结点，然后再让前一结点指向新结点。反之，后续结点将会丢失。例如将结点 `unit` 插入链表：
 - 在最前面插入结点
-    ``` {.C++}
+    ``` C++
         unit->next = head;
         head = unit;
     ```
 - 在中间插入结点
-    ``` {.C++}
+    ``` C++
         unit->next = temp;
         follow->next = unit;
     ```
 - 在末尾插入结点
-    ``` {.C++}
+    ``` C++
         temp->next = unit;
         unit->next = NULL;
     ```
@@ -644,13 +644,13 @@ pi = &e;                    // now pi points to e
 由于涉及两个指针域，双向链表的删除结点和插入结点操作要比单向链表稍复杂一些。
 
 删除双向链表的 `temp` 结点：
-``` {.C++}
+``` C++
     temp->ahead->next = temp->next;
     temp->next->ahead = temp->ahead;
 ```
 
 在双向链表中 `temp` 结点之后插入 `unit` 结点：
-``` {.C++}
+``` C++
     unit->next = temp->next;
     unit->ahead = temp->ahead;
     temp->next->ahead = unit;
