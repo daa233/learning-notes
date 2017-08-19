@@ -1510,6 +1510,214 @@ C++ 代码：
     }
 \end{minted}
 
+\section{运算符重载}
+\subsection{运算符重载的基本概念}
+C++ 中预定义的运算符如 \texttt{+}、\texttt{-}、\texttt{*}、\texttt{/} 等，只能用于如整型、实型、字符型、逻辑型
+等基本的数据类型的运算。
+
+C++ 提供了数据抽象的手段，允许用户通过类自定义数据类型，然后通过调用类的成员函数来操作它的对象。使用类的成员函数来操作
+对象很不方便，我们希望像数学上一样，使用运算符来操作不同的对象，这时就可以对运算符进行重载。
+
+运算符重载是指对已有的运算符赋予多重的含义，使同一运算符作用于不同类型的数据时产生不同的行为。运算符重载的实质是函数重
+载。
+\begin{minted}{C++}
+    返回值类型 operator 运算符(形参表)
+    {
+        ...
+    }
+\end{minted}
+
+运算符重载的目的是扩展 C++ 中提供的运算符的适用范围，以用于类所表示的抽象数据类型。运算符重载使得抽象数据类型也能够直
+接使用 C++ 提供的运算符，使程序更简洁、代码更容易理解。
+
+在程序编译时：
+\begin{itemize}
+    \item 把含运算符的表达式 $\rightarrow$ 对运算符函数的调用
+    \item 把操作符的操作数 $\rightarrow$ 运算符函数的参数
+    \item 运算符被多次重载时，根据实参的类型决定调用哪个运算符函数
+    \item 运算符可以被重载为普通函数，也可以被重载为成员函数
+\end{itemize}
+
+\subsubsection{运算符被重载为普通函数}
+\begin{minted}{C++}
+    class ComplexN {
+    public:
+        ComplexN(double r = 0.0, double i = 0.0) {
+            real = r;
+            imaginary = i;
+        }
+        double real;
+        double imaginary;
+    };
+
+    ComplexN operator+(const ComplexN &a, const ComplexN &b) {
+        return ComplexN(a.real + b.real, a.imaginary + b.imaginary);
+    }
+    int main(int argc, char const *argv[]) {
+        ComplexN a(1, 2), b(2, 3), c;
+        c = a + b;
+        return 0;
+    }
+\end{minted}
+
+运算符被重载为普通函数时，参数个数为运算符目数。
+
+\subsubsection{运算符被重载为成员函数}
+\begin{minted}{C++}
+    class ComplexM {
+    public:
+        ComplexM(double r = 0.0, double m = 0.0) : real(r), imaginary(m) {}
+        ComplexM operator+(const ComplexM &);
+        ComplexM operator-(const ComplexM &);
+    private:
+        double real;
+        double imaginary;
+    };
+
+    ComplexM ComplexM::operator+(const ComplexM &operand) {
+        return ComplexM(real + operand.real, imaginary + operand.imaginary);
+    }
+
+    ComplexM ComplexM::operator-(const ComplexM & operand) {
+        return ComplexM(real - operand.real, imaginary - operand.imaginary);
+    }
+
+    int main(int argc, char const *argv[]) {
+        ComplexM x, y(4.3, 8.2), z(3.3, 1.1);
+        x = y + z;  // same as x = y.operator+(z);
+        x = y - z;  // same as x = y.operator-(z);
+        return 0;
+    }
+\end{minted}
+
+运算符被重载为成员函数时，参数个数为运算符目数减一。
+
+\subsection{赋值运算符的重载}
+如果赋值运算符 \texttt{=} 两边的类型不匹配，我们就需要重载赋值运算符 \texttt{=} 。赋值运算符 \texttt{=} 只能重载
+为成员函数，不能重载为普通函数。
+
+\subsubsection{赋值运算符重载实例}
+下面的代码编写了一个长度可变的字符串类 \texttt{MyString}，其成员包含一个 \mintinline{C++}{char *} 类型的成员变量，
+指向动态分配的存储空间，该存储空间用于存放 \mintinline{C++}{'\0'} 结尾的字符串。
+
+\begin{minted}{C++}
+    class MyString {
+    private:
+        char *str;
+    public:
+        MyString() : str(NULL) {}
+        const char *c_str() {return str;}
+        char *operator=(const char *s);
+        ~MyString();
+    };
+
+    char *MyString::operator=(const char *s) {
+        if (str) delete[] str;
+        if (s) {    // s is not NULL
+            str = new char[strlen(s) + 1];  // + 1 for '\0'
+            strcpy(str, s);
+        } else {
+            str = NULL;
+        }
+        return str;
+    }
+
+    MyString::~MyString() {
+        if (str) delete[] str;
+    }
+
+    int main() {
+        // no constructor MyString(char *)
+        // error: no viable conversion from 'const char [11]' to 'MyString'
+        // MyString s = "Good luck!";
+        MyString s;
+        s = "Good luck!";   // same as s.operator=("Good luck!");
+        std::cout << s.c_str() << std::endl;    // Good luck!
+        s = "Ocean University of China";
+        std::cout << s.c_str() << std::endl;    // Ocean University of China
+
+        MyString s1, s2;
+        s1 = "this";
+        s2 = "that";
+        // Note: here won't call char *operator=(const char *s); the types don't match!
+        // So it will call the default operator= by the compiler, use shallow copy
+        s1 = s2;    // runtime error:  pointer being freed was not allocated
+    }
+\end{minted}
+
+\subsubsection{重载赋值运算符的意义——浅拷贝和深拷贝}
+C++ 并不了解我们自定义的类，它会为我们的类自动重载赋值运算符，采用的是方式是浅拷贝（shallow copy,
+field-by-field copy or memberwise copy），这种赋值运算符的原型如下，它接受并返回一个指向类对象的引用：
+\begin{minted}{C++}
+ClassName &ClassName::operator=(const ClassName &);
+\end{minted}
+
+C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅拷贝。
+
+对一个对象的浅拷贝会拷贝所有它所有成员的值。例如，如果该对象有一个 \mintinline{C++}{int} 类型的成员，那么就把
+\mintinline{C++}{int} 类型的值拷贝过来。但是，如果该对象包含一个指针类型的成员，该指针指向一块动态申请的内存，这时
+就会出现问题了。因为浅拷贝只会把这个指针成员拷贝一份，保证两个指针的值一样，但不会拷贝该指针所指向的内存空间。因此，如
+果一个对象的成员里包含指针，浅拷贝之后，两个对象的指针成员会指向同一块内存。
+
+而对一个对象进行深拷贝则不同，它会将该对象中指针成员指向的内容也复制一份到另一个对象指针成员指向的地方。深拷贝后，两个
+对象的指针成员分别指向两块不同的内存空间，但这两块内存空间的内容是一样的。
+
+重载赋值运算符正确的写法：
+\begin{minted}{C++}
+    MyString &MyString::operator=(const MyString &s) {
+        if (str == s.str) return *this; // check self-assignment
+        if (str) delete[] str;
+        str = new char[strlen(s.str) + 1];
+        strcpy(str, s.str);
+        return *this;   // to chain this operator, eg x = y = z
+    }
+\end{minted}
+
+复制构造函数正确的写法：
+\begin{minted}{C++}
+    MyString::MyString(const MyString &s) {
+        if (s.str) {    // s is not NULL
+            str = new char[strlen(s.str) + 1];  // + 1 for '\0'
+            strcpy(str, s.str);
+        } else {
+            str = NULL;
+        }
+    }
+\end{minted}
+
+注意：在复制构造函数中，没有必要像重载赋值运算符函数中那样检查“自赋值”（相应地，这里指“自构造”）。
+因为 \mintinline{C++}{int a = a;} 在 C++ 中是未定义的行为，就不应该出现，这种检查应该是编译器做的，而不是程序员
+应该做的。\footnote{https://stackoverflow.com/questions/2529111/stdstring-xx}
+\footnote{https://stackoverflow.com/questions/5517698/check-for-self-assignment-in-copy-constructor}
+
+\subsubsection{重载赋值运算符时应该注意的问题}
+重载赋值运算符的一般步骤：
+\begin{enumerate}
+    \item 检查“自赋值”，不检查自赋值可能会删除自身指针成员指向的内存。
+    \item 删除原成员内容。如果包含动态内存，需要使用 \mintinline{C++}{delete}。
+    \item 复制成员，这里和复制构造函数里的操作一致。如果涉及到动态内存，可以用 \mintinline{C++}{new} 进行深拷贝。
+    \item 返回 \mintinline{C++}{*this}。根据赋值运算符原本的特性，返回值一般设置为引用。
+\end{enumerate}
+
+下面再详细地讨论一下返回值的问题。
+
+返回值可以是 \mintinline{C++}{void} 吗？不行，考虑 \mintinline{C++}{a = b = c;} 如果返回值是
+\mintinline{C++}{void}，\texttt{a} 就不不能被正确赋值，所以必须返回 \mintinline{C++}{*this}，以实现链式的表
+达式。
+
+返回值为什么是 \mintinline{C++}{MyString} 类型的引用呢？因为运算符重载时，我们希望尽量保留运算符原本的特性。例如
+\mintinline{C++}{(a = b) = c;} 这个语句，等价于 \mintinline{C++}{(a.operator=(b)).operator=(c);} 按照赋
+值运算符的特性是应该改变 \texttt{a} 的值的，如果不返回该类型的引用，\texttt{a} 的值就不会改变。
+
+返回值可以是 \mintinline{C++}{MyString} 类型吗？可以，但是不好，原因上面已经提到，我们希望保留运算符原本的特性。
+我在自己尝试这种实现时还遇到了其他的问题，和复制构造函数有关。重载赋值运算符是通过成员函数实现的，而我们返回的又是
+\mintinline{C++}{*this}，即返回值是对象本身。前面学习复制构造函数时已经知道，一个类的对象作为函数的返回值，该函数返
+回时会调用该类的复制构造函数，产生一个临时的对象。例如执行 \mintinline{C++}{s1 = s2;} 语句结束后，如果没有自己实现
+复制构造函数，就会调用默认的复制构造函数，通过浅拷贝产生 \texttt{s1} 的一个临时拷贝对象。由于并没有哪个变量去承接这个
+返回值，所以这个临时拷贝对象会立即调用析构函数并消亡。这时需要注意，在上面的例子中，由于没有自己实现深拷贝的复制构造函
+数，临时拷贝对象中的指针成员和 \texttt{s1} 中的指针成员就会指向同一块动态内存，临时拷贝对象消亡时，析构函数会把它们共
+同指向的这块动态内存删除。当 \texttt{s1} 对象也消亡时，会再次调用析构函数，可它指向的那块动态内存已经被删除了，这时就
+会报错。将复制构造函数设计为深拷贝就可以避免这个问题，但是每次返回都会进行一次对象的拷贝和释放，返回引用会更高效。
 
 
 \end{document}
