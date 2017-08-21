@@ -1751,9 +1751,174 @@ C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅�
 但是 \texttt{c.real} 和 \texttt{c.imag} 都是要访问对象 \texttt{c} 的私有成员，普通函数是没有访问权限的。所以要
 把 \texttt{+} 运算符重载为友元函数。
 
+\subsection{流插入运算符和流提取运算符的重载}
+为什么 \mintinline{C++}{cout << 5 << "this";} 能够成立？
 
+\texttt{cout} 是在 \texttt{iostream} 中定义的 \texttt{ostream} 类的对象。\mintinline{C++}{<<}
+能用在 \mintinline{C++}{cout} 上是因为，在 \texttt{iostream} 里对 \texttt{<<} 进行了重载。
 
+怎么样才能使 \mintinline{C++}{cout << 5;} 和 \mintinline{C++}{cout << "this"} 都能成立？
+\mintinline{C++}{cout << 5;} 即 \mintinline{C++}{cout.operator<<(5);} \mintinline{C++}{cout << "this";}
+即 \mintinline{C++}{cout.operator<<("this");} 所以该重载函数的返回值应该还是 \texttt{cout}。
 
+\begin{minted}{C++}
+    ostream &ostream::operator<<(int n) {
+        ...
+        return *this;
+    }
+\end{minted}
 
+假定下面程序输出为 \texttt{5hello}，应该怎么重载 \texttt{<<} 运算符？
+\begin{minted}{C++}
+    class CStudent {
+    public:
+        int nAge;
+    };
+
+    int main(int argc, char const *argv[]) {
+        CStudent s;
+        s.nAge = 5;
+        cout << s << "hello";   // 5hello
+        return 0;
+    }
+\end{minted}
+
+由于 \texttt{cout} 是 \texttt{ostream} 类的对象，而 \texttt{ostream} 是 \texttt{iostream} 中定义好的，所
+以我们不能将 \texttt{<<} 重载为类的成员函数，只能将其重载为全局函数：
+\begin{minted}{C++}
+    ostream &operator<<(ostream &o, const CStudent &s) {
+        o << s.nAge;
+        return o;
+    }
+\end{minted}
+
+假定 \texttt{c} 是 \texttt{Complex} 复数类的对象，现在希望写 \mintinline{C++}{cout << c;} 就能以
+\texttt{a+bi} 的形式输出 \texttt{c} 的值，写 \mintinline{C++}{cin >> c;} 就能从键盘接受 \texttt{a+bi} 形
+式的输入，并且使得 \texttt{c.real = a, c.imag = b}。
+\begin{minted}{C++}
+    class Complex {
+    private:
+        double real;
+        double imag;
+    public:
+        Complex(double r = 0, double i = 0) : real(r), imag(i) {};
+        friend ostream &operator<<(ostream &os, const Complex &c);
+        friend istream &operator>>(istream &is, Complex &c);
+    };
+
+    ostream &operator<<(ostream &os, const Complex &c) {
+        os << c.real << "+" << c.imag << "i";
+        return os;
+    }
+
+    istream &operator>>(istream &is, Complex &c) {
+        string s;
+        is >> s;
+        int pos = s.find("+", 0);
+        string sTmp = s.substr(0, pos); // get real part
+        c.real = atof(sTmp.c_str());    // convert const char * to float
+        sTmp = s.substr(pos+1, s.length()-pos-2);   // get imaginary part
+        c.imag = atof(sTmp.c_str());
+        return is;
+    }
+\end{minted}
+
+\subsection{自加、自减运算符的重载}
+自加运算符 \texttt{++} 和自减运算符 \texttt{--} 有前置和后置之分。
+
+前置运算符作为一元（单目）运算符重载：
+\begin{itemize}
+    \item 重载为成员函数
+    \begin{minted}{C++}
+    T operator++();
+    T operator--();
+    \end{minted}
+    \item 重载为全局函数：
+    \begin{minted}{C++}
+    T operator++(T);
+    T operator--(T);
+    \end{minted}
+\end{itemize}
+
+\mintinline{C++}{++obj}、\mintinline{C++}{obj.operator++()}、\mintinline{C++}{operator++(obj)} 会调用
+上述函数。
+
+后置运算符是也是一元（单目）运算符。但是后置运算符和前置运算符都是单目的，名字又一样，所以为了在重载时区分后置运算符与
+前置运算符，会引入一个多余的参数，将后置运算符作为二元（双目）运算符重载：
+\begin{itemize}
+    \item 重载为成员函数
+    \begin{minted}{C++}
+    T operator++(int);
+    T operator--(int);
+    \end{minted}
+    \item 重载为全局函数
+    \begin{minted}{C++}
+    T operator++(T, int);
+    T operator--(T, int);
+    \end{minted}
+\end{itemize}
+
+\mintinline{C++}{obj++}、\mintinline{C++}{obj.operator++(0)}、\mintinline{C++}{operator++(obj, 0)}
+会调用上述函数。
+
+\begin{minted}{C++}
+    class CDemo {
+    private:
+        int n;
+    public:
+        CDemo(int i = 0) : n(i) {}
+        CDemo &operator++();    // prefix increment
+        CDemo operator++(int);  // postfix increment
+        operator int() {return n;}  // int cast overloading
+        friend CDemo &operator--(CDemo &);      // prefix decrement
+        friend CDemo operator--(CDemo &, int);  // postfix decrement
+    };
+
+    // prefix increment
+    CDemo &CDemo::operator++() {
+        n++;
+        return *this;
+    }
+
+    // postfix increment
+    CDemo CDemo::operator++(int k) {
+        CDemo tmp(*this);
+        n++;
+        return tmp;
+    }
+
+    // prefix decrement
+    CDemo &operator--(CDemo &d) {
+        d.n--;
+        return d;
+    }
+
+    // postfix decrement
+    CDemo operator--(CDemo &d, int) {
+        CDemo tmp(d);
+        d.n--;
+        return tmp;
+    }
+\end{minted}
+
+其中 \mintinline{C++}|operator int() {return n;}| 语句是 \mintinline{C++}{int} 作为一个强制类型转换运算符
+被重载。例如 \mintinline{C++}{Demo s; (int)s;}
+
+类型强制转换运算符重载时，不能写返回值类型，实际上其返回值类型就是强制类型转换运算符代表的类型。
+
+\subsection{运算符重载的注意事项}
+\begin{itemize}
+    \item C++ 不允许定义新的运算符
+    \item 重载后运算符的含义应该符合日常习惯
+    \begin{itemize}
+        \item \mintinline{C++}{complex_a + complex_b}
+        \item \mintinline{C++}{word_a > word_b}
+        \item \mintinline{C++}{date_b = date_a + n}
+    \end{itemize}
+    \item 运算符重载不改变运算符的优先级
+    \item 以下运算符不能被重载：\texttt{.}，\texttt{.*}，\texttt{::}，\texttt{? :}，\texttt{sizeof}
+    \item 重载运算符 \texttt{()}、\texttt{[]}、\texttt{->} 或者 \texttt{=} 时，重载函数必须声明为类的成员函
+    数
+\end{itemize}
 
 \end{document}
