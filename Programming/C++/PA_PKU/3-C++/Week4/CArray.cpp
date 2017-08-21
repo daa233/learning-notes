@@ -81,8 +81,6 @@ CArray &CArray::operator=(const CArray &a) {    // assignment operator overloadi
 
 void CArray::push_back(int v) { // add one element in the end of the array, ineffective
     if (ptr) {  // not empty
-        std::cout << "sizeof(ptr) = " << sizeof(ptr) << std::endl;
-        std::cout << "sizeof(*ptr) = " << sizeof(*ptr) << std::endl;
         int *tmpPtr = new int[size + 1];
         std::memcpy(tmpPtr, ptr, sizeof(int) * size);
         delete[] ptr;
