@@ -2077,7 +2077,7 @@ C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅�
 
 一般来说，基类和派生类不定义同名成员变量，但是有时候可以有同名成员函数。
 
-\subsection{访问范围说明符：\mintinline{C++}{protected}}
+\subsection{访问范围说明符 \mintinline{C++}{protected}}
 访问范围说明符有三种：\mintinline{C++}{public}、\mintinline{C++}{private}、\mintinline{C++}{protected}，
 共同将一个类的成员分为三种，公有成员、私有成员和保护成员。
 
@@ -2185,7 +2185,161 @@ C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅�
     \item 所有间接基类的的全部成员
 \end{itemize}
 
+\section{虚函数和多态}
+多态是指同一名字的事物可以完成不同的功能，例如有几个相似而不完全相同的对象，有时人们要求在向它们发出同一个消息时，它们
+的反应各不相同，分别执行不同的操作。在 C++ 中，所谓多态性是指由继承而产生的相关的不同的类，其对象对同一消息会作出不同的
+响应。多态性是面向对象程序设计的一个重要特征，能有效增加程序的灵活性。
+\subsection{多态和虚函数的基本概念}
+\subsubsection{虚函数}
+在类的定义中，前面有 \mintinline{C++}{virtual} 关键字的成员函数就是虚函数。
+\begin{minted}{C++}
+    class base {
+        virtual int get();
+    };
+    int base::get() {}
+\end{minted}
 
+\mintinline{C++}{virtual} 关键字只用在类定义里的函数声明中，写函数体时不用。构造函数和静态成员函数不能是虚函数。
+
+\subsubsection{多态的表现形式一}
+派生类的指针可以赋值给基类指针。
+
+通过基类指针调用基类和派生类中的同名虚函数时：
+\begin{enumerate}
+    \item 若该指针指向一个基类的对象，那么被调用是基类的虚函数；
+    \item 若该指针指向一个派生类的对象，那么被调用的是派生类的虚函数。
+\end{enumerate}
+
+这种机制就叫做“多态”。
+
+\begin{minted}{C++}
+    class CBase {
+    public:
+        virtual void someVirtualFunction() {}
+    };
+    class CDerived : public CBase {
+    public:
+        virtual void someVirtualFunction() {}
+    };
+    int main() {
+        CDerived oDerived;
+        CBase *p = &oDerived;       // p points to oDerived (class CDerived)
+        p->someVirtualFunction();   // someVirtualFunction in class CDerived
+    }
+\end{minted}
+
+\subsubsection{多态的表现形式二}
+派生类的对象可以赋值给基类引用。
+
+通过基类引用调用基类和派生类中的同名虚函数时：
+\begin{enumerate}
+    \item 若该引用引用的是一个基类的对象，那么被调用的是基类的虚函数；
+    \item 若该引用引用的是一个派生类的对象，那么被调用的是派生类的虚函数。
+\end{enumerate}
+
+这种机制也叫做多态。
+
+\begin{minted}{C++}
+    class CBase {
+    public:
+        virtual void someVirtualFunction() {}
+    };
+    class CDerived : public CBase {
+    public:
+        virtual void someVirtualFunction() {}
+    };
+    int main() {
+        CDerived oDerived;
+        CBase &r = oDerived;        // r refers to oDerived (class CDerived)
+        r.someVirtualFunction();    // someVirtualFunction in class CDerived
+    }
+\end{minted}
+
+在面向对象的程序设计中使用多态，能够增强程序的可扩充性，即程序需要修改或增加功能的时候，需要改动和增加的代码较少。
+
+\subsection{使用多态的游戏程序实例}
+游戏中有很多怪物，如战士、龙、凤凰、天使等，每种怪物都有一个类与之对应，每个怪物就是一个对象。怪物能够互相攻击，攻击敌
+人和被攻击时都有相应的动作，动作是通过对象的成员函数实现的。
+
+在游戏版本升级时，要增加新的怪物——雷鸟。如何编程才能使升级时的代码改动和增加量较小？
+
+基本思路是为每个怪物类编写 \texttt{attack}、\texttt{fightBack} 和 \texttt{hurted} 成员函数。其中
+\texttt{attack} 函数表现攻击动作，攻击某个怪物，并调用被攻击怪物的 \texttt{hurted} 函数，以减少被攻击怪物的生命
+值，同时也调用被攻击怪物的 \texttt{fightBack} 成员函数，遭受被攻击怪物反击。\texttt{hurted} 函数减少自身生命值，
+并表现受伤动作。\texttt{fightBack} 成员函数表现反击动作，并调用被反击对象的 \texttt{hurted} 成员函数，使被反击对
+象受伤。
+
+设置基类 \texttt{CCreature}，并且使 \texttt{CDragon}，\texttt{CWolf} 等其他类都从 \texttt{CCreature} 派生
+而来。
+
+\subsubsection{非多态的实现方式}
+有 n 种怪物，\texttt{CDragon} 类中就会有 n 个 \texttt{attack} 成员函数，以及 n 个 \texttt{fightback} 成员
+函数。对于其他类也如此。
+
+如果游戏版本升级，增加了怪物雷鸟 \texttt{CThunderBird}，则程序改动较大。所有的类都需要增加两个成员函数：
+\begin{itemize}
+    \item \mintinline{C++}{void attack(CThunderBird *pThunderBird);}
+    \item \mintinline{C++}{void fightBack(CThunderBird *pThunderBird);}
+\end{itemize}
+
+在怪物种类多的时候，工作量将巨大无比！
+
+\subsubsection{多态的实现方式}
+基类 \texttt{CCreature} 只有一个 \texttt{attack} 成员函数；也只有一个 \texttt{fightBack} 成员函数；所有
+\texttt{CCreature} 的派生类也是这样。如果游戏版本升级，增加了新的怪物雷鸟 \texttt{CThunderBird}，只需要编写新
+类 \texttt{CThunderBird}，不需要在已有的类里专门为新怪物增加成员函数：
+\begin{itemize}
+    \item \mintinline{C++}{void attack(CThunderBird *pThunderBird);}
+    \item \mintinline{C++}{void fightBack(CThunderBird *pThunderBird);}
+\end{itemize}
+而已有的类也可以原封不动。
+
+\begin{minted}{C++}
+    class CCreature {
+    protected:
+        int mLifeValue, mPower;
+    public:
+        virtual void attack(CCreature *pCreature) {}
+        virtual void hurted(int mPower) {}
+        virtual void fightBack(CCreature *pCreature) {}
+    };
+
+    class CDragon : public CCreature {
+    public:
+        virtual void attack(CCreature *pCreature);
+        virtual void hurted(CCreature *pCreature);
+        virtual void fightBack(CCreature *pCreature);
+    };
+
+    void CDragon::attack(CCreature *p) {
+        // some attack codes
+        p->hurted(mPower);
+        p->fightBack(this);
+    }
+
+    void CDragon::hurted(int nPower) {
+        // some hurted codes
+        mLifeValue -= nPower;
+    }
+
+    void CDragon::fightBack(CCreature *p) {
+        // some fight back codes
+        p->hurted(mPower / 2);
+    }
+
+    int main(int argc, char const *argv[]) {
+        CDragon dragon;
+        CWolf wolf;
+        CGhost ghost;
+        CThunderBird thunderBird;
+        dragon.attack(&wolf);           // CWolf::hurted ...
+        dragon.attack(&ghost);          // CGhost::hurted ...
+        dragon.attack(&thunderBird);    // CThunderBird::hurted ...
+        return 0;
+    }
+\end{minted}
+
+详见 ``Week6/PolymorphismGameSample.cpp'' 文件。
 
 
 \end{document}
