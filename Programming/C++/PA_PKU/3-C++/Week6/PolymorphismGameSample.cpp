@@ -1,5 +1,5 @@
 /**
- * @file: PolymorphismGameSample.cpp
+ * @file: PolymorphismGameSample.cpp (not complete)
  * @description: 使用多态的游戏程序实例——游戏《魔法门之英雄无敌》
                 游戏中有很多怪物，如战士、龙、凤凰、天使等，每种怪物都有一个类与之对应，每个怪物就是一个对象。
                 怪物能够互相攻击，攻击敌人和被攻击时都有相应的动作，动作是通过对象的成员函数实现的。

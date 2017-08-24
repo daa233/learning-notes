@@ -2341,5 +2341,248 @@ C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅�
 
 详见 ``Week6/PolymorphismGameSample.cpp'' 文件。
 
+\subsection{更多多态程序示例}
+\subsubsection{几何形体处理程序}
+几何形体处理程序：输入若干个几何形体的参数，要求按面积排序输出。输出时要指明形状。
+
+输入：第一行是几何形体数目 n （不超过 100）。下面有 n 行，每行以一个字母 c 开头。
+\begin{itemize}
+    \item 若 c 是 ‘R’，则代表一个矩形，本行后面跟着两个整数，分别是矩形的宽和高
+    \item 若 c 是 ‘C’，则代表一个圆，本行后面跟着一个整数代表其半径
+    \item 若 c 是 ‘T’，则代表一个三角形，本行后面跟着三个整数，代表三条边的长度
+\end{itemize}
+
+输出：按面积从小到大依次输出每个几何形体的种类和面积。每行一个几何形体，输出格式为：形体名称:面积
+
+具体实现见 ``Week6/GeometryWithPolymorphism.cpp'' 文件。
+
+用基类指针数组存放指向各种派生类对象的指针，然后遍历该数组，就能对各个派生类对象做各种操作，是很常用的做法。在上面的例子
+中，如果要添加一个新的几何形体五边形，则只需要从 \texttt{CShape} 类派生出 \texttt{CPentagon}，以及在
+\mintinline{C++}{main} 函数中的 \mintinline{C++}{switch} 语句中增加一个 \mintinline{C++}{case} 就可以了，
+其余部分都不用变。
+
+\subsection{多态的又一个例子}
+\begin{minted}{C++}
+    class Base {
+    public:
+        void fun1() {
+            // Call virtual function in a non-constructor and non-destructor
+            // function will invoke polymorphism
+            fun2();     // same as 'this->fun2();', this is a base pointer
+        }
+        virtual void fun2() {
+            cout << "Base::fun2()" << endl;
+        }
+    };
+
+    class Derived : public Base {
+    public:
+        virtual void fun2() {
+            cout << "Derived::fun2()" << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        Derived d;
+        // pBase is a pointer of base class, points to a object of derived class
+        Base *pBase = &d;
+        pBase->fun1();      // Derived::fun2()
+        return 0;
+    }
+\end{minted}
+
+在非构造函数、非析构函数的成员函数中调用虚函数，是多态。
+
+在构造函数和析构函数中调用虚函数，不是多态。编译时即可确定调用的函数是自己的类或基类中定义的函数，不会等到运行时才决定
+调用自己的还是派生类的函数。
+
+\begin{minted}{C++}
+    class Father {
+    public:
+        virtual void hello() {
+            cout << "Hello from Father." << endl;
+        }
+        virtual void bye() {
+            cout << "Bye from Father." << endl;
+        }
+    };
+
+    class Son : public Father {
+    public:
+        Son() {hello();}    // hello is not polymorphism here
+        ~Son() {bye();}     // derived bye() from base class Father
+        // hello has the same virutal function name in base class, it's also virtual here
+        void hello() {
+            cout << "Hello from Son." << endl;
+        }
+    };
+
+    class Grandson : public Son {
+    public:
+        Grandson() {
+            cout << "Constructing Grandson object" << endl;
+        }
+        ~Grandson() {
+            cout << "Destructing Grandson object" << endl;
+        }
+        void hello() {  // virutal function
+            cout << "Hello from Grandson" << endl;
+        }
+        void bye() {
+            cout << "Bye from Grandson" << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        Grandson grandson;
+        Son *son;
+        son = &grandson;
+        son->hello();       // polymorphism
+        // Hello from Son.
+        // Constructing Grandson object
+        // Hello from Grandson
+        // Destructing Grandson object
+        // Bye from Father.
+        return 0;
+    }
+\end{minted}
+
+\subsection{多态的实现原理}
+“多态”的关键在于通过基类指针或引用调用一个虚函数时，编译时不确定到底调用的是基类还是派生类的函数，运行时才确定——这叫
+“动态联编”。“动态联编”是怎么实现的呢？
+
+\subsubsection{多态实现的关键——虚函数表}
+每一个有虚函数的类（或有虚函数的类的派生类）都有一个虚函数表，该类的任何对象都放着虚函数表的指针。虚函数表中列出了该类
+的虚函数地址。在创建含有虚函数的对象时，编译器会给其分配内存来存放虚函数表的地址。
+
+多态的函数调用语句被编译成一系列根据基类指针所指向的（或基类所引用的）对象中存放的虚函数表的地址，在虚函数表中查找虚函数
+的地址，并调用虚函数的指令。
+
+\subsubsection{实现多态的代价}
+多态能够有效提高程序的可扩充性，能够节省程序员的时间，但是使用多态也是有代价的。多态的程序在运行时会有额外的空间和时间的
+开销。因为每一个含有虚函数的类的对象都需要额外的空间来存储虚函数表的地址，在调用多态函数时，查找虚函数表的过程会有额外的
+时间上的开销。
+
+在一个硬件便宜、人力贵的时代，让硬件多花点功夫，省下来人的时间，这是非常划算的。所以多态面向对象语言中一种非常好的特性。
+
+\subsection{虚析构函数}
+看看下面代码可能存在的问题：
+\begin{minted}{C++}
+    class CSon {
+    public:
+        ~CSon() {
+            cout << "Bye CSon." << endl;
+        }
+    };
+
+    class CGrandson : public CSon {
+    public:
+        ~CGrandson() {
+            cout << "Bye CGrandson" << endl;
+        }
+    };
+
+    int main() {
+        CSon *p = new CGrandson;
+        delete p;
+        // Bye CSon.
+        return 0;
+    }
+\end{minted}
+
+在上面的示例代码中，通过基类的指针 \texttt{p} 删除派生类的对象时，只会调用基类的析构函数，这就有可能会导致派生类对象
+中的动态内存泄漏。我们希望在删除一个派生类的对象时，能够先调用派生类的析构函数，然后再调用基类的析构函数。
+
+解决办法是将基类的析构函数声明为 \mintinline{C++}{virtual}。这样通过基类的指针删除派生类对象时，就会首先调用派生类
+的析构函数，然后调用基类的析构函数。
+
+\begin{minted}{C++}
+    class CSon {
+    public:
+        virtual ~CSon() {
+            cout << "Bye CSon." << endl;
+        }
+    };
+
+    class CGrandson : public CSon {
+    public:
+        ~CGrandson() {
+            cout << "Bye CGrandson" << endl;
+        }
+    };
+
+    int main() {
+        CSon *p = new CGrandson;
+        delete p;
+        // Bye CGrandson
+        // Bye CSon.
+        return 0;
+    }
+\end{minted}
+
+由于派生类是继承自基类的，所以派生类的析构函数可以不用声明 \mintinline{C++}{virtual}。
+
+类中如果定义了虚函数，则最好将析构函数也定义成虚函数。
+
+注意：不允许以虚函数作为构造函数。
+
+\subsection{纯虚函数和抽象类}
+纯虚函数：没有函数体的虚函数。
+\begin{minted}{C++}
+    class A {
+    private:
+        int a;
+    public:
+        virtual void print() = 0;   // pure virtual function
+        void fun() {cout << "fun";}
+    };
+\end{minted}
+
+抽象类：包含纯虚函数的类。
+\begin{itemize}
+    \item 只能作为基类来派生新类使用
+    \item 不能创建抽象类的对象
+    \item 抽象类的指针和引用 $\rightarrow$ 由抽象类派生出来类的对象
+\end{itemize}
+
+在抽象类中：
+\begin{itemize}
+    \item 在成员函数内可以调用纯虚函数
+    \item 在构造函数和析构函数内部不能调用纯虚函数
+\end{itemize}
+
+如果一个类从抽象类派生而来，它必须实现基类中所有的纯虚函数，它才能成为非抽象类。如果不实现所有的纯虚函数，该派生类就仍
+旧是抽象类，不能用它创建对象。
+
+\begin{minted}{C++}
+    class A {
+    public:
+        virtual void f() = 0;
+        void g() {
+            this->f();
+        }
+        // A() {f();}   // error: Pure virtual function called!
+    };
+
+    class B : public A {
+    public:
+        void f() {
+            cout << "B::f()" << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        B b;
+        b.g();
+        // B::f()
+        return 0;
+    }
+\end{minted}
+
+
+
+
+
+
 
 \end{document}
