@@ -308,8 +308,8 @@ C/C++ 语言提供了六种位运算符来进行位运算操作：
     void myPrintf(const char *p)
     {
         // error: no matching function for call to 'strcpy'
-        // note: candidate function not viable: 1st argument ('const char *') would lose const qualifier
-        // char    *strcpy(char *__dst, const char *__src);
+        // note: candidate function not viable: 1st argument ('const char *') would lose
+        // const qualifier char    *strcpy(char *__dst, const char *__src);
         // strcpy(p, "this");
         cout << p << endl;
     }
@@ -2081,8 +2081,12 @@ C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅�
 访问范围说明符有三种：\mintinline{C++}{public}、\mintinline{C++}{private}、\mintinline{C++}{protected}，
 共同将一个类的成员分为三种，公有成员、私有成员和保护成员。
 
-一个类的公有成员可以被任意访问，一个类的私有成员只能由该类的成员函数或者友元函数访问。派生类是不能直接访问基类的私有成员
-的。保护成员允许其所在类、友元函数和派生类的成员函数访问。
+一个类的公有成员可以被任意访问。
+
+一个类的私有成员只能由该类的成员函数或者友元函数访问，不允许在类外访问。派生类是不能直接访问基类的私有成员
+的，如果希望派生类能够访问它的成员，就把该成员声明为 \mintinline{C++}{public} 或 \mintinline{C++}{protected}。
+
+保护成员允许其所在类、友元函数和派生类的成员函数访问。
 
 基类的 \mintinline{C++}{private} 成员，可以被下列函数访问：
 \begin{itemize}
@@ -2578,6 +2582,1003 @@ C++ 默认的复制构造函数和默认重载的赋值运算符都执行是浅�
         return 0;
     }
 \end{minted}
+
+\section{文件操作和模板}
+\subsection{文件操作}
+计算机中为了便于数据的管理和检索，引入了“文件”的概念。在程序中，要使用一个文件，先要打开，打开后才能读写，读写完要关闭。
+
+数据的层次：位 $\rightarrow$ 字节 $\rightarrow$ 域/记录 $\rightarrow$ 文件
+
+顺序文件：一个有限字符构成的顺序字符流。
+
+C++ 标准库中共有 \texttt{ifstream}（继承自 \texttt{istream}）、\texttt{ofstream}
+（继承自 \texttt{ostream}） 和 \texttt{fstream}（继承自 \texttt{iostream}）3 个类用于文件操作，统称为文件流
+类。
+
+在 C++ 中使用或创建文件的基本流程：
+\begin{enumerate}
+    \item 打开文件
+    \begin{itemize}
+        \item 通过指定文件名，建立文件和文件流对象的关联
+        \item 指明文件的使用方式
+    \end{itemize}
+    \item 读/写文件
+    \begin{itemize}
+        \item 利用读/写指针进行相应位置的操作
+    \end{itemize}
+    \item 关闭文件
+\end{enumerate}
+
+\subsubsection{建立顺序文件}
+\begin{minted}{C++}
+    #include <fstream>  // include the header
+    // Method 1 Open the file when initializing ofstream object
+    // "client.dat" is the file name, ios::out and ios::binary are file modes
+    ofstream outFile("client.dat", ios::out|ios::binary);
+    // Method 2 Open the file use the ofstream object's open() function
+    ofstream fout;
+    fout.open("test.out", ios::out|ios::binary);
+    // check the if the file has been opened
+    if (!fout) { cerr << "File open error!" << endl; }
+\end{minted}
+其中文件名可以是绝对路径，也可以是相对路径。如果没有交代路径信息，就是在当前目录下查找文件。
+
+\subsubsection{文件的读写指针}
+对于输入文件，有一个读指针；对于输出文件，有一个写指针；对于输入输出文件，有一个读写指针。上述指针可以用于标识文件操作的
+当前位置，指针在哪里，读写操作就在哪里进行。
+
+\begin{minted}{C++}
+    // write pointer
+    ofstream fout("a1.out", ios::app);  // append mode
+    long location = fout.tellp();       // get the file write pointer
+    // the location can be positive or negative
+    location = 10L;
+    // move file pointer to the 10th character
+    fout.seekp(location);
+    // the offset is relative to the the beginning of the file (default)
+    fout.seekp(location, ios::beg);
+    // the offset is relative to the current location of the file pointer
+    fout.seekp(location, ios::cur);
+    // the offset is relative to the end of the file
+    fout.seekp(location, ios::end);
+
+    // read pointer
+    ifstream fin("a1.in", ios::in);     // read mode
+    long location = fin.tellg();        // get the file read pointer
+    location = 10L;
+    fin.seekg(location);
+    fin.seekg(location, ios::beg);
+    fin.seekg(location, ios::cur);
+    fin.seekg(location, ios::end);
+\end{minted}
+
+\subsubsection{二进制文件的读写}
+\begin{minted}{C++}
+    int x = 10;
+    fout.seekp(20, ios::beg);
+    fout.write((const char *)(&x), sizeof(int));
+
+    fin.seekg(0, ios::begin);
+    fin.read((char *)(&x), sizeof(int));
+\end{minted}
+
+在对二进制文件读写时，直接读写二进制数据，未必能用记事本等编辑器正确显示。
+
+无论是读还是写文件，都需要显示地关闭文件，否则可能会导致文件内容出现问题。
+
+\subsection{函数模板}
+\subsubsection{泛型程序设计的概念}
+泛型程序设计（Generic Programming）：算法实现时不指定具体要操作的数据类型。在进行泛型程序设计时，仅需要用算法实现一
+遍，就可以适用于多种数据结构。
+
+泛型设计的优势在于可以减少重复代码的编写。
+
+模板分为两类：函数模板和类模板。
+
+泛型程序设计是一个非常重要的概念，可以和前面的抽象、封装、继承、多态相提并论。
+
+\subsubsection{函数模板的编写}
+为了交换两个 \mintinline{C++}{int} 型变量的值，需要编写一个 \mintinline{C++}{void swap(int &x, int &y)} 的
+函数。如果现在又想交换两个 \mintinline{C++}{double} 型的变量的值，还需要编写
+\mintinline{C++}{void swap(double &x, double &y)} 函数。能否只写一个 \texttt{swap} 函数，就能交换各种类型
+的变量呢？答案是可以，通过函数模板来实现。
+
+\begin{minted}{C++}
+    template<class 类型参数1, class 类型参数2, ...>
+    返回值类型 函数模板名(形参表) {
+        // 函数体
+    }
+\end{minted}
+
+交换两个变量值的函数模板：
+\begin{minted}{C++}
+    template<class T>
+    void swap(T &x, T &y) {
+        T tmp = x;
+        x = y;
+        y = tmp;
+    }
+
+    int main() {
+        int n = 1, m = 2;
+        swap(n, m);
+        double f = 1.2, g = 2.3;
+        swap(f, g);
+    }
+\end{minted}
+
+函数模板中可以有不止一个类型参数：
+\begin{minted}{C++}
+    template<class T1, class T2>
+    T2 print(T1 arg1, T2, arg2) {
+        cout << arg1 << " " << arg2 << endl;
+        return arg2;
+    }
+\end{minted}
+
+\subsubsection{函数模板的重载}
+函数模板可以重载，只要它们的形参表不同即可。例如：
+\begin{minted}{C++}
+    template <class T1, class T2>
+    void print(T1 arg1, T2 arg2) {
+        cout << "template 1 is called." << endl;
+        cout << arg1 << " " << arg2 << endl;
+    }
+
+    template <class T>
+    void print(T arg1, T arg2) {
+        cout << "template 2 is called." << endl;
+        cout << arg1 << " " << arg2 << endl;
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a = 1, b = 2;
+        double c = 3.14;
+        print(a, b);
+        // template 2 is called.
+        // 1 2
+        print(a, c);
+        // template 1 is called.
+        // 1 3.14
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{C++ 函数重载时匹配的优先级}
+现在学了函数模板再做重载的时候，我们就会发现，现在一个程序中可能会同时出现同名的普通函数和同名的模板函数。C++ 编译器是
+如何匹配它们的呢？
+
+C++ 编译器遵循以下优先顺序：
+\begin{enumerate}
+    \item 先找参数完全匹配的普通函数（非模板函数）
+    \item 再找参数完全匹配的模板函数
+    \item 再找实参经过自动类型转换后能够匹配的普通函数
+    \item 上面的都没找到，报错
+\end{enumerate}
+
+\begin{minted}{C++}
+    template <class T>
+    T myMax(T a, T b) {
+        cout << "template 1 is called" << endl;
+        return 0;
+    }
+
+    template <class T1, class T2>
+    T1 myMax(T1 a, T2 b) {
+        cout << "template 2 is called" << endl;
+        return 0;
+    }
+
+    double myMax(double a, double b) {
+        cout << "normal myMax is called" << endl;
+        return 0;
+    }
+
+    int main(int argc, char const *argv[]) {
+        int i = 4, j = 5;
+        myMax(1.2, 3.4);    // normal myMax is called
+        myMax(i, j);        // template 1 is called
+        myMax(1.2, 3);      // template 2 is called
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{赋值兼容原则引起函数模板中类型参数的二义性}
+\begin{minted}{C++}
+    template <class T>
+    T myFunction(T arg1, T arg2) {
+        cout << arg1 << " " << arg2 << endl;
+        return arg1;
+    }
+
+    int main() {
+        myFunction(5, 7);      // OK, replace T with int
+        myFunction(5.8, 8.4);  // OK, replace T with double
+
+        // error: no matching function for call to 'myFunction'
+        // candidate template ignored: deduced conflicting types for
+        // parameter 'T' ('int' vs. 'double')
+        myFunction(5, 8.4);
+    }
+\end{minted}
+
+可以在函数模板中使用多个类型参数，可以避免二义性。
+\begin{minted}{C++}
+    template <class T1, class T2>
+    T1 myFunction(T1 arg1, T2 arg2) {
+        cout << arg1 << " " << arg2 << endl;
+        return arg1;
+    }
+
+    int main() {
+        myFunction(5, 7);       // OK, replace T1 and T2 with int
+        myFunction(5.8, 8.4);   // OK, replace T1 and T2 with double
+        myFunction(5, 8.4);     // OK, replace T1 with int, replace T2 with double
+    }
+\end{minted}
+
+\subsubsection{函数模板的特化}
+在我们使用函数模板时，编译器会根据传入函数模板的实参对其实例化，将模板参数类型替换为实参的类型。这就意味着，虽然由于实
+参的不同会导致不同的数据类型，但同一个函数模板的实现方式是统一的。
+
+但是有些时候，我们希望针对某个特定数据类型，使模板采用不同的实现方式。这就是模板的特化（template specialization）。
+
+函数模板特化的语法：
+\begin{minted}{C++}
+    template <>
+    返回值类型 函数名<指定数据类型>(参数表) {
+        ...
+    }
+\end{minted}
+
+函数模板特化的代码中就不能出现类型参数 \texttt{T} 了，应该用指定的数据类型代替。
+
+例如，我们有一个可以打印不同参数的函数模板：
+\begin{minted}{C++}
+    template <class T>
+    void print(T a) {
+        cout << a << endl;
+    }
+
+    int main(int argc, char const *argv[]) {
+        int a = 1;
+        double b = 2.0;
+        char c = 'C';
+        string d = "Dog";
+        print(a);   // 1
+        print(b);   // 2
+        print(c);   // C
+        print(d);   // Dog
+        return 0;
+    }
+\end{minted}
+
+现在我们想在打印 \mintinline{C++}{double} 类型的数据时显示为科学计数法。这时就可以针对\mintinline{C++}{double}
+类型，对函数模板进行特化，这时可以在上面的代码中插入以下代码：
+\begin{minted}{C++}
+    template <>
+    void print<double>(double a) {
+        cout << scientific << a << endl;
+    }
+\end{minted}
+
+再次运行时，\mintinline{C++}{print(b);} 的结果就会由原来的 \texttt{2} 变成 \texttt{2.000000e+00}。
+
+\subsection{类模板}
+众多函数可以写成一个函数模板，若干个类也可以写成一个模板，这样可以使程序进一步地简化。
+
+定义一批相似的类 $\rightarrow$ 定义类模板 $\rightarrow$ 生成不同的类
+
+\subsubsection{类模板的定义}
+首先通过一个问题来引入类模板。数组是一种常见的数据类型，其元素可以是整型、字符串或者我们自定义的类型。现考虑设计一个数组类，需
+要提供基本的如查看数组长度、访问、修改其中的某个元素等操作。对于这些数组类，除了元素的类型不同之外，其他的完全相同。
+
+在定义类模板的时候需要给它一个/多个参数，这个/些参数表示不同的数据类型。在调用类模板时，指定参数，由编译系统根据参数提
+供的数据类型自动产生相应的模板类。
+
+C++ 的类模板写法如下：
+\begin{minted}{C++}
+    template <类型参数表>
+    class 类模板名 {
+        // 成员函数和成员变量
+    };
+\end{minted}
+
+如果在类模板外定义类模板的成员函数时：
+\begin{minted}{C++}
+    template <类型参数表>
+    返回值类型 类模板名<类型参数名列表>::成员函数表(参数表) {
+        ...
+    }
+\end{minted}
+
+用类模板定义对象的写法如下：
+\begin{minted}{C++}
+    类模板名<真实类型参数表> 对象名(构造函数实际参数表);
+\end{minted}
+
+如果类模板有无参构造函数，那么也可以只写：\mintinline{C++}{类模板名<真实类型参数表> 对象名;}
+
+Pair 类模板：
+\begin{minted}{C++}
+    template <class T1, class T2>
+    class Pair {
+    public:
+        T1 key;
+        T2 value;
+        Pair(T1 k, T2 v) : key(k), value(v) {};
+        bool operator<(const Pair<T1, T2> &p) const;
+    };
+
+    template <class T1, class T2>
+    bool Pair<T1, T2>::operator<(const Pair<T1, T2> &p) const {
+        return key < p.key;
+    }
+
+    int main(int argc, char const *argv[]) {
+        Pair<string, int> student("Tom", 19);
+        cout << student.key << " " << student.value << endl;    // Tom 19
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{使用模板声明对象}
+编译器由类模板生成类的过程叫做类模板的实例化。编译器会自动用具体的数据类型来替换类模板中的类型参数，生成模板类的代码。
+
+由类模板实例化得到的类叫模板类。为类型参数指定的数据类型不同，得到的模板类不同。
+
+同一个类模板的两个模板类是不兼容的：
+\begin{minted}{C++}
+    Pair<stirng, int> *p;
+    Pair<stirng, double> a;
+    p = &a;     // wrong
+\end{minted}
+
+\subsubsection{函数模板作为类模板成员}
+\begin{minted}{C++}
+    template <class T>
+    class A {
+    public:
+        template <class T2>
+        void func(T2 t) { cout << t << endl; }  // member function template
+    };
+
+    int main(int argc, char const *argv[]) {
+        A<int> a;
+        a.func('K');    // instantiate the member function template
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{类模板的特化}
+类模板的特化和函数模板的特化非常相似，同样是为了模板在针对某些特定数据类型的时候采用不同的实现方式。
+
+例如下面的模板类，它能打印 \texttt{MyClass} 构造函数的参数：
+\begin{minted}{C++}
+    template <class T>
+    class MyClass {
+    public:
+        MyClass(T x) {
+            cout << x << " - not a char" << endl;
+        }
+    };
+\end{minted}
+
+现在我们希望该类模板在类型参数 \texttt{T} 为 \texttt{char} 时能够做一些不同的操作，这时可以针对 \texttt{char}
+类型对该类模板进行特化，插入以下代码：
+\begin{minted}{C++}
+    template <>
+    class MyClass<char> {
+    public:
+        MyClass(char x) {
+            cout << x << " is a char!" << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        MyClass<int> obj1(42);          // 42 - not a char
+        MyClass<double> obj2(5.47);     // 5.47 - not a char
+        MyClass<char> obj3('s');        // s is a char!
+        return 0;
+    }
+\end{minted}
+
+需要注意，特化模板和通用模板之间不存在“继承”关系，所以特化模板的类的成员仍需自行定义。
+
+\subsubsection{类模板与非类型参数}
+类模板的参数声明中可以包括非类型参数：\mintinline{C++}{template <class T, int elementsNumber>}，这也叫作模板
+的部分特化。
+\begin{itemize}
+    \item 非类型参数：用来说明类模板中的属性
+    \item 类型参数：用来说明类模板中的属性类型，成员从操作的参数类型和返回值类型
+\end{itemize}
+
+\begin{minted}{C++}
+    template <class T, int size>
+    class CArray {
+    public:
+        T array[size];
+        void print() {
+            for (int i = 0; i < size; ++i) {
+                cout << array[i] << endl;
+            }
+        }
+    };
+\end{minted}
+
+非类型参数的参数类型是某个固定的类型，在实例化时要指定为具体的值。
+
+注意：非类型参数不同的了两个模板类也是不同的类。例如 \texttt{CArray<int, 40>} 和 \texttt{CArray<int, 50>} 完
+全是两个类，这两个类的对象之间不能互相赋值。
+
+\subsubsection{类模板的继承与派生}
+类模板继承的四种形式：
+\begin{enumerate}
+    \item 类模板派生出类模板
+    \begin{minted}{C++}
+    template <class T1, class T2>
+    class A1 {
+    protected:  // private members can't be directly accessed by derived class
+        T1 v1;
+        T2 v2;
+    public:
+        A1(T1 val1, T2 val2) : v1(val1), v2(val2) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            // execute 'a.out | c++fill' to get right display of 'name'
+            cout << "T1 v1: " << typeid(v1).name() << " " << v1 << endl;
+            cout << "T2 v2: " << typeid(v2).name() << " " << v2 << endl;
+        }
+    };
+
+    template <class T1, class T2>
+    class A2 : public A1<T2, T1> {    // note the sequence of T1 and T2
+    protected:
+        T1 v3;
+        T2 v4;
+    public:
+        A2(T2 val1, T1 val2, T1 val3, T2 val4)
+            : A1<T2, T1>(val1, val2), v3(val3), v4(val4) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            // cannot access directly. see:
+            // https://isocpp.org/wiki/faq/templates#nondependent-name-lookup-members
+            // https://stackoverflow.com/questions/24158209/
+            cout << "T2 v1: " << typeid(this->v1).name() << " " << this->v1 << endl;
+            cout << "T1 v2: " << typeid(this->v2).name() << " " << this->v2 << endl;
+            cout << "T1 v3: " << typeid(v3).name() << " " << v3 << endl;
+            cout << "T2 v4: " << typeid(v4).name() << " " << v4 << endl;
+        }
+    };
+
+    int main() {
+        A1<int, double> a1(1, 2.0);         // int v1, double v2
+        // Class: A1<int, double>
+        a1.printMemberVarsTypes();
+        // T1 v1: int 1
+        // T2 v2: double 2
+        A2<int, double> a2(3.0, 4, 5, 6.0); // double v1, int v2, int v3, double v4
+        // Class: A1<double, int>
+        // Class: A2<int, double>
+        a2.printMemberVarsTypes();
+        // T2 v1: double 3
+        // T1 v2: int 4
+        // T1 v3: int 5
+        // T2 v4: double 6
+        return 0;
+    }
+    \end{minted}
+    \item 模板类派生出类模板。模板类是类模板中类型/非类型参数实例化后的类，类型参数实例化后变成某一种具体的数据类型，
+    非类型参数实例化后会变成某一个具体的值或对象，例如 \mintinline{C++}{A<int, double>} 就是一个模板类。
+    \begin{minted}{C++}
+    template <class T1, class T2>
+    class B1 {
+    protected:
+        T1 v1;
+        T2 v2;
+    public:
+        B1(T1 val1, T2 val2) : v1(val1), v2(val2) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            cout << "T1 v1: " << typeid(v1).name() << " " << v1 << endl;
+            cout << "T2 v2: " << typeid(v2).name() << " " << v2 << endl;
+        }
+    };
+
+    template <class T>
+    class B2 : public B1<int, double> {
+    private:
+        T v3;
+    public:
+        B2(int val1, double val2, T val3) : B1<int, double>(val1, val2), v3(val3) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            // no need to use this pointer to access v1, v2 here
+            cout << "int v1: " << typeid(v1).name() << " " << v1 << endl;
+            cout << "double v2: " << typeid(v2).name() << " " << v2 << endl;
+            cout << "T3 v3: " << typeid(v3).name() << " " << v3 << endl;
+        }
+    };
+
+    int main() {
+        B1<double, char *> b1(1.0, "hello");
+        // Class: B1<double, char*>
+        b1.printMemberVarsTypes();
+        // T1 v1: double 1
+        // T2 v2: char* hello
+        B2<char> b2(3, 4.0, 'E');
+        // Class: B1<int, double>
+        // Class: B2<char>
+        b2.printMemberVarsTypes();
+        // int v1: int 3
+        // double v2: double 4
+        // T3 v3: char E
+        return 0;
+    }
+    \end{minted}
+    \item 普通类派生出模板类
+    \begin{minted}{C++}
+    class C1 {
+    protected:
+        int v1;
+    public:
+        C1(int val1) : v1(val1) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            cout << "int v1: " << typeid(v1).name() << " " << v1 << endl;
+        }
+    };
+
+    template <class T>
+    class C2 : public C1 {
+    private:
+        T v2;
+    public:
+        C2(int val1, T val2) : C1(val1), v2(val2) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            cout << "int v1: " << typeid(v1).name() << " " << v1 << endl;
+            cout << "T v2: " << typeid(v2).name() << " " << v2 << endl;
+        }
+    };
+
+    int main() {
+        C1 c1(1);
+        // Class: C1
+        c1.printMemberVarsTypes();
+        // int v1: int 1
+        C2<char> c2(2, 'C');
+        // Class: C1
+        // Class: C2<char>
+        c2.printMemberVarsTypes();
+        // int v1: int 2
+        // T v2: char C
+    }
+    \end{minted}
+    \item 模板类派生出普通类
+    \begin{minted}{C++}
+    template <class T>
+    class D1 {
+    protected:
+        T v1;
+        int v2;
+    public:
+        D1(T val1, int val2) : v1(val1), v2(val2) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            cout << "T v1: " << typeid(v1).name() << " " << v1 << endl;
+            cout << "int v2: " << typeid(v2).name() << " " << v2 << endl;
+        }
+    };
+
+    class D2 : public D1<int> {
+    private:
+        double v3;
+    public:
+        D2(int val1, int val2, double val3) : D1(val1, val2), v3(val3) {
+            cout << "Class: " << typeid(*this).name() << endl;
+        }
+        void printMemberVarsTypes() {
+            cout << "int v1: " << typeid(v1).name() << " " << v1 << endl;
+            cout << "int v2: " << typeid(v2).name() << " " << v2 << endl;
+            cout << "double v3: " << typeid(v3).name() << " " << v3 << endl;
+        }
+    };
+
+    int main() {
+        D1<char> d1('A', 2);
+        // Class: D1<int>
+        d1.printMemberVarsTypes();
+        // T v1: char A
+        // int v2: int 2
+        D2 d2(3, 4, 5);
+        // Class: D1<int>
+        // Class: D2
+        d2.printMemberVarsTypes();
+        // int v1: int 3
+        // int v2: int 4
+        // double v3: double 5
+    }
+    \end{minted}
+\end{enumerate}
+
+\subsection{\mintinline{C++}{string} 类}
+\subsubsection{\mintinline{C++}{string} 类的初始化}
+\mintinline{C++}{string} 类是一个模板类，它的定义如下：
+\begin{minted}{C++}
+    typedef basic_string<char> string;
+\end{minted}
+
+\mintinline{C++}{string} 对象的初始化：
+\begin{itemize}
+    \item \mintinline{C++}{string s1("Hello");}
+    \item \mintinline{C++}{string s2(8, 'x');}
+    \item \mintinline{C++}{string month = "March";}
+\end{itemize}
+
+\mintinline{C++}{string} 类不提供以字符和整数为参数的构造函数。
+
+错误的初始化方法：
+\begin{itemize}
+    \item \mintinline{C++}{string error1 = 'c';}
+    \item \mintinline{C++}{string error2('u');}
+    \item \mintinline{C++}{string error3 = 22;}
+    \item \mintinline{C++}{string error4(8);}
+\end{itemize}
+
+但是可以将字符赋值给 \mintinline{C++}{string} 对象：\mintinline{C++}{string s; s = 'n';}
+
+如果构造的 \mintinline{C++}{string} 过长而无法表达，会抛出 \mintinline{C++}{length error} 的异常。
+
+\mintinline{C++}{string} 对象的长度用成员函数 \texttt{length()} 读取。
+\begin{minted}{C++}
+    string s("hello");
+    cout << s.length() << endl;
+\end{minted}
+
+\mintinline{C++}{string} 支持流读取运算符 \mintinline{C++}{<<}。
+\begin{minted}{C++}
+    string strObj;
+    cin >> strObj;
+\end{minted}
+
+\mintinline{C++}{string} 支持 \texttt{getline()} 函数。
+\begin{minted}{C++}
+    string s;
+    getline(cin, s);
+\end{minted}
+
+\subsubsection{\mintinline{C++}{string} 的赋值和链接}
+\begin{itemize}
+    \item 用“=”赋值
+    \begin{minted}{C++}
+    string s1("cat"), s2;
+    s2 = s1;
+    \end{minted}
+    \item 用 \texttt{assign} 成员函数赋值
+    \begin{minted}{C++}
+    string s1("cat"), s3;
+    s3.assign(s1);
+    \end{minted}
+    \item 用 \texttt{assign} 成员函数部分赋值
+    \begin{minted}{C++}
+    string s1("catpig"), s3;
+    s3.assign(s1, 1, 3);    // start from the 1st char of s1, copy 3 chars to s3
+    \end{minted}
+    \item 单个字符赋值
+    \begin{minted}{C++}
+    s2[5] = s1[3] = 'a';
+    \end{minted}
+    \item 逐个访问 \mintinline{C++}{string} 对象中的字符
+    \begin{minted}{C++}
+    string s1("Hello");
+    for (int i = 0; i < s1.length(); i++)
+        cout << s1.at(i) << endl;
+    \end{minted}
+    下标运算符 \texttt{[]} 和成员函数 \texttt{at} 的区别：下标运算符 \texttt{[]} 不做范围检查；成员函数
+    \texttt{at} 做范围检查，如果超出范围会抛出 \texttt{out of range} 的异常。
+    \item 用 \texttt{+} 运算符连接字符串
+    \begin{minted}{C++}
+    string s1("good"), s2("morning!");
+    s1 += s2;
+    cout << s1 << endl;
+    \end{minted}
+    \item 用成员函数 \texttt{append} 连接字符串
+    \begin{minted}{C++}
+    string s1("good"), s2("morning!");
+    s1.append(s2);          // goodmorning!
+    cout << s1 << endl;
+    // start from the 3rd char of s1, copy s1.size() chars to the end of s2
+    // if there are not so many chars in s1, end copying at the end of s1.
+    s2.append(s1, 3, s1.size());
+    cout << s2 << endl;     // morning!dmorning!
+    \end{minted}
+\end{itemize}
+
+\subsubsection{\mintinline{C++}{string} 的比较}
+\begin{itemize}
+    \item 用关系运算符 \texttt{==}、\texttt{>}、\texttt{>=}、\texttt{<}、\texttt{<=}、\texttt{!=} 比较
+    \mintinline{C++}{string} 的大小。比较表达式的返回值都是 \mintinline{C++}{bool} 类型，成立返回
+    \texttt{true}，否则返回 \texttt{false}。
+    \item 用成员函数 \texttt{compare} 比较 \mintinline{C++}{string} 的大小。
+    \begin{minted}{C++}
+    string s1("hello"), s2("hello"), s3("hell");
+    int f1 = s1.compare(s2);
+    int f2 = s1.compare(s3);
+    int f3 = s3.compare(s1);
+    // int compare (size_t pos, size_t len, const string& str,
+    //       size_t subpos, size_t sublen) const;
+    int f4 = s1.compare(1, 2, s3, 0, 3);
+    // int compare (size_t pos, size_t len, const char* s) const;
+    int f5 = s1.compare(0, s1.size(), s3);
+    cout << f1 << " " << f2 << " " << f3 << " ";
+    cout << f4 << " " << f5 << endl;
+    // 0 1 -1 -1 1 (on vc++)
+    // 0 1 -1 -3 1 (on gcc/clang)
+    \end{minted}
+\end{itemize}
+
+\subsubsection{子串}
+\begin{itemize}
+    \item 成员函数 \texttt{substr()} 可以用于截取一个 \mintinline{C++}{string} 对象的子串。
+    \begin{minted}{C++}
+    string s1("hello world"), s2;
+    // string substr (size_t pos = 0, size_t len = npos) const;
+    s2 = s1.substr(4, 5);
+    cout << s2 << endl;
+    \end{minted}
+\end{itemize}
+
+\subsubsection{交换 \mintinline{C++}{string}}
+\begin{itemize}
+    \item 成员函数 \mintinline{C++}{swap()} 可以用于交换两个 \mintinline{C++}{string} 的值。
+    \begin{minted}{C++}
+    string s1("hello world"), s2("really");
+    s1.swap(s2);
+    cout << s1 << endl;     // really
+    cout << s2 << endl;     // hello world
+    \end{minted}
+\end{itemize}
+
+\subsubsection{\mintinline{C++}{string} 的特性}
+\begin{itemize}
+    \item 成员函数 \texttt{capacity()}，返回无需增加内存即可存放的字符数
+    \item 成员函数 \texttt{maximum\_size()}，返回 \mintinline{C++}{string} 对象可存放的最大字符数
+    \item 成员函数 \texttt{length()} 和 \texttt{size()} 相同，返回字符串的大小/长度
+    \item 成员函数 \texttt{empty()}，返回 \mintinline{C++}{string} 对象是否为空
+    \item 成员函数 \texttt{resize()}，改变 \mintinline{C++}{string} 对象的长度
+\end{itemize}
+
+\subsubsection{寻找 \mintinline{C++}{string} 中的字符}
+\begin{itemize}
+    \item 成员函数 \mintinline{C++}{find()}
+    \begin{minted}{C++}
+    string s1("hello world");
+    // 在 s1 中从前向后查找“lo”第一次出现的地方。如果找到，返回“lo”开始的位置，即‘l’
+    // 所在的位置下标；如果找不到，返回 \mintinline{C++}{string::npos}
+    cout << s1.find("lo") << endl;  // 3
+    \end{minted}
+    \item 成员函数 \mintinline{C++}{rfind()}
+    \begin{minted}{C++}
+    string s1("hello world");
+    // 在 s1 中从后向前查找“lo”第一次出现的地方。如果找到，返回“lo”开始的位置，即‘l’
+    // 所在位置的下标；如果找不到，返回 \mintinline{C++}{string::npos}
+    cout << s1.rfind("lo") << endl; // 3
+    \end{minted}
+    \item 成员函数 \texttt{find\_first\_of()}
+    \begin{minted}{C++}
+    string s1("hello world");
+    // 在 s1 中从前向后查找“abcd”中任何一个字符第一次出现的地方。如果找到，返回找到
+    // 字母的位置；如果找不到，返回 \mintinline{C++}{string::npos}
+    cout << s1.find_first_of("abcd") << endl;       // 10
+    \end{minted}
+    \item 成员函数 \texttt{find\_last\_of()}
+    \begin{minted}{C++}
+    string s1("hello world");
+    // 在 s1 中从后向前查找“abcd”中任何一个字符最后一次出现的地方。如果找到，返回找到
+    // 字母的位置；如果找不到，返回 \mintinline{C++}{string::npos}
+    cout << s1.find_last_of("abcd") << endl;        // 10
+    \end{minted}
+    \item 成员函数 \texttt{find\_first\_not\_of()}
+    \begin{minted}{C++}
+    string s1("hello world");
+    // 在 s1 中从前向后查找不在“abcd”中的字符第一次出现的地方。如果找到，返回找到
+    // 字母的位置；如果找不到，返回 \mintinline{C++}{string::npos}
+    cout << s1.find_first_not_of("abcd") << endl;   // 0
+    \end{minted}
+    \item 成员函数 \texttt{find\_last\_not\_of()}
+    \begin{minted}{C++}
+    string s1("hello world");
+    // 在 s1 中从后向前查找不在“abcd”中的字符最后一次出现的地方。如果找到，返回找到
+    // 字母的位置；如果找不到，返回 \mintinline{C++}{string::npos}
+    cout << s1.find_last_not_of("abcd") << endl;    // 9
+    \end{minted}
+\end{itemize}
+
+\subsubsection{替换 \mintinline{C++}{string} 中的字符}
+\begin{itemize}
+    \item 成员函数 \texttt{erase()}
+    \begin{minted}{C++}
+    string s1("hello worlld");
+    s1.erase(5);    // 清除 s1 下标 5 之后的所有内容
+    cout << s1 << endl;             // hello
+    cout << s1.length() << endl;    // 5
+    cout << s1.size() << endl;      // 5
+    \end{minted}
+    \item 成员函数 \texttt{find()}
+    \begin{minted}{C++}
+    s1 = "hello worlld";
+    // 分别从下标 1、2、3 的位置寻找“ll”
+    cout << s1.find("ll", 1) << endl;   // 2
+    cout << s1.find("ll", 2) << endl;   // 2
+    cout << s1.find("ll", 3) << endl;   // 9
+    \end{minted}
+    \item 成员函数 \texttt{replace()}
+    \begin{minted}{C++}
+    s1 = "hello worlld";
+    // 将 s1 中下标 2 开始的 3 个字符替换成“haha”
+    s1.replace(2, 3, "haha");
+    cout << s1 << endl;                 // hehaha worlld
+    s1 = "hello worlld";
+    // 将 s1 中下标 2 开始的 3 个字符替换成“haha”中下标 1 开始的 2 个字符
+    s1.replace(2, 3, "haha", 1, 2);
+    cout << s1 << endl;                 // heah worlld
+    \end{minted}
+\end{itemize}
+
+\subsubsection{在 \mintinline{C++}{string} 中插入字符}
+\begin{itemize}
+    \item 成员函数 \texttt{insert()}
+    \begin{minted}{C++}
+    s1 = "hello world";
+    string s2("show insert");
+    // 将 s2 插入 s1 下标 5 的位置
+    s1.insert(5, s2);
+    cout << s1 << endl;         // helloshow insert world
+    // 将 s2 中下标 5 开始的 3 个字符插入 s1 下标 2 的位置
+    s1.insert(2, s2, 5, 3);
+    cout << s1 << endl;         // heinslloshow insert world
+    \end{minted}
+\end{itemize}
+
+\subsubsection{将 \mintinline{C++}{string} 转换成 C 语言式 \texttt{char *} 字符串}
+\begin{itemize}
+    \item 成员函数 \texttt{c\_str()}
+    \begin{minted}{C++}
+    s1 = "hello world";
+    // s1.c_str() 返回传统的 const char * 类型的字符串，且该字符串以'\0'结尾
+    printf("%s\n", s1.c_str()); // hello world
+    \end{minted}
+    \item 成员函数 \texttt{data()}
+    \begin{minted}{C++}
+    s1 = "hello world";
+    // s1.data() 返回一个 char * 类型的字符串，对 s1 的修改可能会使 p1 出错
+    const char *p1 = s1.data();
+    for (int i = 0; i < s1.length(); i++) {
+        printf("%c", *(p1 + i));
+    }                           // hello world
+    cout << endl;
+    \end{minted}
+    \item 成员函数 \texttt{copy()}
+    \begin{minted}{C++}
+    s1 = "hello world";
+    int len = s1.length();
+    char *p2 = new char[len+1];
+    // s1.copy(p2, 5, 0) 从 s1 的下标 0 的字符开始，制作一个最长 5 个字符的字符副本
+    // 并将其赋值给 p2，返回值表明实际复制字符串的长度
+    s1.copy(p2, 5, 0);
+    p2[5] = 0;
+    cout << p2 << endl;         // hello
+    \end{minted}
+\end{itemize}
+
+\subsection{输入输出}
+与输入输出流操作相关的类：\texttt{ios}、\texttt{istream}、\texttt{ostream}、\texttt{iostream}、
+\texttt{ifstream}、\texttt{ofstream}、\texttt{fstream}。
+
+\subsubsection{标准流对象}
+\begin{itemize}
+    \item 输入流对象：
+    \begin{itemize}
+        \item \texttt{cin} 与标准输入设备相连。\texttt{cin} 对应于标准输入流，用于从键盘读取数据，也可以被重定
+        向为从文件中读取数据。
+    \end{itemize}
+    \item 输出流对象：
+    \begin{itemize}
+        \item \texttt{cout} 与标准输出设备相连。\texttt{cout} 对应于标准输出流，用于向屏幕输出数据，也可以被重
+        定向为向文件写入数据。
+        \item \texttt{cerr} 与标准错误输出设备相连。\texttt{cerr} 对应于标准错误输出流，用于向屏幕输出错误信
+        息。
+        \item \texttt{clog} 与标准错误输出设备。\texttt{clog} 对应于标准错误输出流，用于向屏幕输出错误信息。\\
+        \texttt{cerr} 和 \texttt{clog} 的区别在于 \texttt{cerr} 不使用缓存区，直接向显示器输出信息；而输出到
+        \texttt{clog} 中的信息先会被存放在缓冲区，缓冲区满或者刷新时才输出到屏幕。
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{输入、输出重定向}
+\begin{minted}{C++}
+    double f;
+    int n;
+    freopen("ind.txt", "r", stdin);      // redirect stdin
+    cin >> f >> n;
+    freopen("out.txt", "w", stdout);    // redirect stdout
+    if (n == 0) {
+        cerr << "error" << endl;        // won't print to "out.txt"
+    }
+    else {
+        cout << f / n << endl;
+    }
+
+    fclose(stdin);
+    fclose(stdout);
+\end{minted}
+
+\subsubsection{判断输入流结束}
+可以利用如下方法判断输入流结束：
+\begin{minted}{C++}
+    int x;
+    while (cin >> x) {
+        ...
+    }
+\end{minted}
+
+\begin{itemize}
+    \item 如果是从文件输入，比如前面有 \mintinline{C++}{freopen("some.txt", "r", stdin);} 那么，读到文件尾
+    部，输入流就算结束，跳出循环
+    \item 如果从键盘输入，则在单独一行输入 \texttt{Ctrl + Z} 代表输入流结束，跳出循环
+\end{itemize}
+
+前面已经接触到，\texttt{cin} 返回的是 \texttt{cin} 的引用，但这里它会强制转换成 \mintinline{C++}{bool} 类型。
+
+也可以利用 \mintinline{C++}{istream} 类的成员函数来判断输入流是否结束。
+
+\begin{itemize}
+    \item \mint{C++}{istream &getline(char *buf, int bufSize);}
+    从输入流中读取 \texttt{bufSize - 1} 个字符到缓存区 \texttt{buf}，或读到碰到 \mintinline{C++}{'\n'} 为止
+    （哪个先到算哪个）
+    \item \mint{C++}{istream &getline(char *buf, int bufSize, char delim);}
+    从输入流中读取 \texttt{bufSize - 1} 个字符到缓存区 \texttt{buf}，或读到碰到 \mintinline{C++}{delim} 字
+    符为止（哪个先到算哪个）
+\end{itemize}
+两个函数都会自动在 \texttt{buf} 中读入数据的结尾添加 \mintinline{C++}{'\0'}。\mintinline{C++}{'\n'} 或
+\texttt{delim} 都不会被读入 \texttt{buf}，但会被从输入流中取走。如果输入流中 \mintinline{C++}{'\n'} 或
+\texttt{delim} 之前的字符个数达到或超过了 \texttt{bufSize} 个，就导致读入出错。其结果是：虽然本次读入已经完成，
+但是之后的读入就都会失败了。
+
+可以用 \mintinline{C++}{if (!cin.getline(...))} 判断输入是否结束。
+
+示例代码：
+\begin{minted}{C++}
+    int x;
+    char buf[100];
+    cin >> x;
+    cin.getline(buf, 90);
+    cout << buf << endl;
+\end{minted}
+
+上面的示例代码在运行时会出现一个比较奇怪的现象：如果输入“12 abcd”，会输出“ abcd”；但是如果希望先输入“12”后回车，再输入
+“abcd”时，就会发现输入回车程序立马就会终止。这是因为 \texttt{getline} 在读到输入流中的 \mintinline{C++}{'\n'}
+时会立刻返回。
+
+\mintinline{C++}{bool eof();} 判断输入流是否结束。
+
+\mintinline{C++}{int peek();} 返回下一个字符，但不会从流中去掉。
+
+\mintinline{C++}{istream &putback(char c);} 将字符 \texttt{ch} 放回输入流。
+
+\mintinline{C++}{istream &ignore(int nCount = 1, int delim = EOF);} 从流中删掉最多 \texttt{nCount} 个
+字符，遇到 \mintinline{C++}{EOF} 时结束。
+
+
+
+
 
 
 
