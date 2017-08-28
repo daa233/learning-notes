@@ -1139,10 +1139,12 @@ C++ 标准的发展：
 
 设置静态成员的这种机制的目的是将和某些类紧密相关的全局变量和函数写到类里面，看上去像一个整体，易于理解和维护。
 
-类里面涉及静态成员变量的语句仅仅是对静态成员变量的声明，不是定义。在使用静态成员变量的时候，需要在所有函数外面对静态成
-员变量进行定义，而且不管有没有访问权限，都可以选择是否对其进行初始化。
+类里面涉及静态成员变量的语句仅仅是对静态成员变量的声明，不是定义，定义时不需要加 \mintinline{C++}{static} 关键字。
+在使用静态成员变量的时候，需要在所有函数外面对静态成员变量进行定义，而且不管有没有访问权限，都可以选择是否对其进行初始
+化。静态变量的初始化必须在全局的范围，而且必须放置在类的定义之后，否则会产生
+\texttt{error: incomplete type '\emph{ClassName}' named in nested name specifier} 的错误。
 \begin{minted}{C++}
-    // 定义静态变量，并初始化为0
+    // 定义静态变量，并初始化为0（只在声明时加 static 关键字，定义时不加）
     int CRectangle::nTotalNumber = 0;
     int CRectangle::nTotalArea = 0;
 \end{minted}
@@ -1155,6 +1157,12 @@ https://stackoverflow.com/questions/18749071/why-does-a-static-data-member-need-
 
 在静态成员函数中，不能访问非静态成员变量，也不能调用非静态成员函数。这是因为静态成员函数不是作用在某个特定的对象上的，
 非静态成员变量属于特定的对象。但是反过来，在非静态成员函数中是可以调用静态成员函数的。
+
+静态成员变量可以被派生类继承，但是基类和派生类的静态成员变量共用一份内存。不能通过成员初始化列表来初始化静态成员变量，
+也不能通过派生类来初始化其从基类继承的静态成员变量。
+
+静态成员变量是可以随时被赋值的，但是如果加上 \mintinline{C++}{const} 限定符后，静态成员变量就会成为静态成员常量，仅
+能在全局范围进行初始化定义，在其他任何地方都不能被赋值。
 
 \subsection{成员对象、封闭类和成员初始化列表}
 \subsubsection{成员对象和封闭类的定义}
@@ -1251,6 +1259,9 @@ https://stackoverflow.com/questions/18749071/why-does-a-static-data-member-need-
         Something(): m_value(5) {} // directly initialize our const member variable
     };
 \end{minted}
+
+注意：静态成员变量不能通过成员初始化列表进行初始化。不管有没有访问权限，静态变量都和全局变量类似，需要在全局范围内进行
+初始化定义。
 
 \subsubsection{封闭类的调用顺序}
 封闭类的对象遵循“先构造的后析构”的顺序。
@@ -1475,7 +1486,7 @@ C++ 代码：
         void func() {}
     };
 
-    void Sample::getValue() const {
+    void Sample::getValue() const { // here need 'const' keyword in definition
         // error: cannot assign to non-static data member within const member
         // function 'getValue'
         value = 0;
