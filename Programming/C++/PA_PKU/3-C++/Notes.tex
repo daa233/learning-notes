@@ -3587,13 +3587,985 @@ Pair 类模板：
 \mintinline{C++}{istream &ignore(int nCount = 1, int delim = EOF);} 从流中删掉最多 \texttt{nCount} 个
 字符，遇到 \mintinline{C++}{EOF} 时结束。
 
+\section{标准模板库 STL}
+本模块将介绍 C++ 的标准模板库（Standard Template Library, STL），这是泛型程序设计最成功的应用实例。STL 是一些常
+用数据结构（如链表、可变长数据、排序二叉树）和算法（如排序、查找）的模板的集合。有了 STL，我们就不必编写大多的、常用的
+数据结构和算法，并且可获得非常高的性能。
+
+\subsection{STL 概述}
+C++ 语言的核心优势之一就是便于软件的重用。
+
+C++ 中有两个方面体现软件的重用：
+\begin{enumerate}
+    \item 面向对象的思想：继承和多态，标准类库
+    \item 泛型程序设计（generic programming）的思想：模板机制，以及标准模板库 STL
+\end{enumerate}
+
+STL 中的一些基本概念：
+\begin{description}
+    \item[容器] 可容纳各种数据类型的通用数据结构，是类模板
+    \item[迭代器] 可用于依次存取容器中的元素，类似于指针
+    \item[算法] 用来操作容器中的元素的函数模板
+    \begin{itemize}
+        \item \texttt{sort()} 用来对一个 \texttt{vector} 中的数据进行排序
+        \item \texttt{find()} 用来搜索一个 \texttt{list} 中的对象
+    \end{itemize}
+\end{description}
+
+算法本身与他们操作的数据类型无关，因此它们可以在从简单数据到高度复杂容器的任何数据结构上使用。
+
+示例代码：
+\begin{minted}{C++}
+    int array[100];
+    sort(array, array+70);  // 将前 70 个元素排序
+\end{minted}
+其中，数组 array[100] 就是容器，而 \mintinline{C++}{int *} 类型的指针变量就可以作为迭代器，\texttt{sort} 算法
+就可以作用于该容器上，对其进行排序。
+
+\subsection{容器概述}
+容器可以用于存放各种类型的数据（基本类型的变量、对象等）的数据结构，都是类模板，分为三种：
+\begin{enumerate}
+    \item 顺序容器：\texttt{vector}，\texttt{deque}，\texttt{list}
+    \item 关联容器：\texttt{set}，\texttt{multiset}，\texttt{map}，\texttt{multimap}
+    \item 容器适配器：\texttt{stack}，\texttt{queue}，\texttt{priority\_queue}
+\end{enumerate}
+
+对象被插入容器中，被插入的对象是一个复制品。许多算法，比如排序、查找等，要求对容器中的元素进行比较，有的容器本身就是排序
+的，所以，放入容器的对象所属的类，往往还应该重载 \texttt{==} 和 \texttt{<} 运算符。
+
+\subsubsection{顺序容器简介}
+顺序容器有 \texttt{vector}、\texttt{deque}、\texttt{list} 三种。顺序容器不是排序的，元素的插入位置同元素的值无
+关。
+
+\begin{itemize}
+    \item \texttt{vector} 头文件 \texttt{<vector>} \\
+    动态数组。元素在内存中连续存放。随机存取任何元素都能在常数时间完成。在尾端增删元素具有较佳的性能（大部分情况是常数
+    时间）。在头端和中间插入元素时间复杂度为 $O(n)$。
+    \item \texttt{deque} 头文件 \texttt{<deque>} \\
+    双向队列。元素在内存连续存放。随机存取任何元素都能在常数时间完成（但次于 \texttt{vector}）。在两端增
+    删元素具有较佳的性能（大部分情况是常数时间）。
+    \item \texttt{list} 头文件 \texttt{<list>} \\
+    双向链表。元素在内存不连续存放。在任何位置增删元素都能在常数时间完成（前提是已找到增删元素的位置）。不支持随机存取。
+\end{itemize}
+
+\subsubsection{关联容器简介}
+关联容器是排序的，插入任何元素，都按相应的排序规则来确定其位置。
+
+关联容器在查找时具有非常好的性能，通常以平衡二叉树的方式实现，插入和检索的时间都是 $O(log(N))$。
+
+\begin{itemize}
+    \item \texttt{set/multiset} 头文件 \texttt{<set>} \\
+    集合。\texttt{set} 中不允许相同元素，\texttt{multiset} 中允许存在相同的元素。
+    \item \texttt{map/multimap} 头文件 \texttt{<map>} \\
+    \texttt{map} 与 \texttt{set} 不同在于 \texttt{map} 中存放的元素有且仅有两个成员变量，一个名为
+    \texttt{first}，另一个名为 \texttt{second}，\texttt{map} 根据 \texttt{first} 值对元素进行从小到大排序，
+    并可快速地根据 \texttt{first} 来检索元素。
+    \texttt{map} 同 \texttt{multimap} 的不同在于是否允许相同 \texttt{first} 值的元素。
+\end{itemize}
+
+\subsubsection{容器适配器简介}
+\begin{itemize}
+    \item \texttt{stack} 头文件 \texttt{<stack>} \\
+    栈。\texttt{stack} 是项的有限序列，并满足序列中被删除、检索和修改的项只能是最近插入序列的项（栈顶的项）。后进先
+    出。
+    \item \texttt{queue} 头文件 \texttt{<queue>} \\
+    队列。插入只可以在尾部进行，删除、检索和修改只允许从头部进行。先进先出。
+    \item \texttt{priority\_queue} 头文件 \texttt{queue} \\
+    优先级队列。最高优先级元素总是第一个出列。
+\end{itemize}
+
+\subsubsection{顺序容器和关联容器中都有的成员函数}
+\begin{itemize}
+    \item \texttt{begin} 返回指向容器中第一个元素的迭代器
+    \item \texttt{end} 返回指向容器中最后一个元素后面的位置的迭代器
+    \item \texttt{rbegin} 返回指向容器中最后一个元素的迭代器
+    \item \texttt{rend} 返回指向容器中第一个元素前面位置的迭代器
+    \item \texttt{erase} 从容器中删除一个或几个元素
+    \item \texttt{clear} 从容器中删除所有元素
+\end{itemize}
+
+\subsubsection{顺序容器的常用成员函数}
+\begin{itemize}
+    \item \texttt{front} 返回容器中第一个元素的引用
+    \item \texttt{back} 返回容器中最后一个元素的引用
+    \item \texttt{push\_back} 在容器末尾增加新元素
+    \item \texttt{pop\_back} 删除容器末尾的元素
+    \item \texttt{erase} 删除迭代器指向的元素（可能会使该迭代器失效），或删除一个区间，返回被删除元素后面的那个元
+    素的迭代器
+\end{itemize}
+
+\subsubsection{\texttt{vector}}
+\texttt{vector} 是可变长的动态数组。使用 \texttt{vector} 必须包含头文件 \mintinline{C++}{#include <vector>}
+
+\texttt{vector} 支持随机访问迭代器，可以根据下标随机访问某个元素的时间为常数，在尾部添加元素速度很快，在中间插入元素
+较慢。
+
+所有的 STL 算法都可以对 \texttt{vector} 操作。
+
+构造函数初始化：
+\begin{itemize}
+    \item \mintinline{C++}{vector();} 无参构造函数，将容器初始化成空的
+    \item \mintinline{C++}{vector(int n);} 将容器初始化成有 \texttt{n} 个元素
+    \item \mintinline{C++}{vector(int n, const T &val);} 假定元素类型是 \texttt{T}，将容器初始化成有
+    \texttt{n} 个元素，每个元素的值都是 \texttt{val}
+    \item \mintinline{C++}{vector(iterator first, iterator last);} 将容器初始化为与别的容器上区间
+    \texttt{[first, last)} 一致的内容
+\end{itemize}
+
+其他常用函数：
+\begin{itemize}
+    \item \mintinline{C++}{void pop_back();} 删除容器末尾的元素
+    \item \mintinline{C++}{void push_back(const T &val);} 将 \texttt{val} 添加到容器末尾
+    \item \mintinline{C++}{int size();} 返回容器中第一个元素的引用
+    \item \mintinline{C++}{T &front();} 返回容器中第一个元素的引用
+    \item \mintinline{C++}{T &back();} 返回容器中最后一个元素的引用
+\end{itemize}
+
+\subsubsection{list}
+\texttt{list} 上是数据结构中的双向链表。使用 \texttt{list} 需要包含头文件
+\mintinline{C++}{#include <list>}
+
+在 \texttt{list} 中的任何位置插入或删除元素都是常数时间。\texttt{list} 不支持根据下标随机存取元素。
+
+\texttt{list} 是顺序容器，具有所有顺序容器都有的成员函数。\texttt{list} 还支持 8 个成员函数：
+\begin{itemize}
+    \item \texttt{push\_front} 在链表最前面插入
+    \item \texttt{pop\_front} 删除链表最前面的元素
+    \item \texttt{sort} 排序（\texttt{list} 不支持 STL 的算法 \texttt{sort}）
+    \item \texttt{remove} 删除和指定值相等的所有元素
+    \item \texttt{unique} 删除容器中的所有连续重复元素，仅仅留下每组等值元素中的第一个元素。
+    \item \texttt{merge} 合并两个链表，并清空被合并的链表
+    \item \texttt{reverse} 颠倒（逆序）链表
+    \item \texttt{splice} 在指定位置前面插入另一链表中的一个或多个元素，并在另一链表中删除被插入的元素
+\end{itemize}
+
+\texttt{list} 容器的迭代器不支持完全随机访问，不能用 STL 中的 \texttt{sort} 函数进行排序。但 \texttt{list} 有
+自己的 \texttt{sort} 成员函数：
+\begin{minted}{C++}
+    list<T> className;
+    className.sort(compare);    // compare can be defined by programmers
+    className.sort();           // no arguments, sort from smallest to largest
+\end{minted}
+
+\texttt{list} 容器只能使用双向迭代器，不支持大于/小于比较运算符，\texttt{[]} 运算符和随机移动（即类似“list 的迭
+代器 + 2”这种操作）。
+
+\subsubsection{\texttt{deque}}
+\texttt{deque} 是双向队列，使用它时必须要包含头文件 \mintinline{C++}{#include <deque>}
+
+所有适用于 \texttt{vector} 的操作都适用于 \texttt{deque}。\texttt{deque} 还有 \texttt{push\_front}（将元素
+插入到容器的头部）和 \texttt{pop\_front}（删除头部的元素）操作。\texttt{deque} 没有 \texttt{sort} 成员函数。
+
+\subsubsection{\texttt{set} 和 \texttt{multiset}}
+\texttt{set}、\texttt{multiset}，\texttt{map}、\texttt{multimap} 都属于关联容器。关联容器内部元素有序排列，
+新元素插入的位置取决于它的值，查找速度快。
+
+关联容器除了各容器都有的函数外，还支持以下成员函数：
+\begin{itemize}
+    \item \texttt{find} 查找等于某个值的元素（\texttt{x} 小于 \texttt{y} 和 \texttt{y} 小于 \texttt{x} 同
+    时不成立即为相等）
+    \item \texttt{lower\_bound} 查找某个下界
+    \item \texttt{uppper\_bound} 查找某个上界
+    \item \texttt{equal\_range} 同时查找上界和下界
+    \item \texttt{count} 计算等于某个值的元素个数（\texttt{x} 小于 \texttt{y} 和 \texttt{y} 小于 \texttt{x} 同
+    时不成立即为相等）
+    \item \texttt{insert} 用于插入一个元素或一个区间
+\end{itemize}
+
+预备知识：\texttt{pair} 模板：
+\begin{minted}{C++}
+    template <class _T1, class _T2>
+    struct pair {
+        typedef _T1 first_type;
+        typedef _T2 second _type;
+        _T1 first;
+        _T2 second;
+        pair() : first(), second() {}
+        pair(const _T1 &__a, const _T2 &__b) : first(__a), second(__b) {}
+        template <class _U1, class _U2>
+        pair(const pair<_U1, class _U2> &__p)
+            : first(__p.first), second(__p.second) {}
+    };
+\end{minted}
+\texttt{map} 和 \texttt{multimap} 容器里放着的都是 \texttt{pair} 模板类的对象，且按 \texttt{first} 从小到大
+排序。
+
+上面代码中的第三个构造函数用法示例：
+\begin{minted}{C++}
+    pair<int, int> p(pair<double, double>(5.5, 4.6));   // p.first = 5, p.second = 4
+\end{minted}
+
+\texttt{multiset} 的定义：
+\begin{minted}{C++}
+    template <class Key, class Pred = less<Key>, class A = allocator<Key> >
+    class multiset {...};
+\end{minted}
+\texttt{Pred} 类型的变量决定了 \texttt{multiset} 中的元素，以及“一个比另一个小”的定义。\texttt{multiset} 运行
+过程中，比较连个元素 \texttt{x} 和 \texttt{y} 大小的做法，就是生成一个 \texttt{Pred} 类型的变量。假定该变量为
+\texttt{op}，若表达式 \texttt{op(x, y)} 返回值为 \texttt{true}，则 \texttt{x} 比 \texttt{y} 小。
+
+\texttt{Pred} 的缺省类型是 \texttt{less<Key>}，\texttt{less} 模板的定义如下：
+\begin{minted}{C++}
+    template <class T>
+    struct less : public binary_function<T, T, bool> {
+        bool operator()(const T &x, const T &y) const {
+            return x < y;   // less 模板是靠 < 来比较大小的
+        }
+    };
+\end{minted}
+
+\texttt{multiset} 的成员函数：
+\begin{itemize}
+    \item \texttt{iterator find(const T \&val);} \\
+    在容器中查找值为 \texttt{val} 的元素，返回其迭代器。如果找不到，返回 \texttt{end()}。
+    \item \texttt{iterator insert(const T \&val);} \\
+    将 \texttt{val} 插入到容器中并返回其迭代器。
+    \item \texttt{void insert(iterator first, iterator last);} \\
+    将区间 \texttt{[first, last)} 插入容器。
+    \item \texttt{int count(const T \&val);} \\
+    统计有多少个元素的值和 \texttt{val} 相等。
+    \item \texttt{iterator lower\_bound(const T \&val);} \\
+    查找一个最大的位置 \texttt{it}，使得 \texttt{[begin(), it)} 中所有元素都比 \texttt{val} 小。
+    \item \texttt{iterator upper\_bound(const T \&val);} \\
+    查找一个最小的位置 \texttt{it}，使得 \texttt{[it, end())} 中所有的元素都比 \texttt{val} 大。
+    \item \texttt{pair<iterator, iterator> equal\_range(const T \&val);} \\
+    同时求得 \texttt{lower\_bound} 和 \texttt{upper\_bound}。
+    \item \texttt{iterator erase(iterator it);} \\
+    删除 \texttt{it} 指向的元素，返回其后面的元素的迭代器（不同编译器可能结果不同）
+\end{itemize}
+
+\texttt{multiset} 的用法：
+\begin{minted}{C++}
+    #include <set>
+    using namespace std;
+    class A {};
+    int main() {
+        multiset<A> a;
+        // error: invalid operands to binary expression ('const A' and 'const A')
+        a.insert(A());
+    }
+\end{minted}
+\texttt{multiset<A> a;} 等价于 \texttt{multiset<A, less<A> > a;} 插入元素时，\texttt{multiset} 会将被插
+入元素和已有元素进行比较。由于 \texttt{less} 模板是用 \texttt{<} 进行比较的，所以这都要求 \texttt{A} 的对象能用
+\texttt{<} 比较，即适当重载了 \texttt{<} 运算符。
+
+\texttt{set} 的定义：
+\begin{minted}{C++}
+    template <class Key, class Pred = less<Key>, class A = allocator<Key> >
+    class set {...};
+\end{minted}
+
+对于 \texttt{set} 来说，如果有两个元素 \texttt{a} 和 \texttt{b}，\texttt{a < b} 和 \texttt{b < a} 也不成
+立，那么它就会认为 \texttt{a} 和 \texttt{b} 是重复的。在 \texttt{set} 中插入已有元素时，会被 \texttt{set} 忽
+略。
+
+\subsubsection{\texttt{map} 和 \texttt{multimap}}
+前面已经提到了 \texttt{pair} 模板，\texttt{map/multimap} 里放着的都是 \texttt{pair} 模板类的对象，且按
+\texttt{first} 从小到大排序。
+
+\texttt{multimap} 的定义：
+\begin{minted}{C++}
+    template <class Key, class T, class Pred = less<Key>, class A = allocator<T> >
+    class multimap {
+        ...
+        typedef pair<const Key, T> value_type;
+        ...
+    };  // Key 代表关键字的类型
+\end{minted}
+\texttt{multimap} 中的元素由 \texttt{<key, value>} 组成，每个元素是一个 \texttt{pair} 对象，关键字就是
+\texttt{first} 成员变量，其类型是 \texttt{Key}。
+
+\texttt{multimap} 中允许许多个元素的关键字相同。元素按照 \texttt{first} 成员变量从小到大排列，缺省情况下用
+\texttt{less<Key>} 定义关键字的“小于”关系。
+
+下面三段程序，哪个不会导致编译出错？（答案是第一个)
+\begin{itemize}
+    \item
+    \begin{minted}{C++}
+    multimap<string, greater<string> > mp;
+    \end{minted}
+    \item
+    \begin{minted}{C++}
+    multimap<string, double, less<int> > mp1;
+    mp1.insert(make_pair("ok", 3.14));
+    \end{minted}
+    \item
+    \begin{minted}{C++}
+    multimap<string, double, less<int> > mp2;
+    mp2.insert("ok", 3.14);
+    \end{minted}
+    \item 都会导致编译出错
+\end{itemize}
+
+\texttt{map} 的定义：
+\begin{minted}{C++}
+    template <class Key, class T, class Pred = less<Key>, class A = allocator<T> >
+    class map {
+        ...
+        typedef pair<const Key, T> value_type;
+    };
+\end{minted}
+\texttt{map} 中的元素都是 \texttt{pair} 模板类的对象。关键字（\texttt{first} 成员变量）各不相同。元素按照关键字
+从小到大排列，缺省情况下用 \texttt{less<Key>}，即“\texttt{<}” 定义“小于”。
+
+\texttt{map} 的 \texttt{[]} 成员函数：\\
+若 \texttt{pairs} 为 \texttt{map} 模板类的对象，\texttt{pairs[key]} 返回对关键字等于 \texttt{key} 的元素的
+值（\texttt{second} 成员变量）的引用。若没有关键字为 \texttt{key} 的元素，则会往 \texttt{pairs} 里插入一个关键
+字为 \texttt{key} 的元素，其值用无参构造函数初始化，并返回其值的引用。
+
+如 \mintinline{C++}{map<int, double> pairs;} 则 \mintinline{C++}{pairs[50] = 5;} 会修改 \texttt{pairs}
+中关键字为 \texttt{50} 的元素，使其值变为 \texttt{5}。
+
+由很多例子可以看出，关联容器特别适合用于一些需要不断更新数据和查询数据的情形。
+
+\subsubsection{容器适配器}
+容器适配器可以用某种顺序容器来实现（让已有的顺序容器以栈/队列的方式工作）。
+\begin{enumerate}
+    \item \texttt{stack} 头文件 \texttt{<stack>} \\
+    栈——后进后出
+    \item \texttt{queue} 头文件 \texttt{<queue>} \\
+    队列——先进先出
+    \item \texttt{priority\_queue} 头文件 \texttt{queue} \\
+    优先级队列——最高优先级元素总是第一个出列
+\end{enumerate}
+
+容器适配器都有 3 个成员函数：
+\begin{itemize}
+    \item \texttt{push} 添加一个元素
+    \item \texttt{top} 返回栈顶部或队头元素的引用
+    \item \texttt{pop} 删除一个元素
+\end{itemize}
+
+容器适配器上没有迭代器。STL 中各种排序、查找、变序等算法都不适合容器适配器。
+
+\texttt{stack} 是后进先出的数据结构，只能插入、删除、访问栈顶的元素。\texttt{stack} 可用 \texttt{vector}、
+\texttt{list} 或 \texttt{deque} 实现。在 STL 中，默认使用 \texttt{deque} 来实现 \texttt{stack}，用
+\texttt{vector} 和 \texttt{deque} 实现要比用 \texttt{list} 实现性能好。
+\begin{minted}{C++}
+    template <class T, class Cont = deque<T> >
+    class stack {
+        ...
+    };
+\end{minted}
+
+\texttt{stack} 中主要的三个成员函数：
+\begin{itemize}
+    \item \texttt{void push(const T \&x);} \\
+    将 \texttt{x} 压入栈顶
+    \item \texttt{void pop();} \\
+    弹出（即删除）栈顶元素
+    \item \texttt{T \&top();} \\
+    返回栈顶元素的引用。通过该函数可以读取栈顶元素的值，也可以修改栈顶元素。
+\end{itemize}
+
+\texttt{queue} 和 \texttt{stack} 基本类似，可以用 \texttt{list} 和 \texttt{deque} 实现。缺省情况下用
+\texttt{deque} 实现：
+\begin{minted}{C++}
+    template <class T, class Cont = deque<T> >
+    class queue {
+        ...
+    };
+\end{minted}
+
+\texttt{queue} 同样也有 \texttt{push}、\texttt{pop} 和 \texttt{top} 函数。\texttt{push} 发生在队尾；
+\texttt{pop}、\texttt{top} 发生在队头，先进先出。
+
+\texttt{priority\_queue} 和 \texttt{queue} 类似，可以用 \texttt{vector} 和 \texttt{deque} 实现，缺省情况
+下用的是 \texttt{vector}。
+
+\texttt{priority\_queue} 通常会采用堆排序的技术，以保证最大的元素总是在最前面。在执行 \texttt{pop} 操作，删除的
+是最大的元素；执行 \texttt{top} 操作时，返回的是最大元素的引用。
+
+\texttt{priority\_queue} 默认的元素比较器是 \texttt{less<T>}。
+
+\subsection{迭代器简介}
+迭代器用于指向顺序容器和关联容器中的元素，用法和指针类似。
+
+迭代器有 \mintinline{C++}{const} 和 非 \mintinline{C++}{const} 两种，通过迭代器可以读取它指向的元素。通过非
+\mintinline{C++}{const} 迭代器还能修改其指向的元素。
+
+定义一个容器类（容器模板实例化后的类）的迭代器：\mintinline{C++}{容器类名::iterator 变量名;}
+
+或定义一个容器类的常量迭代器：\mintinline{C++}{容器类名::const_iterator 变量名;} 可以通过此迭代器访问其指向的元
+素，但不可以修改它指向的元素。
+
+或定义一个容器类的反向迭代器：\mintinline{C++}{容器类名::reverse_iterator 变量名;} 可以通过此迭代器反向地访问其
+指向的元素。反向迭代器和迭代器的类型是不兼容的。
+
+访问一个迭代器指向的元素：\mintinline{C++}{*迭代器变量名}
+
+迭代器上可以执行 \texttt{++} 操作，以使其指向容器中的下一个元素。如果迭代器到达了容器中的最后一个元素的后面，此时再使
+用它，就会出错，类似于使用 \mintinline{C++}{NULL} 或未初始化的指针一样。
+
+在 STL 中我们常用的迭代器有两种，一种是双向迭代器，另一种是随机访问迭代器。
+
+支持双向迭代器的容器：\texttt{list}、\texttt{set/multiset}、\texttt{map/multimap}
+支持随机访问迭代器的容器：\texttt{vector}、\texttt{deque}
+不支持迭代器的容器：\texttt{stack}、\texttt{queue}、\texttt{priority\_queue}
+
+\subsubsection{双向迭代器}
+若 \texttt{p} 和 \texttt{p1} 都是双向迭代器，则可对 \texttt{p}、\texttt{p1} 可进行以下操作：
+\begin{itemize}
+    \item \texttt{++p / p++} 使 \texttt{p} 指向容器中下一个元素
+    \item \texttt{--p / p--} 使 \texttt{p} 指向容器中上一个元素
+    \item \texttt{*p} 取 \texttt{p} 指向的元素
+    \item \texttt{p = p1;} 赋值
+    \item \texttt{p == p1 / p != p1} 判断是否相等、不等
+\end{itemize}
+
+\subsubsection{随机访问迭代器}
+若 \texttt{p} 和 \texttt{p1} 都是随机访问迭代器，则可对 \texttt{p}、\texttt{p1} 进行以下操作：
+\begin{itemize}
+    \item 双向迭代器的所有操作
+    \item \mintinline{C++}{p += i;} 将 \texttt{p} 向后移动 \texttt{i} 个元素
+    \item \mintinline{C++}{p -= i;} 将 \texttt{p} 向前移动 \texttt{i} 个元素
+    \item \mintinline{C++}{p + i} 值为指向 \texttt{p} 后面的第 \texttt{i} 个元素的迭代器
+    \item \mintinline{C++}{p - i} 值为指向 \texttt{p} 前面的第 \texttt{i} 个元素的迭代器
+    \item \mintinline{C++}{p[i]} 值为 \texttt{p} 后面第 \texttt{i} 个元素的引用
+    \item \mintinline{C++}{p < p1, p <= p1, p > p1, p >= p1}
+\end{itemize}
+
+有的算法，例如 \texttt{sort}、\texttt{binary\_search} 需要通过随机访问迭代器来访问容器中的元素，那么
+\texttt{list} 以及关联容器就不支持该算法。
+
+\subsubsection{利用迭代器遍历容器}
+\texttt{vector} 的迭代器是随机迭代器。遍历 \texttt{vector} 可以有以下几种做法（\texttt{deque} 亦然）：
+\begin{minted}{C++}
+    vector<int> v(100);
+    int i;
+    for (i = 0; i < v.size(); i++) {
+        v[i] = i;
+        cout << v[i] << " ";   // randomly access by subscript
+    }
+    cout << endl;
+
+    vector<int>::const_iterator ii;
+    for(ii = v.begin(); ii != v.end(); ii++) {
+        cout << *ii << " ";
+    }
+    cout << endl;
+
+    for (ii = v.begin(); ii < v.end(); ii++) {
+        cout << *ii << " ";
+    }
+    cout << endl;
+
+    ii = v.begin();
+    while (ii < v.end()) {
+        cout << *ii << " ";
+        ii = ii + 2;
+    }
+    cout << endl;
+\end{minted}
+
+\texttt{list} 的迭代器是双向迭代器，正确的遍历 \texttt{list} 的方法：
+\begin{minted}{C++}
+    list<int> v;
+    list<int>::const_iterator ii;
+    for (ii = v.begin(); ii != v.end(); ++ii) {
+        cout << *ii;
+    }
+\end{minted}
+
+错误的遍历 \texttt{list} 的方法：
+\begin{minted}{C++}
+    list<int> v;
+    list<int>::const_iterator ii;
+    // wrong, bidirectional iterators don't support <.
+    for (ii = v.begin(); ii < v.end(); ++ii) {
+        cout << *ii;
+    }
+    // wrong, list doesn't have [] member function
+    for (int i = 0; i < v.size(); i++) {
+        cout << v[i];
+    }
+\end{minted}
+双向迭代器不支持 \texttt{<}，\texttt{list} 没有 \texttt{[]} 成员函数。
+
+\subsection{算法简介}
+算法就是一个个的函数模板，大多数在 \texttt{<algorithm>} 中定义。STL 中提供了能在各种容器中通用的算法，比如查找、排
+序等。
+
+算法通过迭代器来操纵容器中的元素。许多算法，例如排序和查找算法，可以对容器中的一个局部区间进行操作，因此需要两个参数，一
+个是起始元素的迭代器，一个是终止元素后面一个元素的迭代器。
+
+有的算法返回一个迭代器。比如 \texttt{find()} 算法，在容器中查找一个元素，并返回一个指向该元素的迭代器。
+
+算法既可以处理容器，也可以处理普通数组。
+
+\texttt{find()} 算法示例：
+\begin{minted}{C++}
+    template<class InIt, class T>
+    InIt find(InIt first, InIt last, const T &val);
+\end{minted}
+其中，\texttt{first} 和 \texttt{last} 这两个参数都是容器的迭代器，它们给出了容器中的查找区间起点和终点
+\texttt{[first, last)}。区间的起点是位于查找范围之中的，而终点不是。
+
+\texttt{find} 在 \texttt{[first, last)} 查找等于 \texttt{val} 的元素。\texttt{find()} 利用 \texttt{==}
+运算符来判断是否相等，其返回值是一个迭代器。如果找到，则该迭代器指向被找到的元素；如果找不到，则该迭代器等于
+\texttt{last}。
+
+\texttt{find()} 的时间复杂度是 $O(n)$。
+
+\subsubsection{STL 算法分类}
+STL 中的算法大致可以分为以下七类：
+\begin{itemize}
+    \item 不变序列算法
+    \item 变值算法
+    \item 删除算法
+    \item 变序算法
+    \item 排序算法
+    \item 有序区间算法
+    \item 数值算法
+\end{itemize}
+
+大多重载的算法都是有两个版本的：
+\begin{itemize}
+    \item 用 \texttt{==} 判断元素是否相等，或用 \texttt{<} 来比较大小
+    \item 多出一个类型参数 \texttt{Pred} 和函数形参 \texttt{Pred op}，通过表达式 \texttt{op(x, y)} 的返回
+    值（\texttt{true/false}）来判断 \texttt{x} 是否“等于” \texttt{y}，或者 \texttt{x} 是否“小于”
+    \texttt{y}。
+\end{itemize}
+
+如 \texttt{min\_element} 就有如下两个版本：
+\begin{itemize}
+    \item \mintinline{C++}{iterator min_element(iterator first, iterator last);}
+    \item \mintinline{C++}{iterator min_element(ieterator first, iterator last, Pred op);}
+\end{itemize}
+其中，第一个版本利用 \texttt{<} 来比较大小；第二个版本利用 \texttt{Pred op} 来比较大小。在调用第二个版本的
+\texttt{min\_element} 时，传递给 \texttt{op} 的实参可以是函数名，也可以是函数对象。
+
+\subsubsection{不变序列算法}
+不变序列算法不会修改算法所作用的容器或对象，适用于顺序容器和关联容器，时间复杂度都是 $O(n)$。
+
+常见的不变序列算法：
+\begin{itemize}
+    \item \texttt{min} \\
+    求两个对象中较小的（可自定义比较器）
+    \item \texttt{max} \\
+    求两个对象中较大的（可自定义比较器）
+    \item \texttt{min\_element} \\
+    求区间中的最小值（可自定义比较器）
+    \begin{minted}{C++}
+    template <class FwdIt>
+    FwdIt min_element(FwdIt first, FwdIt last);
+    \end{minted}
+    返回 \texttt{[first, last)} 中最小元素的迭代器，以 \texttt{<} 作比较器。最小指没有元素比它小，而不是它比别的
+    不同元素都小，因为即便 \texttt{a != b}，\texttt{a < b} 和 \texttt{b < a} 有可能都不成立。
+    \item \texttt{max\_element} \\
+    求区间的最大值（可自定义比较器）
+    \begin{minted}{C++}
+    template <class FwdIt>
+    FwdIt max_element(FwdIt first, FwdIt last);
+    \end{minted}
+    返回 \texttt{[first, last)} 中最大元素（不小于任何其他元素）的迭代器，以 \texttt{<} 作比较器
+    \item \texttt{for\_each} \\
+    这里是不变序列的版本，对区间中的每个元素都做某种操作
+    \begin{minted}{C++}
+    template <class InIt, class Fun>
+    Fun for_each(InIt first, InIt last, Fun f);
+    \end{minted}
+    对 \texttt{[first, last)} 中的每个元素 \texttt{e} 执行 \texttt{f(e)}，要求 \texttt{f(e)} 不能改变
+    \texttt{e}
+    \item \texttt{count} \\
+    计算区间中等于某值的元素个数（利用 \texttt{x == y} 比较）
+    \begin{minted}{C++}
+    template <class InIt, class T>
+    size_t count(InIt first, InIt last, const T &val);
+    \end{minted}
+    \item \texttt{count\_if} \\
+    计算区间中符合某种条件的元素个数
+    \begin{minted}{C++}
+    template <class InIt, class Pred>
+    size_t count_if(InIt first, InIt last, Pred pr);
+    \end{minted}
+    计算 \texttt{[first, last)} 中复合 \texttt{pre(e) == true} 的元素 \texttt{e} 的个数
+    \item \texttt{find} \\
+    在区间中查找等于某值的元素
+    \begin{minted}{C++}
+    template <class InIt, class T>
+    InIt ifnd(InIt first, InIt last, const T &val);
+    \end{minted}
+    返回区间 \texttt{[first, last)} 中的迭代器 \texttt{i}，使得 \texttt{*i == val}
+    \item \texttt{find\_if} \\
+    在区间中查找符合条件的元素
+    \begin{minted}{C++}
+    template <class InIt, class Pred>
+    InIt find_if(InIt first, InIt last, Pred pr);
+    \end{minted}
+    返回区间 \texttt{[first, last)} 中的迭代器 \texttt{i}，使得 \texttt{pr(*i) == true}
+    \item \texttt{find\_end} \\
+    在区间中查找另一个区间最后一次出现的位置（可自定义比较器）
+    \item \texttt{find\_first\_of} \\
+    在区间中查找第一个出现在另一个区间中的元素（可自定义比较器）
+    \item \texttt{adjacent\_find} \\
+    在区间中寻找第一次出现连续两个相等元素的位置（可自定义比较器）
+    \item \texttt{search} \\
+    在区间中查找另一个区间第一次出现的位置（可自定义比较器）
+    \item \texttt{search\_n} \\
+    在区间中查找第一次出现等于某值的连续 \texttt{n} 个元素（可自定义比较器）
+    \item \texttt{equal} \\
+    判断两区间是否相等（可自定义比较器）
+    \item \texttt{mismatch} \\
+    逐个比较两个区间的元素，返回第一次发生不相等的两个元素的位置（可自定义比较器）
+    \item \texttt{lexicographical\_compare} \\
+    按字典序比较两个区间的大小（可自定义比较器）
+\end{itemize}
+
+\subsubsection{变值算法}
+变值算法会修改源区间或目标区间元素的值。但是被修改的区间不能属于关联容器，因为这可能会破坏关联容器的有序性。
+
+常见的变值算法：
+\begin{itemize}
+    \item \texttt{for\_each} \\
+    对区间中的每个元素都做某种操作
+    \item \texttt{copy} \\
+    复制一个区间到别处
+    \item \texttt{copy\_backward} \\
+    复制一个区间到别处，但目标区间是从后往前被修改的
+    \item \texttt{transform} \\
+    将一个区间的元素变形后拷贝到另一个区间
+    \begin{minted}{C++}
+    template <class InIt, class OutIt, class Unop>
+    OutIt transform(InIt first, InIt last, OutIt x, Unop uop);
+    \end{minted}
+    对 \texttt{[first, last)} 中的每个迭代器 \texttt{I}
+    \begin{itemize}
+        \item 执行 \texttt{uop(*I)} 并将结果依次放入从 \texttt{x} 开始的地方
+        \item 要求 \texttt{uop(*I)} 不得改变 \texttt{*I} 的值
+    \end{itemize}
+    该模板返回值是个迭代器，即 \texttt{x + (last - first)}，\texttt{x} 可以和 \texttt{first} 相等
+    \item \texttt{swap\_ranges} \\
+    交换两个区间内容
+    \item \texttt{fill} \\
+    用某个值填充空间
+    \item \texttt{fill\_n} \\
+    用某个值替换区间中的 \texttt{n} 个元素
+    \item \texttt{generate} \\
+    用某个操作的结果填充区间
+    \item \texttt{generate\_n} \\
+    用某个操作的结果替换区间中的 \texttt{n} 个元素
+    \item \texttt{replace} \\
+    将区间中的某个值替换为另一个值
+    \item \texttt{replace\_if} \\
+    将区间中符合某种条件的值替换成另一个值
+    \item \texttt{replace\_copy} \\
+    将一个区间拷贝到另一个区间，拷贝时某个值要换成新值拷过去
+    \item \texttt{replace\_copy\_if} \\
+    将一个区间拷贝到另一个区间，拷贝时符合某条件的值要换成新值拷过去
+\end{itemize}
+
+在``Week9/ValueChangingAlgorithms.cpp'' 的示例代码中，
+\mintinline{C++}{ostream_iterator<int> output(cout, " ");} 定义了一个 \texttt{ostream\_iterator<int>}
+对象，可以通过 \texttt{cout} 输出以“ ”（空格）分隔的一个个整数。之后，
+\mintinline{C++}{copy(v.begin(), v.end(), output);} 会导致 \texttt{v} 的内容在 \texttt{cout} 上输出。
+
+\texttt{copy} 函数模板（算法）
+\begin{minted}{C++}
+    template <class InIt, class OutIt>
+    OutIt copy(InIt first, InIt last, OutIt x);
+\end{minted}
+该函数对每个在区间 \texttt{[0, last - first)} 中的 \texttt{N} 执行一次
+\mintinline{C++}{*(x + N) = *(first + N)}，返回 \texttt{x + N}。
+
+对于 \mintinline{C++}{copy(v.begin(), v.end(), output);} \texttt{first} 和 \texttt{last} 的类型是
+\texttt{vector<int>::const\_iterator}，\texttt{output} 的类型是 \texttt{ostream\_iterator<int>}。
+
+\texttt{copy} 的源代码：
+\begin{minted}{C++}
+    template <class _II, class _OI>
+    inline _OI copy(_II _F, _II _L, _OI _X) {
+        for ( ; _F != _L; ++_X, ++_F)
+            *_X =  *_F;
+        return(_X);
+    }
+\end{minted}
+
+观察下面的代码，考虑应该如何编写 \texttt{My\_ostream\_iterator} 才能使其完成预期的功能。
+\begin{minted}{C++}
+    int a[4] = {1, 2, 3, 4};
+    My_ostream_iterator<int> oit(cout, "*");
+    copy(a, a + 4, oit);    // print 1*2*3*4
+    ofstream oFile("test.txt", ios::out);
+    My_ostream_iterator<int> oitf(oFile, "*");
+    copy(a, a + 4, oitf);   // write 1*2*3*4 into test.txt
+    oFile.close();
+\end{minted}
+
+上面程序中调用语句 \texttt{copy(a, a + 4, oit)} 实例化后得到 \texttt{copy} 如下：
+\begin{minted}{C++}
+    My_ostream_iterator<int> copy(int *_F, int *_L, My_ostream_iterator<int> _X) {
+        for ( ; _F != _L; ++_X, ++_F)
+            *_X = *_F;
+        return(_X);
+    }
+\end{minted}
+所以 \texttt{My\_ostream\_iterator} 应该对 \texttt{++}、\texttt{*} 和 \texttt{=} 运算符进行重载。重载后的
+类模板如下：
+\begin{minted}{C++}
+    template <class T>
+    class My_ostream_iterator : public iterator<output_iterator_tag, T> {
+    private:
+        string sep;     // delimiter
+        ostream &os;    // to store cout
+    public:
+        My_ostream_iterator(ostream &o, string s) : sep(s), os(o) {}
+        void operator++() {}
+        My_ostream_iterator &operator*() {
+            return *this;
+        }
+        My_ostream_iterator &operator=(const T &val) {
+            os << val << sep;
+            return *this;
+        }
+    };
+\end{minted}
+
+由以上示例可以看出，一个 STL 的模板究竟能实现哪些功能，并不是由它的名字决定的，而是取决于我们的想象力。
+
+\subsubsection{删除算法}
+删除算法可以用于删除一个容器里的某些元素。所谓“删除”，并不会使容器里的元素减少，而是将所有应该被删除的元素看作是空位子，
+用留下的元素从后往前移，依次去填空位子。元素往前移后，它原来的位置也会变成空位子，也应该由后面的留下的元素来填上。最后，
+没有被填上的空位子，维持其原来的值不变，可以被打印出来。
+
+删除算法不应作用于关联容器。
+
+常见的删除算法：
+\begin{itemize}
+    \item \texttt{remove} \\
+    删除区间中等于某个值的元素
+    \item \texttt{remove\_if} \\
+    删除区间中满足某种条件的元素
+    \item \texttt{remove\_copy} \\
+    拷贝区间到另一个区间。等于某个值的元素不拷贝
+    \item \texttt{remove\_copy\_if} \\
+    拷贝区间到另一个区间。符合某种条件的元素不拷贝
+    \item \texttt{unique} \\
+    删除区间中连续相等的元素，只留下一个（可自定义比较器）
+    \item \texttt{unique\_copy} \\
+    拷贝区间到另一个区间。连续相等的元素，只拷贝第一个到目标区间（可自定义比较器）
+\end{itemize}
+
+以上的算法复杂度都是 $O(n)$ 的。
+
+\texttt{unique} 类模板定义有两个版本，分别采用不同的比较大小的方式。
+\begin{itemize}
+    \item 用 \texttt{==} 比较是否相等
+    \begin{minted}{C++}
+    template <class FwdIt>
+    FwdIt unique(FwdIt first, FwdIt last);
+    \end{minted}
+    \item 用 \texttt{Pred pr} 比较是否相等
+    \begin{minted}{C++}
+    template <class FwdIt, class Pred>
+    FwdIt unique(FwdIt first, FwdIt last, Pred pr);
+    \end{minted}
+    \begin{itemize}
+        \item 用 \texttt{pr(x, y)} 为 \texttt{true} 说明 \texttt{x} 和 \texttt{y} 相等
+        \item 对 \texttt{[first, last)} 这个序列中连续相等的元素，只留下第一个
+        \item 返回值时迭代器，指向元素删除后的区间的最后一个元素的后面
+    \end{itemize}
+\end{itemize}
 
 
 
+\subsection{STL 中“大”、“小”和“相等”的概念}
+关联容器内部的元素是从小到大排序的。“大”和“小”的含义是程序员自定义的。
 
+有些算法要求其操作的区间是从小到大排序的，称为“有序区间算法”，例如 \texttt{binary\_search}。有些算法会对区间进行从
+小到大排序，称为“排序算法”，例如 \texttt{sort}。还有一些其他算法会用到“大”、“小”的概念。
 
+使用 STL 时，在\emph{缺省}的情况下，以下三个说法等价：
+\begin{enumerate}
+    \item \texttt{x} 比 \texttt{y} 小
+    \item 表达式 \texttt{x < y} 为真
+    \item \texttt{y} 比 \texttt{x} 大
+\end{enumerate}
 
+有时，“\texttt{x} 和 \texttt{y} 相等”等价于 “\texttt{x == y} 为真”。例如在未排序的区间上进行的顺序查找算法
+\texttt{find}。
 
+有时，“\texttt{x} 和 \texttt{y} 相等”等价于“\texttt{x} 小于 \texttt{y} 和 \texttt{y} 小于 \texttt{x} 同
+时为假”。例如有序区间算法中，\texttt{binary\_search} 关联容器自身的成员函数 \texttt{find}。
+
+\subsection{函数对象}
+若一个类重载了运算符 \texttt{()}，则该类的对象就成为函数对象。
+\begin{minted}{C++}
+    class CMyAverage {
+    public:
+        double operator()(int a1, int a2, int a3) {
+            return (double)(a1 + a2 + a3) / 3;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        CMyAverage average;
+        cout << average(3, 2, 3) << endl;   // average.operator()(3, 2, 3)
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{函数对象的应用}
+Dev C++ 中的 \texttt{accumulate} 源代码 1：
+\begin{minted}{C++}
+    template <typename _InputIterator, typename _Tp>
+    _Tp accumulate(_InputIterator __first, _InputIterator __last, _Tp __init) {
+        for ( ; __first != __last; ++__first) {
+            __init = __init + *__first;
+            return __init;
+        }
+    }
+\end{minted}
+
+Dev C++ 中的 \texttt{accumulate} 源代码 2：
+\begin{minted}{C++}
+    template <typename _InputIterator, typename _Tp, typename _BinaryOperation>
+    _Tp accumulate(_InputIterator __first, _InputIterator __last,
+        _Tp __init, _BinaryOperation __binary_op) {
+        for ( ; __first != __last; ++__first) {
+            __init = __binary_op(__init, *__first);
+            return __init;
+        }
+    }
+\end{minted}
+在调用 \texttt{accumulate} 时，和 \texttt{\_\_binary\_op} 对应的实参可以是个函数或函数对象。
+
+例如，现定义了如下函数，分别用于求一个数和另一个数的 $n$ 次幂的和。并在 \texttt{main} 函数中利用
+\texttt{accumulate}调用它们，实现求一组数的 $n$ 次幂之和。
+\begin{minted}{C++}
+    int sumSquares(int total, int value) {  // compute total + value ^ 2
+        return total + value * value;
+    }
+
+    template <class T>
+    class SumPowers {
+    private:
+        int power;
+    public:
+        SumPowers(int p) : power(p) {}
+        // compute total + value ^ power
+        const T operator()(const T &total, const T &value) {
+            T v  = value;
+            // compute (v ^ power)
+            for (int i = 0; i < power -  1; ++i) {
+                v = v * value;
+            }
+            return total + v;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        const int SIZE = 10;
+        int a1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        vector<int> v(a1, a1 + SIZE);
+        cout << "1) ";
+        printInterval(v.begin(), v.end());
+        // 1) 1 2 3 4 5 6 7 8 9 10
+        int result = accumulate(v.begin(), v.end(), 0, sumSquares);
+        cout << "2) Sum of square: " << result << endl;
+        // 2) Sum of square: 385
+        result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(3));
+        cout << "3) Sum of cube: " << result << endl;
+        // 3) Sum of cube: 3025
+        result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(4));
+        cout << "4) Sum of quartic: " << result << endl;
+        // 4) Sum of quartic: 25333
+        return 0;
+    }
+\end{minted}
+
+\mintinline{C++}{int result = accumulate(v.begin(), v.end(), 0, sumSquares);} 会实例化出：
+\begin{minted}{C++}
+    int accumulate(vector<int>::iterator first, vector<int>::iterator last,
+        int init, int (*op)(int, int)) {    // op is a function pointer
+        for ( ; first != last; ++first)
+            init = op(init, *first);
+        return init;
+    }
+\end{minted}
+
+\mintinline{C++}{result = accumulate(v.begin(), v.end(), 0, SumPowers<int>(3));} 会实例化出：
+\begin{minted}{C++}
+    int accumulate(vector<int>::iterator first, vector<int>::iterator last,
+        int init, SumPowers<int> op) {      // op is a function object
+        for ( ; first != last; ++first)
+            init = op(init, *first);
+        return init;
+    }
+\end{minted}
+
+以上代码详见``Week8/FunctionObjectSample.cpp''文件。
+
+以下模板可以用来生成函数对象，在使用时需要包含头文件 \texttt{<functional>}：
+\begin{itemize}
+    \item \texttt{equal\_to}
+    \item \texttt{greater}
+    \item \texttt{less}
+    \item ...
+\end{itemize}
+
+\subsubsection{\texttt{greater} 函数对象类模板及其应用}
+\begin{minted}{C++}
+    template <class T>
+    struct greater : public some_binary_function<T, T, bool> {
+        bool operator()(const T &x, const T &y) const {
+            return x > y;
+        }
+    }
+\end{minted}
+
+\texttt{list} 有两个 \texttt{sort} 成员函数：
+\begin{itemize}
+    \item \texttt{void sort();} \\
+    将 \texttt{list} 中的元素按“\texttt{<}” 规定的比较方法升序排列。
+    \item
+    \begin{minted}{C++}
+    template <class Compare>
+    void sort(Compare op);
+    \end{minted}
+    将 \texttt{list} 中的元素按 \texttt{op} 规定的比较方法升序排列。即要比较 \texttt{x}、\texttt{y} 大小时，
+    看 \texttt{op(x, y)} 的返回值，为 \texttt{true} 则认为 \texttt{x} 小于 \texttt{y}。
+\end{itemize}
+
+下面的代码利用 \texttt{greater} 实现了对 \texttt{list} 进行降序排列：
+\begin{minted}{C++}
+    class MyLess {
+    public:
+        bool operator()(const int &c1, const int &c2) {
+            return (c1 % 10) < (c2 % 10);
+        }
+    };
+
+    template <class T>
+    void print(T first, T last) {
+        for ( ; first != last; ++first) {
+            cout << *first << ", ";
+        }
+    }
+
+    int main(int argc, char const *argv[]) {
+        const int SIZE_B = 5;
+        int a[SIZE_B] = {5, 21, 14, 2, 3};
+        list<int> lst(a, a + SIZE_B);
+        lst.sort(MyLess()); // MyLess() constructs a temporary object without arguments
+        print(lst.begin(), lst.end());
+        // 21, 2, 3, 14, 5,
+        cout << endl;
+        lst.sort(greater<int>());   // greater<int> constructs a temporary object
+        print(lst.begin(), lst.end());
+        // 21, 14, 5, 3, 2,
+        cout << endl;
+        return 0;
+    }
+\end{minted}
+
+由此可见，关联容器和 STL 中许多算法，都是可以用函数或函数对象自定义比较器的。在自定义了比较器 \texttt{op} 的情况下，
+以下三种说法是等价的：
+\begin{itemize}
+    \item \texttt{x} 小于 \texttt{y}
+    \item \texttt{op(x, y)} 返回值为 \texttt{true}
+    \item \texttt{y} 大于 \texttt{x}
+\end{itemize}
 
 
 
