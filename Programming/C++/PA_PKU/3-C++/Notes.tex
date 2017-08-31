@@ -3670,7 +3670,7 @@ STL 中的一些基本概念：
     出。
     \item \texttt{queue} 头文件 \texttt{<queue>} \\
     队列。插入只可以在尾部进行，删除、检索和修改只允许从头部进行。先进先出。
-    \item \texttt{priority\_queue} 头文件 \texttt{queue} \\
+    \item \texttt{priority\_queue} 头文件 \texttt{<queue>} \\
     优先级队列。最高优先级元素总是第一个出列。
 \end{itemize}
 
@@ -3979,7 +3979,8 @@ STL 中的一些基本概念：
 \texttt{priority\_queue} 默认的元素比较器是 \texttt{less<T>}。
 
 \subsection{迭代器简介}
-迭代器用于指向顺序容器和关联容器中的元素，用法和指针类似。
+迭代器用于指向顺序容器和关联容器中的元素。迭代器模拟了指针，可以用 \texttt{*} 或者 \texttt{->} 运算符来访问容器中
+的元素。
 
 迭代器有 \mintinline{C++}{const} 和 非 \mintinline{C++}{const} 两种，通过迭代器可以读取它指向的元素。通过非
 \mintinline{C++}{const} 迭代器还能修改其指向的元素。
@@ -3998,10 +3999,11 @@ STL 中的一些基本概念：
 用它，就会出错，类似于使用 \mintinline{C++}{NULL} 或未初始化的指针一样。
 
 在 STL 中我们常用的迭代器有两种，一种是双向迭代器，另一种是随机访问迭代器。
-
-支持双向迭代器的容器：\texttt{list}、\texttt{set/multiset}、\texttt{map/multimap}
-支持随机访问迭代器的容器：\texttt{vector}、\texttt{deque}
-不支持迭代器的容器：\texttt{stack}、\texttt{queue}、\texttt{priority\_queue}
+\begin{itemize}
+    \item 支持双向迭代器的容器：\texttt{list}、\texttt{set/multiset}、\texttt{map/multimap}
+    \item 支持随机访问迭代器的容器：\texttt{vector}、\texttt{deque}
+    \item 不支持迭代器的容器：\texttt{stack}、\texttt{queue}、\texttt{priority\_queue}
+\end{itemize}
 
 \subsubsection{双向迭代器}
 若 \texttt{p} 和 \texttt{p1} 都是双向迭代器，则可对 \texttt{p}、\texttt{p1} 可进行以下操作：
@@ -4107,7 +4109,6 @@ STL 中的一些基本概念：
 
 \texttt{find()} 的时间复杂度是 $O(n)$。
 
-\subsubsection{STL 算法分类}
 STL 中的算法大致可以分为以下七类：
 \begin{itemize}
     \item 不变序列算法
@@ -4257,7 +4258,7 @@ STL 中的算法大致可以分为以下七类：
 
 在``Week9/ValueChangingAlgorithms.cpp'' 的示例代码中，
 \mintinline{C++}{ostream_iterator<int> output(cout, " ");} 定义了一个 \texttt{ostream\_iterator<int>}
-对象，可以通过 \texttt{cout} 输出以“ ”（空格）分隔的一个个整数。之后，
+对象，可以通过 \texttt{cout} 输出以“~”（空格）分隔的一个个整数。之后，
 \mintinline{C++}{copy(v.begin(), v.end(), output);} 会导致 \texttt{v} 的内容在 \texttt{cout} 上输出。
 
 \texttt{copy} 函数模板（算法）
@@ -4367,6 +4368,223 @@ STL 中的算法大致可以分为以下七类：
     \end{itemize}
 \end{itemize}
 
+\subsubsection{变序算法}
+变序算法改变容器中元素的顺序，但是不改变元素的值。变序算法不适用于关联容器。变序算法的复杂度都是 $O(n)$ 的。
+
+常见的变序算法：
+\begin{itemize}
+    \item \texttt{reverse} \\
+    颠倒区间 \texttt{[first, last)} 前后次序
+    \begin{minted}{C++}
+    template <class BidIt>
+    void reverse(BidIt first, BidIt last);
+    \end{minted}
+    \item \texttt{reverse\_copy} \\
+    把一个区间颠倒后的结果拷贝到另一个区间，源区间不变。
+    \item \texttt{rotate} \\
+    将区间进行循环左移
+    \item \texttt{rotate\_copy} \\
+    将区间以首尾相接的形式进行旋转后的结果拷贝到另一个区间，源区间不变
+    \item \texttt{next\_permutation} \\
+    将区间改为下一个排列（排列是有大小的，这个大小可通过自定义比较器来设定）。如果能产生一个字典序更大的排列，就会返回
+    \texttt{true}；否则返回 \texttt{false}。
+    \begin{minted}{C++}
+    template <class InIt>
+    bool next_permutation(InIt first, InIt last);
+    \end{minted}
+    \item \texttt{prev\_permutation} \\
+    将区间改为上一个排列（可自定义比较器）
+    \item \texttt{random\_shuffle} \\
+    随机打乱区间内元素的顺序
+    \begin{minted}{C++}
+    template <class RanIt>
+    void random_shuffle(RanIt first, RanIt last);
+    \end{minted}
+    \item \texttt{partition} \\
+    把区间内满足某个条件的元素移到前面，不满足该条件的移到后面
+    \item \texttt{stable\_patition} \\
+    把区间内满足某个条件的元素移到前面，不满足该条件的移到后面。而对这两部分的元素，分别保持它们原来的先后次序不变。
+\end{itemize}
+
+\subsubsection{排序算法}
+排序算法比前面的变序算法的复杂度更高，一般是 $O(nlog(n))$。排序算法需要随机访问迭代器的支持，不适用于关联容器和
+\texttt{list}。
+
+常见的排序算法：
+\begin{itemize}
+    \item \texttt{sort} \\
+    将区间从小到大排序（可自定义比较器）
+    \item \texttt{stable\_sort} \\
+    将区间从小到大排序，并保持相等元素间的相对次序（可自定义比较器）
+    \item \texttt{partial\_sort} \\
+    对区间部分排序，直到最小的 \texttt{n} 个元素就位（可自定义比较器）
+    \item \texttt{partial\_sort\_copy} \\
+    将区间前 \texttt{n} 个元素的排序结果拷贝到别处，源区间不变（可自定义比较器）
+    \item \texttt{nth\_element} \\
+    对区间部分排序，使得第 \texttt{n} 小的元素（\texttt{n} 从 0 开始算）就位，而且比它小的都在它前面，比它大的都
+    在它后面。
+    \item \texttt{make\_heap} \\
+    使区间成为一个“堆”（可自定义比较器）
+    \item \texttt{push\_heap} \\
+    将元素加入一个“堆”区间（可自定义比较器）
+    \item \texttt{pop\_heap} \\
+    从“堆”区间删除栈顶元素（可自定义比较器）
+    \item \texttt{sort\_heap} \\
+    对一个“堆”区间进行排序，排序结束后，该区间就是普通的有序区间，不再是“堆”了（可自定义比较器）
+\end{itemize}
+
+\texttt{sort} 模板有两个版本，分别对应不同的比较大小的方式。
+
+根据 \texttt{<} 进行比较的版本，默认按升序排序，判断 \texttt{x} 是否应该比 \texttt{y} 靠前，要看
+\texttt{x < y} 是否为 \texttt{true}：
+\begin{minted}{C++}
+    template <class RanIt>
+    void sort(RanIt first, RanIt last);
+\end{minted}
+
+根据 \texttt{Pred pr} 进行比较的版本，按升序排序，判断 \texttt{x} 是否应该比 \texttt{y} 靠前，就看
+\texttt{pr(x, y)} 的返回值是否为 \texttt{true}：
+\begin{minted}{C++}
+    template <class RanIt, class Pred>
+    void sort(RanIt first, RanIt last, Pred pr);
+\end{minted}
+
+\texttt{sort} 实际上是快速排序，时间复杂度为 $O(n*log(n))$。其平均性能最优，但是在“最坏情况”下，性能可能非常差，
+会达到 $O(n^2)$。
+
+如果要保证“最坏情况”下的性能，那么可以使用 \texttt{stable\_sort}，其用法与 \texttt{sort} 相同。
+\texttt{stable\_sort} 实际上是归并排序，特点是能保持相等元素之间的先后次序。在有足够存储空间的情况下，复杂度为
+$O(n*log(n))$，否则复杂度为 $O(n*log(n)*log(n))$。
+
+排序算法要求随机存取迭代器的支持，所以 \texttt{list} 不能使用排序算法，要使用 \texttt{list::sort}。
+
+\subsubsection{有序区间算法}
+有序区间算法要求所操作的区间是已经从小到大排好序的。有序区间算法需要随机访问迭代器的支持，不能用于关联容器和
+\texttt{list}。
+
+常见的有序区间算法：
+\begin{itemize}
+    \item \texttt{binary\_search} \\
+    判断区间中是否包含某个元素。采用折半查找的方法，时间复杂度为 $O(log(n))$。要求容器已经有序且支持随机访问迭代器，
+    返回是否找到。
+    \begin{minted}{C++}
+    // 用 < 作比较器
+    template <class FwdIt, class T>
+    bool binary_search(FwdIt first, FwdIt last, const T &val);
+    // 用 Pred pr 作比较器，若 p(x, y) 为 true，则认为 x 小于 y
+    template <class FwdIt, class T, class Pred>
+    bool binary_search(FwdIt first, FwdIt last, const T &val, Pred pr);
+    \end{minted}
+    \item \texttt{includes} \\
+    判断是否一个区间中的每个元素，都在另一个区间中
+    \begin{minted}{C++}
+    // 用 < 作比较器
+    template <class InIt1, class InIt2>
+    bool includes(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2);
+    // 用 Pred pr 作比较器，pr(x, y) == true 说明 x 和 y 相等
+    template <class InIt1, class InIt2>
+    bool includes(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2, Pred pr);
+    \end{minted}
+    \item \texttt{lower\_bound} \\
+    查找最后一个不小于某值的元素的位置
+    \begin{minted}{C++}
+    template <class FwdIt, class T>
+    FwdIt lower_bound(FwdIt first, FwdIt last, const T &val);
+    \end{minted}
+    要求 \texttt{[first, last)} 是有序的，查找 \texttt{[first, last)} 中最大的位置 \texttt{FwdIt}，使得
+    \texttt{[first, FwdIt)} 中所有的元素都比 \texttt{val} 小
+    \item \texttt{upper\_bound} \\
+    查找第一个大于某值的元素的位置
+    \begin{minted}{C++}
+    template <class FwdIt, class T>
+    FwdIt upper_bound(FwdIt first, FwdIt last, const T &val);
+    \end{minted}
+    要求 \texttt{[first, last)} 是有序的，查找 \texttt{[first, last)} 中最小的位置 \texttt{FwdIt}，使得
+    \texttt{[FwdIt, last)} 中所有的元素都比 \texttt{val} 大
+    \item \texttt{equal\_range} \\
+    同时获取 \texttt{lower\_bound} 和 \texttt{upper\_bound}
+    \begin{minted}{C++}
+    template <class FwdIt, class T>
+    pair<FwdIt, FwdIt> equal_range(FwdIt first, FwdIt last, const T &val);
+    \end{minted}
+    要求 \texttt{[first, last)} 是有序的，返回值是一个 \texttt{pair}，假设为 \texttt{p}，则：
+    \begin{itemize}
+        \item \texttt{[first, p.first)} 中的元素都比 \texttt{val} 小
+        \item \texttt{[p.second, last)} 中的所有元素都比 \texttt{val} 大
+        \item \texttt{p.first} 就是 \texttt{lower\_bound} 的结果
+        \item \texttt{p.last} 就是 \texttt{upper\_bound} 的结果
+    \end{itemize}
+    \item \texttt{merge} \\
+    合并两个有序区间到第三个区间：
+    \begin{minted}{C++}
+    // 用 < 作比较器
+    template <class InIt1, class InIt2, class OutIt>
+    OutIt merge(InIt1 first1, InIt last1, InIt first2, InIt2 last2, OutIt x);
+    // 用 Pred pr 作比较器
+    template <class InIt1, class InIt2, class OutIt, class Pred>
+    OutIt merge(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2, OutIt x,
+        Pred pr);
+    \end{minted}
+    把 \texttt{[first1, last1)}、\texttt{[first2, last2)} 两个升序序列合并，形成第 3 个升序序列，第 3 个升
+    序序列以 \texttt{x} 开头
+    \item \texttt{set\_union} \\
+    将两个有序区间的并拷贝到第三个区间
+    \begin{minted}{C++}
+    // 用 < 作比较器
+    template <class InIt1, class InIt2, class OutIt>
+    OutIt set_union(InIt1 first1, InIt last1, InIt first2, InIt2 last2, OutIt x);
+    // 用 Pred pr 作比较器
+    template <class InIt1, class InIt2, class OutIt, class Pred>
+    OutIt set_union(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2, OutIt x,
+        Pred pr);
+    \end{minted}
+    \item \texttt{set\_intersection} \\
+    将两个有序区间的交拷贝到第三个区间
+    \begin{minted}{C++}
+    // 利用 < 作比较器
+    template <class InIt1, class InIt2, class OutIt>
+    OutIt set_intersection(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2,
+        OutIt x);
+    // 利用 Pred pr 作比较器
+    template <class InIt1, class InIt2, class OutIt, class Pred>
+    OutIt set_intersection(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2,
+        OutIt x, Pred pr);
+    \end{minted}
+    求出 \texttt{[first1, last1)} 和 \texttt{[first2, last2)} 中共有的元素，放到从 \texttt{x} 开始的地方。
+    若某个元素 \texttt{e} 在 \texttt{[first1, last1)} 里出现 \texttt{n1} 次，在 \texttt{[first2, last2)}
+    里出现 \texttt{n2} 次，则该元素在目标区间里出现 \texttt{min(n1, n2)} 次
+    \item \texttt{set\_difference} \\
+    将两个有序区间的差拷贝到第三个区间
+    \begin{minted}{C++}
+    // 用 < 作比较器
+    template <class InIt1, class InIt2, class OutIt>
+    OutIt set_difference(InIt1 first1, InIt1 last1, InIt2 first2, InIt2 last2,
+        OutIt x);
+    // 用 Pred pr 作比较器
+    template <class InIt1, class InIt2, class OutIt, class Pred>
+    OutIt set_difference(InIt1 first1, InIt1 last, InIt2 first2, InIt2 last2,
+        OutIt x, Pred pr);
+    \end{minted}
+    求出 \texttt{[first1, last1)} 中不在 \texttt{[first2, last2)} 中的元素，放到从 \texttt{x} 开始的地方。
+    如果 \texttt{[first1, last1)} 里有多个相等元素不在 \texttt{[first2, last2)} 中，则这多个元素也都会被放入
+    \texttt{x} 代表的目标区间里
+    \item \texttt{set\_symmetric\_difference} \\
+    将两个有序空间的对称差（并减去交）拷贝到第三个区间
+    \begin{minted}{C++}
+    // 利用 < 作比较器
+    template <class InIt1, class InIt2, class OutIt>
+    OutIt set_symmetric_difference(InIt1 first1, InIt1 last1, InIt2 first2,
+        InIt2 last2, OutIt x);
+    // 利用 Pred pr 作比较器
+    template <class InIt1, class InIt2, class OutIt, class Pred>
+    OutIt set_symmetric_difference(InIt1 first1, InIt1 last1, InIt2 first2,
+        InIt2 last2, OutIt x, Pred pr);
+    \end{minted}
+    把两个区间里相互不在另一区间里的元素放入 \texttt{x} 开始的地方
+    \item \texttt{inplace\_merge} \\
+    将两个连续的有序区间原地合并为一个有序区间
+\end{itemize}
+
 
 
 \subsection{STL 中“大”、“小”和“相等”的概念}
@@ -4387,6 +4605,52 @@ STL 中的算法大致可以分为以下七类：
 
 有时，“\texttt{x} 和 \texttt{y} 相等”等价于“\texttt{x} 小于 \texttt{y} 和 \texttt{y} 小于 \texttt{x} 同
 时为假”。例如有序区间算法中，\texttt{binary\_search} 关联容器自身的成员函数 \texttt{find}。
+
+\subsection{\texttt{bitset}}
+\begin{minted}{C++}
+    template<size_t N>
+    class bitset {
+        ...
+    };
+\end{minted}
+
+实际使用的时候，\texttt{N} 是个整型常数。例如：
+\begin{minted}{C++}
+    bitset<40> bst;
+\end{minted}
+其中 \texttt{bst} 是一个由 40 位组成的对象，用 \texttt{bitset} 的函数可以方便地访问任何一位。
+
+\texttt{bitset} 的成员函数：
+\begin{itemize}
+    \item \mintinline{C++}{bitset<N> &operator&=(const bitset<N> &rhs);}
+    \item \mintinline{C++}{bitset<N> &operator|=(const bitset<N> &rhs);}
+    \item \mintinline{C++}{bitset<N> &operator^=(const bitset<N> &rhs);}
+    \item \mintinline{C++}{bitset<N> &operator<<=(size_t, num);}
+    \item \mintinline{C++}{bitset<N> &operator>>=(size_t, num);}
+    \item \mintinline{C++}{bitset<N> &set();} 全部置 1
+    \item \mintinline{C++}{bitset<N> &set(size_t pos, bool val = true);} 将某位置 1
+    \item \mintinline{C++}{bitset<N> &reset();}  全部置 0
+    \item \mintinline{C++}{bitset<N> &reset(size_t pos);} 将某位置 0
+    \item \mintinline{C++}{bitset<N> &flip();} 全部翻转
+    \item \mintinline{C++}{bitset<N> &flip(size_t pos);} 翻转某位
+    \item \mintinline{C++}{reference operator[](size_t, pos);} 返回对某位的引用
+    \item \mintinline{C++}{bool operator[](size_t pos) const;} 判断某位是否为 1
+    \item \mintinline{C++}{reference at(size_t, pos);}
+    \item \mintinline{C++}{bool at(size_t pos) const;}
+    \item \mintinline{C++}{unsigned long to_ulong() const;} 转换为整数
+    \item \mintinline{C++}{string to_string() const;} 转换成字符串
+    \item \mintinline{C++}{size_t count() const;} 计算 1 的个数
+    \item \mintinline{C++}{size_t size() const;}
+    \item \mintinline{C++}{bool operator==(const bitset<N> &rhs) const;}
+    \item \mintinline{C++}{bool operator!=(const bitset<N> &rhs) const;}
+    \item \mintinline{C++}{bool test(size_t pos) const;} 测试某位是否为 1
+    \item \mintinline{C++}{bool any() const;} 是否有某位为 1
+    \item \mintinline{C++}{bool none() const;} 是否全部为 0
+    \item \mintinline{C++}{bitset<N> operator<<(size_t pos) const;}
+    \item \mintinline{C++}{bitset<N> operator>>(size_t pos) const;}
+    \item \mintinline{C++}{bitset<N> operator~();}
+    \item \mintinline{C++}{static const size_t bitset_size = N;}
+\end{itemize}
 
 \subsection{函数对象}
 若一个类重载了运算符 \texttt{()}，则该类的对象就成为函数对象。
@@ -4566,7 +4830,6 @@ Dev C++ 中的 \texttt{accumulate} 源代码 2：
     \item \texttt{op(x, y)} 返回值为 \texttt{true}
     \item \texttt{y} 大于 \texttt{x}
 \end{itemize}
-
 
 
 \end{document}
