@@ -32,20 +32,20 @@ int main(int argc, char *argv[])
 {
     int n;          // 数据组数
     cin >> n;       // 输入数据组数
-    float d[n];       // 每组的距离
-    int bikeTime = 0;   // 骑车要花的总时间
-    int walkTime = 0;   // 走路要花的总时间
-
+    double d[n];    // 每组的距离
+    double bikeTime = 0;   // 骑车要花的总时间
+    double walkTime = 0;   // 走路要花的总时间
+    double a = 2.0; double b = 2.0;
     for (int i = 0; i < n; i++) {
         cin >> d[i];
         bikeTime = d[i] / 3 + 27 +23;   // 骑车总时间
         walkTime = d[i] / 1.2;          // 走路总时间
         if (bikeTime < walkTime) {
             cout << "Bike" << endl;     // 骑车时间短
-        } else if (bikeTime == walkTime) {
-            cout << "All" << endl;      // 时间一样长
-        } else {
-            cout << "Walk" << endl;     // 走路时间短
+        } else if (bikeTime > walkTime) {
+            cout << "Walk" << endl;     // 时间一样长
+        } else {    // 注意：这里最好不要用 == 比较两个浮点数
+            cout << "All" << endl;      // 走路时间短
         }
     }
     return 0;
