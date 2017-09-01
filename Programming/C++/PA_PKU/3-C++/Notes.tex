@@ -3925,7 +3925,7 @@ STL 中的一些基本概念：
     栈——后进后出
     \item \texttt{queue} 头文件 \texttt{<queue>} \\
     队列——先进先出
-    \item \texttt{priority\_queue} 头文件 \texttt{queue} \\
+    \item \texttt{priority\_queue} 头文件 \texttt{<queue>} \\
     优先级队列——最高优先级元素总是第一个出列
 \end{enumerate}
 
@@ -4830,6 +4830,199 @@ Dev C++ 中的 \texttt{accumulate} 源代码 2：
     \item \texttt{op(x, y)} 返回值为 \texttt{true}
     \item \texttt{y} 大于 \texttt{x}
 \end{itemize}
+
+\section{强制类型转换}
+\subsection{\texttt{static\_cast}}
+\texttt{static\_cast} 用来进行比较“自然”和低风险的转换，比如整型和实数型、字符型之间的互相转换。
+
+\texttt{static\_cast} 不能在不同类型的指针之间互相转换，也不能用于整型和指针之间的互相转换，也不能用于同类型的引用
+之间的转换。
+
+\subsection{\texttt{reinterpret\_cast}}
+\texttt{reinterpret\_cast} 用来进行各种不同类型的指针之间的转换、不同类型的引用之间的转换、以及指针和能容纳得下指
+针的整数类型之间的转换。转换的时候，执行的是逐个比特拷贝的操作。
+
+\subsection{\texttt{const\_cast}}
+用来进行去除 \texttt{const} 属性的转换。将 \texttt{const} 引用转换成同类型的非 \texttt{const} 引用，将
+\texttt{const} 指针转换为同类型的非 \texttt{const} 指针时用它。例如：
+\begin{minted}{C++}
+    const string s = "Inception";
+    string &p = const_cast<string &>(s);
+    string *ps = const_cast<string *>(&s);  // the type of &s is const string *
+\end{minted}
+
+\subsection{\texttt{dynamic\_cast}}
+\texttt{dynamic\_cast} 专门用于将多态基类（包含虚函数的基类）的指针或引用，强制转换为派生类的指针或引用，而且能够检
+查转换的安全性。对于不安全的指针转换，转换结果返回 \texttt{NULL} 指针。
+
+\texttt{dynamic\_cast} 不能用于将非多态基类的指针或引用，强制转换为派生类的指针或引用。
+
+\texttt{dynamic\_cast} 也可以用于基类的引用到派生类的引用的强制转换，并且可以判断转换是否安全：
+\begin{minted}{C++}
+    Derived &r = dynamic_cast<Derived &>(b);
+\end{minted}
+
+如何判断转换是否安全呢？答案是不安全时抛出异常。
+
+\section{异常处理}
+程序运行中总难免发生错误，而引起这些错误异常情况的原因又多种多样。我们总希望在发生异常情况时不只是简单地终止程序运行，
+而是能够反馈异常情况的信息，能够对程序中已发生的事情做些处理，例如取消对输入文件的改动、释放已经申请的系统资源等。
+
+通常的做法是：在预计会发生异常的地方，加入相应的代码，但这种做法并不总是适用的。例如：
+\begin{minted}{C++}
+    ... // 对文件 A 进行了相关的操作
+    fun(arg, ...);  // 可能发生异常
+    ...
+\end{minted}
+
+那么调用者应该如何知道 \texttt{fun(arg, ...)} 是否发生异常呢？如果 \texttt{fun(arg, ...)} 是别人已经开发好的代
+码，\texttt{fun(arg, ...)} 的编写者不知道其他人会如何使用这个函数，通过返回值来返回异常不符合编程的习惯，异常有很多
+种时通过返回值判断也很麻烦。
+
+所以，需要一种手段，可以把异常与函数的接口分开，并且能够区分不同的异常。并且能够在函数体外捕获所发生的异常，并提供更多的
+异常信息。
+
+\subsection{用 \texttt{try}、\texttt{catch} 处理异常}
+\begin{minted}{C++}
+    double m, n;
+    cin >> m >> n;
+    try {
+        cout << "before dividing." << endl;
+        if (n == 0) {
+            throw -1;
+        } else {
+            cout << m / n << endl;
+        }
+        cout << "after dividing" << endl;
+    } catch (double d) {
+        cout << "catch(double) " << d << endl;
+    } catch (int e) {
+        cout << "catch(int) " << e << endl;
+    }
+    cout << "finished" << endl;
+\end{minted}
+
+如果在上面的程序运行时输入 \texttt{9 0}，\texttt{try} 模块就会捕获到这个异常，并通过 \texttt{throw} 将异常抛出，
+交给 \texttt{catch} 处理。
+
+\subsection{异常的再抛出}
+如果一个函数在执行的过程中，抛出的异常在本函数内就被 \texttt{catch} 块捕获处理了，那么该异常就不会抛给这个函数的调用
+者（也称“上一层的函数”）；如果异常在本函数中没被处理，就会抛给上一层的函数。
+
+\begin{minted}{C++}
+    class CException {
+    public:
+        string msg;
+        CException(string s) : msg(s) {}
+    };
+
+    double divide(double x, double y) {
+        if (y == 0) {
+            throw CException("divided by zero");    // the exception is not handled here
+        }
+        cout << "in divide" << endl;
+        return x / y;
+    }
+
+    int countTax(int salary) {
+        try {
+            if (salary < 0) {
+                throw -1;
+            }
+            cout << "counting tax" << endl;
+        } catch (int) {
+            cout << "salary < 0" << endl;
+        }
+        cout << "tax counted" << endl;
+        return salary * 0.15;
+    }
+
+    int main(int argc, char const *argv[]) {
+        double f = 1.2;
+        try {
+            countTax(-1);       // handle the exception in countTax() function
+            // salary < 0
+            // tax counted
+            f = divide(3, 0);   // handle the exception out of divide() function
+            cout << "end of try block" << endl; // not printed
+        } catch (CException e) {
+            cout << e.msg << endl;
+            // divided by zero
+        }
+        cout << "f = " << f << endl;
+        cout << "finished" << endl;
+        return 0;
+    }
+\end{minted}
+
+\subsection{C++ 标准异常类}
+C++ 标准库中有一些类代表异常，这些类都是从 \texttt{exception} 类派生而来的。常用的几个异常类有：
+\texttt{bad\_typeid}、\texttt{bad\_cast}、\texttt{bad\_alloc}、\texttt{ios\_base::failure}、
+\texttt{logic\_error}。其中 \texttt{logic\_error} 又派生出了 \texttt{out\_of\_range} 异常。
+
+\subsubsection{\texttt{bad\_cast}}
+在用 \texttt{dynamic\_cast} 进行从多态基类对象（或引用），到派生类的引用的强制类型转换时，如果转换是不安全的，则会
+抛出此异常。
+
+\begin{minted}{C++}
+    class Base {
+        virtual void func() {}
+    };
+
+    class Derived : public Base {
+    public:
+        void print() {}
+    };
+
+    void printObj(Base &b) {
+        try {
+            // if not safe, it will throw bad_cast
+            Derived &rd = dynamic_cast<Derived &>(b);
+            rd.print();
+        } catch (bad_cast &e) {
+            cerr << e.what() << endl;
+        }
+    }
+
+    int main(int argc, char const *argv[]) {
+        Base b;
+        printObj(b);    // std::bad_cast
+        return 0;
+    }
+\end{minted}
+
+\subsubsection{\texttt{bad\_alloc}}
+在用 \texttt{new} 运算符进行动态内存分配时，如果没有足够的内存，则会引发此异常。
+
+\begin{minted}{C++}
+    try {
+        char *p = new char[0x7fffffffffffff];
+        delete[] p;
+    } catch (bad_alloc &e) {
+        cerr << e.what() << endl;   // std::bad_alloc
+    }
+\end{minted}
+
+\subsubsection{\texttt{out\_of\_range}}
+用 \texttt{vector} 或 \texttt{string} 的 \texttt{at} 成员函数根据下标访问元素时，如果下标越界，就会抛出此异常。
+
+\begin{minted}{C++}
+    vector<int> v(10);
+    try {
+        v.at(100) = 100;                // throw out_of_range exception
+    } catch (out_of_range &e) {
+        cerr << e.what() << endl;      // vector
+    }
+    string s = "hello";
+    try {
+        char c = s.at(100);
+    } catch (out_of_range &e) {
+        cerr << e.what() << endl;      // basic_string
+    }
+\end{minted}
+
+
+
 
 
 \end{document}
