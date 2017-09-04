@@ -5021,6 +5021,370 @@ C++ 标准库中有一些类代表异常，这些类都是从 \texttt{exception}
     }
 \end{minted}
 
+\section{C++11 特性}
+C++11 是 C++ 标准委员会在 2011 年发布的 C++ 标准，C++11 引入了很多新特性。
+
+\subsection{统一的初始化方法}
+\begin{minted}{C++}
+    struct A {
+        int i, j;
+        A(int m, int n) : i(m), j(n) {}
+    };
+
+    A func(int m, int n) {
+        return {m, n};      // not recommended
+    }
+
+    int main(int argc, char const *argv[]) {
+        int arr[3]{1, 2, 3};
+        vector<int> iv{1, 2, 3};
+        map<int, string> mp{{1, "a"}, {2, "b"}};
+        string str{"Hello world"};
+        int *p = new int[20]{1, 2, 3};  // left elements are 0
+        A *pa = new A{3, 7};
+        delete pa;
+        return 0;
+    }
+\end{minted}
+
+\subsection{成员变量默认初始值}
+\begin{minted}{C++}
+    class B {
+    public:
+        int m = 1234;
+        int n;
+    };
+
+    int main(int argc, char const *argv[]) {
+        B b;
+        cout << b.m << endl;    // 1234
+        return 0;
+    }
+\end{minted}
+
+\subsection{\texttt{auto} 关键字}
+\texttt{auto} 关键字用于定义变量，编译器可以自动判断变量的类型。
+\begin{minted}{C++}
+    class A {
+        A operator+(int n, const A &a) {
+            return a;
+        }
+    };
+
+    template <class T1, class T2>
+    auto add(T1 x, T2 y) -> decltype(x + y) {   // return type depends on (x + y)
+        return x + y;
+    }
+
+    int main(int argc, char const *argv[]) {
+        auto i = 100;       // i is int
+        auto p = new A();   // p is A *
+        auto k = 34343LL;   // k is long long
+        map<string, int, greater<string> > mp;
+        for (auto i = mp.begin(); i != mp.end(); ++i) {
+            // i is map<string, int, greater<string> >::iterator
+            cout << i->first << ", " << i->second;
+        }
+        auto d = add(100, 1.5); // double d = 101.5
+        auto f = add(100, A()); // the type of f is A
+        return 0;
+    }
+\end{minted}
+
+\subsection{\texttt{decltype} 关键字}
+可以通过 \texttt{decltype} 返回表达式的类型。
+\begin{minted}{C++}
+    int i;
+    double t;
+    struct A {
+        double x;
+    };
+    const A *a = new A();
+
+    decltype(a) x1;             // x1 is A *
+    decltype(i) x2;             // x2 is int
+    decltype(a->x) x3;          // x3 is double
+    decltype((a->x)) x4 = t;    // x4 is double &
+    // run with command '| c++filt'
+    cout << typeid(x1).name() << endl;  // main::A const*
+    cout << typeid(x2).name() << endl;  // int
+    cout << typeid(x3).name() << endl;  // double
+    cout << typeid(x4).name() << endl;  // double
+\end{minted}
+
+\subsection{智能指针 \texttt{shared\_ptr}}
+智能指针 \texttt{shared\_ptr} 是一个类模板，在使用时需要包含头文件 \texttt{<memory>}。
+
+通过 \texttt{shared\_ptr} 的构造函数，可以让 \texttt{shared\_ptr} 对象托管一个 \texttt{new} 运算符返回的指
+针， 写法为：
+\begin{minted}{C++}
+    shared_ptr<T> ptr(new T);   // T can be int, char or class name etc.
+\end{minted}
+此后 \texttt{ptr} 就可以像 \texttt{T *} 类型的指针一样来使用，即 \texttt{*ptr} 就是用 \texttt{new} 动态分配
+的那个对象，而且不必操心释放内存的事情。
+
+多个 \texttt{shared\_ptr} 对象可以同时托管一个指针，系统会维护一个托管计数。当无 \texttt{shared\_ptr} 托管该指
+针时，\texttt{delete} 该指针。
+
+\texttt{shared\_ptr} 对象不能托管指向动态分配内存的数组的指针，否则程序运行会出错。
+
+\begin{minted}{C++}
+    struct A {
+        int n;
+        A(int v = 0) : n(v) {}
+        ~A() {
+            cout << n << " destructor" << endl;
+        }
+    };
+
+    int main(int argc, char const *argv[]) {
+        shared_ptr<A> sp1(new A(2));    // sp1 owns A(2)
+        shared_ptr<A> sp2(sp1);         // sp2 owns A(2) too
+        cout << "1) " << sp1->n << ", " << sp2->n << endl;  // 1) 2, 2
+        shared_ptr<A> sp3;
+        A *p = sp1.get();               // p gets the pointer sp1 owns, i.e. A(2)
+        cout << "2) " << p->n << endl;  // 2) 2
+        sp3 = sp1;                      // sp3 owns A(2) too
+        cout << "3) " << (*sp3).n << endl;  // 3) 2
+        sp1.reset();                    // sp1 doesn't own A(2) anymore
+        if (!sp1) {
+            cout << "4) sp1 is null" << endl;   // 4) sp1 is null
+        }
+        A *q = new A(3);
+        sp1.reset(q);                   // sp1 owns q, i.e. A(3)
+        cout << "5) " << sp1->n << endl;        // 5) 3
+        shared_ptr<A> sp4(sp1);         // sp4 owns A(3)
+        sp1.reset();                    // sp1 doesn't own A(3) anymore
+        cout << "before end main" << endl;
+        sp4.reset();                    // sp4 doesn't own A(3) anymore
+        // 3 destructor
+        cout << "end main" << endl;
+        // 2 destructor
+        return 0;
+    }
+\end{minted}
+
+在使用 \texttt{shared\_ptr} 时需要注意，通过 \texttt{reset()} 函数托管一个指针时，并不会增加其他
+\texttt{shared\_ptr} 对象关于该指针的托管计数，在该指针消亡时，该指针有可能被 \texttt{delete} 多次，从而导致程序
+崩溃。
+
+\subsection{空指针 \texttt{nullptr}}
+\begin{minted}{C++}
+    int *p1 = NULL;
+    int *p2 = nullptr;
+    shared_ptr<double> p3 = nullptr;
+    if (p1 == p2) {
+        cout << "p1 equals p2" << endl;
+        // p1 equals p2
+    }
+    if (p3 == nullptr) {
+        cout << "p3 equals nullptr" << endl;
+        // p3 equals nullptr
+    }
+    // error: invalid operands to binary expression ('int *' and 'shared_ptr<double>')
+    // if (p2 == p3) {
+    //     cout << "p2 equals p3" << endl;
+    // }
+    if (p3 == NULL) {
+        cout << "p3 equals NULL" << endl;
+        // p3 equals NULL
+    }
+    bool b = nullptr;   // b = false
+    // error: cannot initialize a variable of type 'int' with an rvalue of type 'nullptr_t'
+    // int i = nullptr;
+\end{minted}
+
+\subsection{基于范围的 \texttt{for} 循环}
+\begin{minted}{C++}
+    int array[] = {1, 2, 3, 4, 5};
+    for (int & e: array) {
+        e *= 10;
+    }
+    for (int e : array) {
+        cout << e << ", ";
+    }
+    // 10, 20, 30, 40, 50,
+    cout << endl;
+    vector<A> st(array, array + 5);
+    for (auto & it : st) {
+        it.n *= 10;
+    }
+    for (A it : st) {
+        cout << it.n << ", ";
+    }
+    // 100, 200, 300, 400, 500,
+    cout << endl;
+    return 0;
+\end{minted}
+
+\subsection{右值引用和 \texttt{move} 语义}
+右值：一般来说，不能取地址的表达式，就是右值，能取地址的，就是左值。之前遇到的引用都是左值引用。
+\begin{minted}{C++}
+    class A{};
+    A &r = A();     // error, A() 是无名变量，是右值
+    A &&r = A();    // OK, r 是右值引用
+\end{minted}
+
+右值引用的主要目的是提高程序运行的效率，减少需要进行深拷贝的对象进行深拷贝的次数。
+
+\texttt{move} 是 STL 中定义好的函数模板，可以把一个左值变为一个右值。在操作某些临时变量时，可以通过 \texttt{move}
+语义来减少深拷贝的次数。
+\begin{minted}{C++}
+    class String {
+    public:
+        char *str;
+        String() : str(new char[1]) {
+            str[0] = 0;
+        }
+        String(const char *s) {
+            str = new char[strlen(s) + 1];
+            strcpy(str, s);
+        }
+        String(const String &s) {
+            cout << "copy constructor is called" << endl;
+            str = new char[strlen(s.str) + 1];
+            strcpy(str, s.str);
+        }
+        String &operator=(const String &s) {
+            cout << "copy operator= is called" << endl;
+            if (str != s.str) {
+                delete[] str;
+                str = new char[strlen(s.str) + 1];
+                strcpy(str, s.str);
+            }
+            return *this;
+        }
+        // move constructor
+        String(String &&s) : str(s.str) {
+            cout << "move constructor is called" << endl;
+            s.str = new char[1];
+            s.str[0] = 0;
+        }
+        // move assignment
+        String &operator=(String &&s) {
+            cout << "move operator= is called" << endl;
+            if (str != s.str) { // check if it is self-assignment
+                str = s.str;
+                s.str = new char[1];
+                s.str[0] = 0;
+            }
+            return *this;
+        }
+        ~String() {
+            delete[] str;
+        }
+    };
+\end{minted}
+
+\subsection{无序容器（哈希表）}
+无序容器也称为哈希表，属于关联容器，可以存储多对键值和映射值，并且允许通过键值快速搜索映射值。哈希表插入和查询的时间复
+杂度几乎是常数。使用时需包含 \texttt{<unordered\_map>} 头文件。
+\begin{minted}{C++}
+    unordered_map<string, int> turingWinner;
+    turingWinner.insert(make_pair("Dijkstra", 1972));
+    turingWinner.insert(make_pair("Scott", 1976));
+    turingWinner.insert(make_pair("Wilkes", 1967));
+    turingWinner.insert(make_pair("Hanmming", 1968));
+    turingWinner["Ritchie"] = 1983;
+    string name;
+    cin >> name;
+    unordered_map<string, int>::iterator p = turingWinner.find(name);
+    if (p != turingWinner.end()) {
+        cout << p->second << endl;
+    } else {
+        cout << "Not found" << endl;
+    }
+\end{minted}
+
+\subsection{正则表达式}
+正则表达式使用单个字符串来描述、匹配一系列的匹配某个句法规则的字符串。在 C++ 中使用正则表达式需要包含
+\texttt{<regex>} 头文件。
+
+\begin{minted}{C++}
+regex reg("b.?p.*k");
+    // . matches any single character
+    // ? indicates zero or one occurrences of the preceding element
+    // * indicates zero or more occurrences of the preceding element
+    cout << regex_match("bopggk", reg) << endl;             // 1 (matched)
+    cout << regex_match("boopgggk", reg) << endl;           // 0 (not matched)
+    cout << regex_match("b pk", reg) << endl;               // 1 (matched)
+    regex reg2("\\d{3}([a-zA-Z]+).(\\d{2}|N/A\\s\\1)");
+    // \\d matches any signle digit
+    // {n} the preceding item is matched exactly n times
+    // () defines a marked subexpression
+    // [] matches a single character that is contained within the brackets
+    // + indicates one or more occurrences of the preceding element
+    // | matches either the expression before or the expression after the operator
+    // \\s matches a whitespace character
+    // \\n matches what the nth marked subexpression matched, n is a digit from 1 to 9
+    string correct = "123Hello N/A Hello";
+    string incorrect = "123Hello 12 hello";
+    cout << regex_match(correct, reg2) << endl;             // 1 (matched)
+    cout << regex_match(incorrect, reg2) << endl;           // 0 (not matched)
+\end{minted}
+
+\subsection{Lambda 表达式}
+只使用一次的函数对象，能否不要专门为其编写一个类？只调用一次的简单函数，能否在调用时才写出其函数体？ Lambda 表达式可以
+解决上述问题。
+
+Lambda 表达式是一个匿名函数，即没有函数名的函数，基于数学中的 $\lambda$ 演算得名。
+
+Lambda 表达式的形式：
+\begin{minted}{C++}
+    [外部变量访问方式说明符](参数表) -> 返回值类型 {
+        语句组
+    }
+\end{minted}
+其中，“外部变量访问方式说明符”可以是：
+\begin{itemize}
+    \item \texttt{[=]} 以传值的形式使用所有外部变量
+    \item \texttt{[]} 不使用任何外部变量
+    \item \texttt{[\&]} 以引用形式使用所有外部变量
+    \item \texttt{[x, \&y]} \texttt{x} 以传值形式使用，\texttt{y} 以引用形式使用
+    \item \texttt{=, \&x, \&y} \texttt{x, y} 以引用形式使用，其余变量以传值形式使用
+    \item \texttt{\&, x, y} \texttt{x, y} 以传值的形式使用，其余变量以引用形式使用
+\end{itemize}
+“\texttt{->} 返回值类型”也可以没有，没有则编译器自动判断返回值类型。
+
+\begin{minted}{C++}
+    int x = 100, y = 200, z = 300;
+    cout << [](double a, double b) { return a + b; } (1.2, 2.5) << endl;    // 3.7
+    auto ff = [=, &y, &z](int n) {
+        cout << x << endl;              // 100
+        y++;
+        z++;
+        return n * n;
+    };
+    cout << ff(15) << endl;             // 225
+    cout << y << ", " << z << endl;     // 201, 301
+
+    int a[4] = {4, 2, 11, 33};
+    sort(a, a + 4, [](int x, int y) -> bool { return x % 10 < y % 10; });
+    for_each(a, a + 4, [](int x) {cout << x << " ";});  // 11 2 33 4
+    cout << endl;
+
+    int n = 0;
+    int b[] = {1, 2, 3, 4};
+    for_each(b, b + 4, [&](int e) { ++e; n += e; });
+    cout << n << ", " << b[2] << endl;  // 14, 3
+
+    vector<int> c{1, 2, 3, 4};
+    int total = 0;
+    for_each(c.begin(), c.end(), [&](int &x) { total += x; x *= 2; });
+    cout << total << endl;              // 10
+    for_each(c.begin(), c.end(), [](int x) {cout << x << " ";});    // 2 4 6 8
+    cout << endl;
+\end{minted}
+
+利用 Lambda 表达式实现递归求斐波那契数列的第 n 项：
+\begin{minted}{C++}
+    function<int(int)> fib = [&fib](int n) {
+        return n <= 2 ? 1 : fib(n - 1) + fib(n - 2);
+    };
+    cout << fib(5) << endl;             // 5
+\end{minted}
+\texttt{function<int(int)>} 表示返回值为 \texttt{int}、有一个 \texttt{int} 参数的函数。
+
 
 
 
