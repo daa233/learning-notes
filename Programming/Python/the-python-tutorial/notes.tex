@@ -104,11 +104,724 @@ first line of the file. The syntax is as follows:
 \end{minted}
 where \emph{encoding} is one of the valid \texttt{codes} supported by Python.
 
+\section{An Informal Introduction to Python}
+In the following examples, input and output are distinguished by the presence or absence of prompts
+(\texttt{>>>} and \texttt{...}).
 
+Comments in Python start with the hash character \texttt{\#}, and extend to the end of the physical
+line. A hash character in a string literal is just a hash character.
 
+\begin{minted}{Python}
+    # this is the first comment
+    spam = 1    # and this the second comment
+                # and now a third!
+    text = "# This is not a comment because it's inside quotes."
+\end{minted}
 
+\subsection{Using Python as a Calculator}
+\subsubsection{Numbers}
+\begin{minted}{bash}
+    >>> 2 + 2
+    4
+    >>> 50 - 5 * 6
+    20
+    >>> (50 - 5.0 * 6) / 4
+    5.0
+    >>> 8 / 5.0
+    1.6
+\end{minted}
 
+The integer numbers(e.g. \texttt{2}, \texttt{4}, \texttt{20}) have type \texttt{int}, the ones with
+a fractional part(e.g. \texttt{5.0}, \texttt{1.6}) have type \texttt{float}.
 
+The return type of a division (\texttt{/}) operation depends on its operands. If both operands are
+of type \texttt{int}, floor division is performed and an \texttt{int} is returned. If either
+operand is a float, classic division is performed and a float is returned. The \texttt{//} operator
+is also provided for doing floor divsion no matter what the operands are. The remainder can be
+calculated with the \texttt{\%} operator:
+\begin{minted}{bash}
+    >>> 17 / 3    # int / int -> int
+    5
+    >>> 17 / 3.0  # int / float -> float
+    5.666666666666667
+    >>> 17 // 3.0 # explicit floor division discards the fractional part
+    5.0
+    >>> 5 * 3 + 2 # result * divisor + remainder
+    17
+\end{minted}
+
+With Python, it is possible to use \texttt{**} operator to calculate powers:
+\begin{minted}{bash}
+    >>> 5 ** 2  # 5 squared
+    25
+    >>> 2 ** 7  # 2 to the power of 7
+    128
+\end{minted}
+
+The equal sign (\texttt{=}) is used to assign a value to a variable. Afterwards, no results is
+displayed before the next interactive prompt:
+\begin{minted}{bash}
+    >>> width = 20
+    >>> height = 5 * 9
+    >>> width * height
+    900
+\end{minted}
+
+If a variable is not "defined" (assigned a value), trying to use it will give you an error:
+\begin{minted}{bash}
+    >>> n   # try to access an undefined variable
+    Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    NameError: name 'n' is not defined
+\end{minted}
+
+There is full support for floating point; operators with mixed type operands convert the integer
+operand to floating point:
+\begin{minted}{bash}
+    >>> 3 * 3.75 / 1.5
+    7.5
+    >>> 7.0 / 2
+    3.5
+\end{minted}
+
+In interactive mode, the last printed expression is assigned to the variable \texttt{\_}.
+\begin{minted}{bash}
+    >>> tax = 12.5 / 100
+    >>> price = 100.50
+    >>> price * tax
+    12.5625
+    >>> price + _
+    113.0625
+    >>> round(_, 2)
+    113.06
+\end{minted}
+
+The variable should be treated as read-only by the user. Don't explicitly assign a value to it ---
+you would create an independent local variable with the same name masking the built-in variable with
+its magic behavior.
+
+In addition to \texttt{int} and \texttt{float}, Python supports other types of numbers, such as
+\texttt{Decimal} and \texttt{Fraction}. Python also has built-in support for complex numbers, and
+uses the \texttt{j} or \texttt{J} suffix to indicate the imaginary part (e.g. \texttt{3 + 5j}).
+
+\subsubsection{Strings}
+Python can also manipulate strigns, which should be enclosed in single quotes (\texttt{'...'}) or
+double quotes (\texttt{"..."}) with the same result. \texttt{\textbackslash} can be used to escape
+quotes.
+\begin{minted}{bash}
+    >>> 'spam eggs'  # single quotes
+    'spam eggs'
+    >>> 'doesn\'t'   # use \' to escape the single quote...
+    "doesn't"
+    >>> "doesn't"    # ... or use double quotes instead
+    "doesn't"
+    >>> '"Yes," he said.'
+    '"Yes," he said.'
+    >>> "\"Yes,\" he said."
+    '"Yes," he said.'
+    >>> '"Isn\'t," she said.'
+    '"Isn\'t," she said.'
+\end{minted}
+
+The \texttt{print} statement produces a more readable output, by omitting the enclosing quotes and
+by printing escaped and special characters:
+\begin{minted}{bash}
+    >>> '"Isn\'t," she said.'
+    '"Isn\'t," she said.'
+    >>> print '"Isn\'t," she said.'
+    "Isn't," she said.
+    >>> s = 'First line. \nSecond line.'  # \n means newline
+    >>> s       # without print, \n is included in the output
+    'First line. \nSecond line.'
+    >>> print s # with print, \n produces a new line
+    First line.
+    Second line.
+\end{minted}
+
+If you don't want characters prefaced by \texttt{\textbackslash} to be interpreted as special
+characters, you can use \emph{raw strings} by adding an \texttt{r} before the first quote:
+\begin{minted}{bash}
+    >>> print 'C:\some\name'  # here \n means newline!
+    C:\some
+    ame
+    >>> print r'C:\some\name' # note the r before the quote
+    C:\some\name
+\end{minted}
+
+String literals can span multiple lines. One way is using triple-quotes: \texttt{"""..."""} or
+\texttt{'''...'''}. End of lines are automatically included in the string, but it's possible to
+prevent this by adding a \texttt{\textbackslash} at the end of the line:
+\begin{minted}{bash}
+    >>> print """
+    ... Usage: thingy [OPTIONS]
+    ...     -h              Display this usage message
+    ...     -H hostname     Hostname to connect to
+    ... """
+
+    Usage: thingy [OPTIONS]
+        -h          Display this usage message
+        -H hostname Hostname to connect to
+
+    >>> print """\  # prevent the initial newline
+    ... Usage: thingy [OPTIONS]
+    ...     -h              Display this usage message
+    ...     -H hostname     Hostname to connect to
+    ... """
+    Usage: thingy [OPTIONS]
+        -h          Display this usage message
+        -H hostname Hostname to connect to
+
+\end{minted}
+
+Strings can be concatenated (glued together) with \texttt{+} operator, and repeated with \texttt{*}:
+\begin{minted}{bash}
+    >>> # 3 times 'un', followed by 'ium'
+    ... 3 * 'un' + 'ium'
+    'unununium'
+\end{minted}
+
+Two or more string literals next to each other are automatically concatenated:
+\begin{minted}{bash}
+    >>> 'Py' 'thon'
+    'Python'
+\end{minted}
+
+This only works with two literals though, not with variables or expressions. If you want to
+concatenate variables or a variable and a literal, use \texttt{+}.
+\begin{minted}{bash}
+    >>> prefix = 'Py'
+    >>> prefix 'thon'  # can't concatenate a variable and string literal
+      File "<stdin>", line 1
+        prefix 'thon'  # can't concatenate a variable and string literal
+                    ^
+    SyntaxError: invalid syntax
+
+    >>> prefix + 'thon'
+    'Python'
+\end{minted}
+
+This feature is particularly useful when you want to break long strings:
+\begin{minted}{bash}
+    >>> text = ('Put several string within parentheses '
+    ...         'to have them joined together.')
+    >>> text
+    'Put several string within parentheses to have them joined together.'
+\end{minted}
+
+Strings can be indexed(subscripted), with the first character having index 0. There is no separate
+character type; a character is simple a string a size one:
+\begin{minted}{bash}
+    >>> word  = 'Python'
+    >>> word[0]     # character in position 0
+    'P'
+    >>> word[5]     # character in position 5
+    'n'
+\end{minted}
+
+Indices may also be negative nubmers, to start counting from the right:
+\begin{minted}{bash}
+    >>> word[-1]    # last character
+    'n'
+    >>> word[-2]    # second-last character
+    'o'
+    >>> word[-6]
+    'P'
+\end{minted}
+Note that since -0 is the same as 0, negative indices start from -1.
+
+In addition to indexing, \emph{slicing} is also supported. While indexing is used to obtain
+individual characters, \emph{slicing} allows you to obtain a substring:
+\begin{minted}{bash}
+    >>> word[0:2]   # characters from position 0 (included) to 2 (excluded)
+    'Py'
+    >>> word[2:5]   # characters from position 2 (included) to 5 (excluded)
+    'tho'
+\end{minted}
+
+Since indices have useful defaults; an omitted first index defaults to zero, an ommited second
+index defaults to the size of the string being sliced.
+\begin{minted}{bash}
+    >>> word[:2]    # character from the beginning to position 2 (excluded)
+    'Py'
+    >>> word[4:]    # character from the position 4 (included) to the end
+    'on'
+    >>> word[-2:]   # character from the second-last (included) to the end
+    'on'
+\end{minted}
+
+Note how the start is always included, and the end always excluded. This makes sure that
+\texttt{s[:i] + s[i:]} is always equal to \texttt{s}:
+\begin{minted}{bash}
+    >>> word[:2] + word[2:]
+    'Python'
+    >>> word[:4] + word[4:]
+    'Python'
+\end{minted}
+
+One way to remember how slices work is to think of the indices as pointing \emph{between}
+characters, with the left edge of the first character numbered 0. Then the right edge of the last
+character of a string of n characters has index \emph{n}, for example:
+\begin{minted}{text}
+    +---+---+---+---+---+---+
+    | P | y | t | h | o | n |
+    +---+---+---+---+---+---+
+    0   1   2   3   4   5   6
+    -6  -5  -4  -3  -2  -1
+\end{minted}
+
+Attempting to use an index that is too large will result in an error:
+\begin{minted}{bash}
+    >>> word[42]
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    IndexError: string index out of range
+\end{minted}
+
+However, out of range slice indices are handled gracefully when used for slicing:
+\begin{minted}{bash}
+    >>> word[4:42]
+    'on'
+    >>> word[42:]
+    ''
+\end{minted}
+
+Python strings cannot be changed --- they are immutable. Therefore, assigning to a indexed position
+in the string results in an error:
+\begin{minted}{bash}
+>>> word[0] = 'J'
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: 'str' object does not support item assignment
+
+    >>> word[2:] = 'py'
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: 'str' object does not support item assignment
+\end{minted}
+
+If you need a different string, you should create a new one:
+\begin{minted}{bash}
+    >>> 'J' + word[1:]
+    'Jython'
+    >>> word[:2] + 'py'
+    'Pypy'
+\end{minted}
+
+The built-in fucntion \texttt{len()} returns the length of a string:
+\begin{minted}{bash}
+    >>> s = 'supercalifragilisticexpialidocious'
+    >>> len(s)
+    34
+\end{minted}
+
+\subsubsection{Unicode Strings}
+Unicode has the advantege of providing one ordinal for every character in every script used in
+modern and ancient texts.
+
+Creating Unicode strings in Python is just as simple as creating normal strings:
+\begin{minted}{bash}
+    >>> u'Hello World!'
+    u'Hello World!'
+\end{minted}
+
+The small \texttt{'u'} in front of the quote indicates that a Unicode string is supposed to be
+created. If you want to include special characters in the string, you can do so by using the
+Python \emph{Unicode-Escape} encoding. The following example shows how:
+\begin{minted}{bash}
+    >>> u'Hello\u0020World!'
+    u'Hello World!'
+\end{minted}
+The escape sequence \texttt{\textbackslash u0020} indicates to insert the Unicode character with
+the ordinal value 0x0020(the space character) at the given position.
+
+\subsubsection{Lists}
+Python knows a number of compound data types, used to group together other values. The most
+versatile is the \emph{list}, which can be written as a list of comma-separated values (items)
+between square brackets. Lists might contain items of different types, but usually the items all
+have the same type.
+
+\begin{minted}{bash}
+    >>> squares = [1, 4, 9, 16, 25]
+    >>> squares
+    [1, 4, 9, 16, 25]
+\end{minted}
+
+Like strings (and all other built-in sequence type), lists can be indexed and sliced:
+\begin{minted}{bash}
+    >>> squares[0]      # indexing returns the item
+    1
+    >>> squares[-1]
+    25
+    >>> squares[-3:]    # slicing returns a new list
+    [9, 16, 25]
+\end{minted}
+
+All slice operations return a new list containing the requested elements. This means that the
+following slice returns a new (shallow) copy of the list:
+\begin{minted}{bash}
+    >>> squares[:]
+    [1, 4, 9, 16, 25]
+\end{minted}
+
+Lists also supports operations like concatenation:
+\begin{minted}{bash}
+    >>> squares + [36, 49, 64, 81, 100]
+    [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+\end{minted}
+
+Unlike strings, which are immutable, lists are a mutable type, i.e. it is possible to change their
+content:
+\begin{minted}{bash}
+    >>> cubes = [1, 8, 27, 65, 125] # something's wrong here
+    >>> 4 ** 3  # the cube of 4 is 64, not 65!
+    64
+    >>> cubes[3] = 64   # replace the wrong value
+    >>> cubes
+    [1, 8, 27, 64, 125]
+\end{minted}
+
+You can also add new items at the end of the list, by using the \texttt{append()} method:
+\begin{minted}{bash}
+    >>> cubes.append(216)           # add the cube of 6
+    >>> cubes.append(7 ** 3)        # add the cube of 7
+    >>> cubes
+    [1, 8, 27, 64, 125, 216, 343]
+\end{minted}
+
+Assignment to slices is also possible, and this can even change the size of the list or clear it
+entirely:
+\begin{minted}{bash}
+    >>> letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    >>> letters
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    >>> # replace some values
+    ... letters[2:5] = ['C', 'D', 'E']
+    >>> letters
+    ['a', 'b', 'C', 'D', 'E', 'f', 'g']
+    >>> # now remove them
+    ... letters[2:5] = []
+    >>> letters
+    ['a', 'b', 'f', 'g']
+    >>> # clear the list by replacing all the elements with an empty list
+    ... letters[:] = []
+    >>> letters
+    []
+\end{minted}
+
+The built-in function \texttt{len()} also applies to lists:
+\begin{minted}{bash}
+    >>> letters = ['a', 'b', 'c', 'd']
+    >>> len(letters)
+    4
+\end{minted}
+
+It is possible to nest lists (create lists containing other lists), for example:
+\begin{minted}{bash}
+    >>> a = ['a', 'b', 'c']
+    >>> n = [1, 2, 3]
+    >>> x = [a, n]
+    >>> x
+    [['a', 'b', 'c'], [1, 2, 3]]
+    >>> x[0]
+    ['a', 'b', 'c']
+    >>> x[0][1]
+    'b'
+    >>> x[1]
+    [1, 2, 3]
+\end{minted}
+
+\subsection{First Steps Towards Programming}
+We can write an initial sub-sequence of the \emph{Fibonacci} series as follows:
+\begin{minted}{bash}
+    >>> # Fibonacci series:
+    ... # the sum of two elements defines the next
+    ... a, b = 0, 1     # multiple assignment
+    >>> while b < 10:   # loop as long as the condition remains true
+    ...     print b
+    ...     a, b = b, a + b
+    ...
+    1
+    1
+    2
+    3
+    5
+    8
+\end{minted}
+
+In Python, like in C, any non-zero integer value is true; zero is false. The condition of the
+\texttt{while} loop may also be a string or list value, in fact any sequence; anything with a
+non-zero length is true, empty sequences are false. The standard comparision operators are written
+the same as in C: \texttt{<} (less than), \texttt{>} (greater than), \texttt{==} (equal to),
+\texttt{<=} (less than or equal to), \texttt{>=} (greater than or equal to) and \texttt{!=} (not
+equal to).
+
+The \emph{body} of loop is \emph{indented}: indentation is Python's way of grouping statements.
+At the interactive prompt, you have to type a tab or space(s) for each indented line.
+
+The \texttt{print} statement writes the value of the expression(s) it is given. It differs from
+just writing the expression you want to write in the way it handles multiple expressions and
+strings. Strings are pointer without quotes, and a space is inserted between items, so you can
+format things nicely, like this:
+\begin{minted}{bash}
+    >>> i = 256 * 256
+    >>> print 'The value of i is', i
+    The value of i is 65536
+\end{minted}
+
+A trailing comma avoids the newline after the output:
+\begin{minted}{bash}
+    >>> a, b = 0, 1
+    >>> while b < 1000:
+    ...     print b,
+    ...     a, b = b, a + b
+    ...
+    1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
+\end{minted}
+
+\section{More Control Flow Tools}
+\subsection{\texttt{if} Statements}
+\begin{minted}{bash}
+    >>> x = int(raw_input("Please enter an integer: "))
+    Please enter an integer: 42
+    >>> if x < 0:
+    ...     x = 0
+    ...     print 'Negative changed to zero'
+    ... elif x == 0:
+    ...     print 'Zero'
+    ... elif x == 1:
+    ...     print 'Single'
+    ... else:
+    ...     print 'More'
+    ...
+    More
+\end{minted}
+
+\subsection{\texttt{for} Statements}
+The \texttt{for} statement in Python differs a bit from what you may be used to in C or Pascal.
+Rather than always iterating over an arithmetic progression of numbers (like in Pascal), or giving
+the user the ability to define both the iteration step and halting condition (as C), Python's
+\texttt{for} statement iterates over the items of any sequence (a list or a string), in the order
+that they appear in the sequence. For example:
+\begin{minted}{bash}
+    >>> # Measure some strings:
+    ... words = ['cat', 'window', 'defenestrate']
+    >>> for w in words:
+    ...     print w, len(w)
+    ...
+    cat 3
+    window 6
+    defenestrate 12
+\end{minted}
+
+If you need to modify the sequence you are iterating over while inside the loop, it is recommended
+that you first make a copy. Iterating over a sequence does not implicitly make a copy. The slice
+notation makes this especially convenient:
+\begin{minted}{bash}
+    >>> for w in words[:]:
+    ...     if len(w) > 6:
+    ...         words.insert(0, w)
+    ...
+    >>> words
+    ['defenestrate', 'cat', 'window', 'defenestrate']
+\end{minted}
+
+\subsection{The \texttt{range()} function}
+If you do need to iterate over a sequence of numbers, the built-in function \texttt{range()} comes
+in handy. It generates lists containing arithmetic progressions:
+\begin{minted}{bash}
+    >>> range(10)
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    >>> range(5, 10)    # the given end point is never part of the generated list
+    [5, 6, 7, 8, 9]
+    >>> range(0, 10, 3) # '3' here is the increment('step'), it can be negative
+    [0, 3, 6, 9]
+    >>> range(-10, -100, -30)
+    [-10, -40, -70]
+\end{minted}
+
+To iterate over the indices of a sequence, you can combine \texttt{range()} and \texttt{len()} as
+follows:
+\begin{minted}{bash}
+    >>> a = ['Mary', 'had', 'a', 'little', 'lamb']
+    >>> for i in range(len(a)):
+    ...     print i, a[i]
+    ...
+    0 Mary
+    1 had
+    2 a
+    3 little
+    4 lamb
+\end{minted}
+
+\subsection{\texttt{break} and \texttt{continue} Statements, and \texttt{else} Clauses on Loops}
+The \texttt{break()} statement, like in C, breaks out of the innermost enclosing \texttt{for} or
+\texttt{while} loop.
+
+Loop statements may have an \texttt{else} clause; it is exected when the loop terminates through
+exhaustion of the list (with \texttt{for}) or when the condition becomes false (with
+\texttt{while}), but not when the loop is terminated by a \texttt{break} statement. This is
+exemplified by the following loop, which searches for prime numbers:
+\begin{minted}{bash}
+    >>> for n in range(2, 10):
+    ...     for x in range(2, n):
+    ...         if n % x == 0:
+    ...             print n, 'equals', x, '*', n / x
+    ...             break
+    ...     else:
+    ...         # loop fell through without finding a factor
+    ...         print n, 'is a prime number'
+    ...
+    2 is a prime number
+    3 is a prime number
+    4 equals 2 * 2
+    5 is a prime number
+    6 equals 2 * 3
+    7 is a prime number
+    8 equals 2 * 4
+    9 equals 3 * 3
+\end{minted}
+
+When used with a loop, the \texttt{else} clause has more in common with the \texttt{else} clause of
+a \texttt{try} statement than it does that of \texttt{if} statements: a \texttt{try} statement's
+\texttt{else} clause runs when no exception occurs, and a loop's \texttt{else} clause runs when no
+\texttt{break} occurs.
+
+The \texttt{continue} statement, also borrowed from C, continues with the next iteration of the
+loop:
+\begin{minted}{bash}
+    >>> for num in range(2, 10):
+    ...     if num % 2 == 0:
+    ...         print "Found an even number", num
+    ...         continue
+    ...     print "Found a number", num
+    ...
+    Found an even number 2
+    Found a number 3
+    Found an even number 4
+    Found a number 5
+    Found an even number 6
+    Found a number 7
+    Found an even number 8
+    Found a number 9
+\end{minted}
+
+\subsection{\texttt{pass} Statements}
+The \texttt{pass} statement does nothing. It can be used when a statement is required syntactically
+but the program requires no action. For example:
+\begin{minted}{bash}
+    >>> while True:
+    ...     pass    # Busy-wait for keyboard interrupt (Ctrl + C)
+    ...
+    ^CTraceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    KeyboardInterrupt
+\end{minted}
+
+This is commonly used for creating minimal classes:
+\begin{minted}{bash}
+    >>> class MyEmpthClass:
+    ...     pass
+    ...
+\end{minted}
+
+Another place \texttt{pass} can be used is as a place-holder for a function or conditional body
+when you are working on new code, allowing you to keep thinking at a more abstract level. The
+\texttt{pass} is silently ignored:
+\begin{minted}{bash}
+    >>> def initlog(*args):
+    ...     pass    # Remember to implement this!
+    ...
+\end{minted}
+
+\subsection{Defining Functions}
+We can create a function that writes the Fibonacci series to an arbitrary boundary:
+\begin{minted}{bash}
+    >>> def fib(n):     # write Fibonacci series up to n
+    ...     """Print a Fibonacci series up to n."""
+    ...     a, b = 0, 1
+    ...     while a < n:
+    ...         print a,
+    ...         a, b = b, a + b
+    ...
+    >>> # Now call the function we just defined:
+    ... fib(2000)
+    0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597
+\end{minted}
+
+The keyword \texttt{def} introduces a function \emph{definition}. It must be followed by the
+function name and the parenthesized list of formal parameters. The statements that form the body of
+the function start at the next line, and must be indented.
+
+The first statement of the function body can optionally be a string literal; this string literal is
+the function's documentation string, or \emph{docstring}. There are tools which use docstrings to
+automatically produce online or printed documentation, or to let the user interactively browse
+through code; it's a good practice to include docstrings in code that you write, so make a habit of
+it.
+
+The \texttt{execution} of a function introduces a new symbol table used for the local variables of
+the function. More precisely, all variable assignments in a function store the value in the local
+symbol table; whereas variable references first look in the local symbol table, then in the local
+symbol tables of enclosing functions, then in the global symbol table, and finally in the table of
+built-in names. Thus, global variables cannot be directly assigned a value within a function
+(unless named in a \texttt{global} statement), although they may be referenced.
+
+The actual parameters (arguments) to a function call are introduced in the local symbol table of
+the called function when it is called; thus, arguments are passed using \emph{call by value} (where
+the \emph{value} is always an object \emph{reference}, not the value of the object). When a
+function calls another function, a new local symbol table is created for that call.
+
+A function definition introduces the function name in the current symbol table. The value of the
+function name has a type that is recognized by the interpreter as a userdefined function. This
+value can be assigned to another name which can be used as a function. This serves as a general
+renaming mechanism:
+\begin{minted}{bash}
+    >>> fib
+    <function fib at 0x106cd8140>
+    >>> f = fib
+    >>> f(100)
+    0 1 1 2 3 5 8 13 21 34 55 89
+\end{minted}
+
+Coming from other languages, you might object that \texttt{fib} is not a function but a procedure
+since it doesn't return a value. In fact, even functions without a \texttt{return} statement do
+return a value, albeit a rather boring one. This value is called \texttt{None} (It's a built-in
+name). Writing the value \texttt{None} is normally suppressed by the interpreter if it would be the
+only value written. You can see if you really want to using \texttt{print}:
+\begin{minted}{bash}
+    >>> fib(0)
+    >>> print fib(0)
+    None
+\end{minted}
+
+It is simple to write a function that returns a list of the numbers of the Fibonacci series,
+instead of printing it:
+\begin{minted}{bash}
+    >>> def fib2(n):
+    ...     """Return a list containing the Fibonacci series up to n."""
+    ...     result = []
+    ...     a, b = 0, 1
+    ...     while a < n:
+    ...         result.append(a)
+    ...         a, b = b, a + b
+    ...     return result
+    ...
+    >>> f100 = fib2(100)
+    >>> f100
+    [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+\end{minted}
+This example, as usual, demonstrates some new Python features:
+\begin{itemize}
+    \item The \texttt{return} statement returns with a value from a function. \texttt{return}
+    without an expression argument returns \texttt{None}. Falling off the end of a function also
+    returns \texttt{None}.
+    \item The statement \texttt{result.append(a)} calls a method of the list object \texttt{result}.
+    A method is a function that 'belongs' to an object is named \texttt{obj.methodname}, where
+    \texttt{obj} is some object (this may be an expression), and \texttt{methodname} is the name of
+    a method that is defined by the object's type. \\
+    The method \texttt{append()} shown in the example is defined for list objects; it adds a new
+    element at the end of the list. In this example it is equivalent to
+    \texttt{result = result + [a]}, but more efficient.
+\end{itemize}
 
 
 
