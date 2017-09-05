@@ -1,0 +1,116 @@
+%-*- coding: UTF-8 -*-
+% notes.tex
+%
+\documentclass[UTF8]{article}
+\usepackage{geometry}
+\geometry{a4paper, centering, scale=0.8}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage{indentfirst} % to indent the first paragraph of a section
+
+\title{The Python Tutorial Notes}
+\author{Du Ang \\ \texttt{du2ang233@gmail.com} }
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Whetting Your Appetite}
+\subsection{Some applications of Python}
+\begin{itemize}
+    \item Automate works on computer
+    \item Help software engineers develop and test more quickly
+    \item ...
+\end{itemize}
+
+\subsection{The features of Python}
+\begin{itemize}
+    \item High-level language \\
+    High-level more general data types
+    \item Allow to split program into modules
+    \item Interpreted language
+    \begin{itemize}
+        \item No necessary compilation and linking
+        \item The interpreter can be used interactively
+    \end{itemize}
+    \item Shorter programs than equivalent C, C++ or Java programs
+    \begin{itemize}
+        \item high-level data types
+        \item statement grouping is done by indentation instead of brackets
+        \item no variable or argument declarations are necessary
+    \end{itemize}
+    \item Extensible
+\end{itemize}
+
+\subsection{The origin of the name "Python"}
+“Monty Python’s Flying Circus”, the skits on BBC.
+
+\section{Using the Python Interpreter}
+\subsection{Invoking the Interpreter}
+The Python interpreter is usually installed as \texttt{/usr/local/bin/python}, and usually the
+\texttt{/usr/local/bin} has been put in the Unix shell’s search path. Type command \texttt{python}
+to the shell to invoke the Python interpreter.
+
+Type an end-of-file character(\texttt{Ctrl-D} on Unix, \texttt{Ctrl-Z} on Windows) to exit the
+interpreter. If that doesn’t work, type command \mintinline{Python}{quit()} to the shell.
+
+A second way of starting the interpreter is \mintinline{bash}{python -c 'command [arg] ...'},
+which executes the statement(s) in command.
+
+Some Python modules are also useful as scripts. These can be invoked using
+\mintinline{bash}{python -m module [arg] ...}, which executes the source file for modules as if you
+had spelled out its full name on the command line.
+
+\subsubsection{Argument Passing}
+When known to the interpreter, the script name and additional arguments thereafter are turned into
+a list of strings and assigned to the \texttt{argv} variable in the \texttt{sys} module. You can
+access this list by executing \texttt{import sys}. The length of the list is at least one; when no
+script and no arguments are given, \texttt{sys.argv[0]} is an empty string. When the script name is
+given as \texttt{'-'} (meaning standard input), \texttt{sys.argv[0]} is set to \texttt{'-'}. When
+\texttt{-c} command is used, \texttt{sys.argv[0]} is set to \texttt{'-c'}. When \texttt{-m} module
+is used, \texttt{sys.argv[0]} is set to the full name of the located module. Options found after
+\texttt{-c} command or \texttt{-m} module are not consumed by the Python interpreter’s option
+processing but left in \texttt{sys.argv} for the command or module to handle.
+
+\subsubsection{Interactive Mode}
+\begin{itemize}
+    \item \emph{primary prompt}: \texttt{>>>}
+    \begin{minted}{bash}
+    Python 2.7.10 (default, Feb  7 2017, 00:08:15)
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>>
+    \end{minted}
+    \item \emph{secondary prompt}: \texttt{...}
+    \begin{minted}{bash}
+    >>> the_world_is_flat = 1
+    >>> if the_world_is_flat:
+    ...     print "Be careful not to fall off!"
+    ...
+    Be careful not to fall off!
+    \end{minted}
+\end{itemize}
+
+\subsection{The Interpreter and Its Environment}
+\subsubsection{Source Code Encoding}
+By default, Python source files are treated as encoded in UTF-8.
+
+To declare an encoding other than the default one, a special comment line should be added as the
+first line of the file. The syntax is as follows:
+\begin{minted}{Python}
+    # -*- coding: encoding -*-
+\end{minted}
+where \emph{encoding} is one of the valid \texttt{codes} supported by Python.
+
+
+
+
+
+
+
+
+
+
+\end{document}
