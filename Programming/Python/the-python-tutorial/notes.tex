@@ -823,6 +823,720 @@ This example, as usual, demonstrates some new Python features:
     \texttt{result = result + [a]}, but more efficient.
 \end{itemize}
 
+\subsection{More on Defining Functions}
+It is also possible to define functions with a variable number of arguments. There are three forms,
+which can be comined.
+\subsubsection{Default Arguments Values}
+The most useful form is to specify a default value for one or more arguments. The default arguments
+can't be followed by non-default arguments. This creates a function that can be called with fewer
+arguments than it is defined to allow. For example:
+\begin{minted}{bash}
+    >>> def ask_ok(prompt, retries = 4, complaint = "Yes or no, please!"):
+    ...     while True:
+    ...         ok = raw_input(prompt)
+    ...         if ok in ('y', 'ye', 'yes'):
+    ...             return True
+    ...         if ok in ('n', 'no', 'nop', 'nope'):
+    ...             return False
+    ...         retries = retries - 1
+    ...         if retries < 0:
+    ...             raise IOError('refusenik user')
+    ...         print complaint
+    ...
+\end{minted}
+This function can be called in several ways:
+\begin{itemize}
+    \item giving only the madatory argument: \\
+    \texttt{ask\_ok('Do you really want to quit?')}
+    \item giving one of the optional arguments: \\
+    \texttt{ask\_ok('OK to overwrite the file?', 2)}
+    \item or even giving all arguments: \\
+    \texttt{ask\_ok('OK to overwrite the file?', 2, 'Come on, only yes or no!')}
+\end{itemize}
+
+The keyword \texttt{in} can test whether or not a sequence contains a certain value.
+
+The default values are evaluated at the point of function definition in the \emph{defining} scope.
+In other words, default parameter values are always evaluated when, and only when, the \texttt{def}
+statement they belong to is executed, so that
+\begin{minted}{bash}
+    >>> i = 5
+    >>> def f(arg = i):
+    ...     print arg
+    ...
+    >>> f()
+    5
+    >>> i = 6
+    >>> f()
+    5
+\end{minted}
+
+\textbf{Important warnings: The default value is evaluated only once.}
+\footnote{http://effbot.org/zone/default-values.htm} This makes a difference when
+the default is a mutable object
+\footnote{https://codehabitude.com/2013/12/24/python-objects-mutable-vs-immutable/}
+such as a list, dictionary, or instances of most classes. For example, the following function
+accumulates the arguments passed to it on subsequent calls:
+\begin{minted}{bash}
+>>> def f(a, L = []):
+    ...     L.append(a)
+    ...     return L
+    ...
+    >>> print f(1)
+    [1]
+    >>> print f(2)
+    [1, 2]
+    >>> print f(3)
+    [1, 2, 3]
+\end{minted}
+
+If you don't want the default to be shared between subsequent calls, you can write the function
+like this instead:
+\begin{minted}{bash}
+    >>> def f(a, L = None):
+    ...     if L is None:
+    ...         L = []
+    ...     L.append(a)
+    ...     return L
+    ...
+    >>> print f(1)
+    [1]
+    >>> print f(2)
+    [2]
+    >>> print f(3)
+    [3]
+\end{minted}
+
+\subsubsection{Keyword Arguments}
+Functions can also be called using keyword arguments of the form \texttt{kwarg = value}.
+
+\begin{minted}{bash}
+    >>> def parrot(voltage, state = 'a stiff', action = 'voom', type = 'Norwegian Blue'):
+    ...     print "-- This parrot wouldn't", action,
+    ...     print "if you put", voltage, "volts through it."
+    ...     print "-- Lovely plumage, the", type
+    ...     print "-- It's", state, "!"
+    ...
+\end{minted}
+
+This function can be called in any of the following ways:
+\begin{minted}{bash}
+    parrot(1000)                                          # 1 positional argument
+    parrot(voltage=1000)                                  # 1 keyword argument
+    parrot(voltage=1000000, action='VOOOOOM')             # 2 keyword arguments
+    parrot(action='VOOOOOM', voltage=1000000)             # 2 keyword arguments
+    parrot('a million', 'bereft of life', 'jump')         # 3 positional arguments
+    parrot('a thousand', state='pushing up the daisies')  # 1 positional, 1 keyword
+\end{minted}
+but all the following calls would be invalid:
+\begin{minted}{bash}
+    parrot()                     # required argument missing
+    parrot(voltage=5.0, 'dead')  # non-keyword argument after a keyword argument
+    parrot(110, voltage=220)     # duplicate value for the same argument
+    parrot(actor='John Cleese')  # unknown keyword argument
+\end{minted}
+
+When a final formal parameter of the form \texttt{**name} is present, it receives a dictionary
+containing all keyword arguments except for those corresponding to a formal parameter. This may be
+contained with a formal parameter of the form \texttt{*name} which receives a tuple containing the
+positional arguments beyond the formal parameter list. (\texttt{*name} must occur before
+\texttt{**name}.) For example, if we define a function like this:
+\begin{minted}{bash}
+    >>> def cheeseshop(kind, *arguments, **keywords):
+    ...     print "-- Do you have any", kind + "?"
+    ...     print "-- I'm sorry, we're all out of", kind
+    ...     for arg in arguments:
+    ...             print arg
+    ...     print "-" * 40
+    ...     keys = sorted(keywords.keys())
+    ...     for kw in keys:
+    ...             print kw, ":", keywords[kw]
+    ...
+    >>> cheeseshop("Limburger", "It's very runny, sir.",
+    ...             "It's really very, VERY runny, sir.",
+    ...             shopkeeper = 'Michael Palin',
+    ...             client = "John Cleese",
+    ...             sketch = "Cheese Shop Sketch")
+    -- Do you have any Limburger?
+    -- I'm sorry, we're all out of Limburger
+    It's very runny, sir.
+    It's really very, VERY runny, sir.
+    ----------------------------------------
+    client : John Cleese
+    shopkeeper : Michael Palin
+    sketch : Cheese Shop Sketch
+\end{minted}
+
+Note that the list of keyword argument names is created by sorting the result of the keywords
+dictionary's \texttt{keys()} method before printing its contents; if this is not done, the order in
+which the arguments are printed is undefined.
+
+\subsubsection{Unpacking Arugument Lists}
+The reverse situation occurs when the arguments are already in a list or tuple but need to be
+unpacked for a function call requiring separate positional arguments. For instances, the built-in
+\texttt{range()} function expects separate \emph{start} and \emph{stop} arguments. If they are not
+available separately, write the function call with the \texttt{*}-operator to unpack the arguments
+out of a list or tuple:
+\begin{minted}{bash}
+    >>> range(3, 6)
+    [3, 4, 5]
+    >>> args = [3, 6]
+    >>> range(*args)
+    [3, 4, 5]
+\end{minted}
+
+In the same fashion, dictionaries can deliver keyword arguments with the \texttt{**}-operator:
+\begin{minted}{bash}
+    >>> def parrot(voltage, state = 'a stiff', action = 'voom'):
+    ...     print "-- This parrot wouldn't", action,
+    ...     print "if you put", voltage, "volts through it.",
+    ...     print "E's", state + "!"
+    ...
+    >>> d = {"voltage" : "four million", "state" : "blledin' demised", "action" : "VOOM"}
+    >>> parrot(**d)
+    -- This parrot wouldn't VOOM if you put four million volts through it. E's blledin' demised!
+\end{minted}
+
+\subsubsection{Lambda Expressions}
+Small anonymous functions can be created with the \texttt{lambda} keyword. This function returns
+the sum of its two arguments: \mintinline{Python}{lambda a, b : a + b}. Lambda functions can be
+used wherever function objects are required. They are syntactically restricted to a single
+expression. Semantically, they are just syntactic sugar for a normal function definition. Like
+nested function definitions, lambda functions can reference variables from the containing scope:
+\begin{minted}{bash}
+    >>> def make_incrementor(n):
+    ...     return lambda x : x + n     # return a function
+    ...
+    >>> f = make_incrementor(42)
+    >>> f(0)
+    42
+    >>> f(1)
+    43
+\end{minted}
+
+The above example uses a lambda expression to return a function. Another use is to pass a small
+function as an argument:
+\begin{minted}{bash}
+    >>> pairs = [(1, 'one'), (2, 'two'), (3, 'three'), (4, 'four')]
+    >>> pairs.sort(key = lambda pair : pair[1])
+    >>> pairs
+    [(4, 'four'), (1, 'one'), (3, 'three'), (2, 'two')]
+\end{minted}
+
+\subsubsection{Documentation Strings}
+There are emerging conventions about the content and formatting of documentation strings.
+
+The first line should always be a short, concise summary of the object's purpose. For brevity, it
+should not explicitly state the object's name or type, since these are available by other means
+(except if the name happens to be a verb describing a function's operation). This line should begin
+with a capital letter and end with a period.
+
+If there are more lines in the documentation string, the seocnd line should be blank, visually
+separating the summary from the rest of the description. The following lines should be one or more
+paragraphs describing the object's calling conventions, its side effects, etc.
+
+The Python parser does not strip indentation from multi-line string literals in Python, so tools
+that process documentation have to strip indentation if desired. This is done using the following
+convention. The first non-blank line \emph{after} the first line of the string determines the
+amount of indentation for the entire documentation string. Whitespace ``equivalent'' to this
+indentation is then stripped from the start of all lines of the string.
+
+Here is an example of a multi-line docstring:
+\begin{minted}{bash}
+    >>> def my_function():
+    ...     """Do nothing, but document it.
+    ...
+    ...     No, really, it doesn't do anything.
+    ...     """
+    ...     pass
+    ...
+    >>> print my_function.__doc__
+    Do nothing, but document it.
+
+            No, really, it doesn't do anything.
+
+\end{minted}
+
+\section{Intermezzo: Coding Style}
+Making it easy for others to read your code is always a good a idea, and adopting a nice coding
+style helps tremendously for that.
+
+For Python, PEP 8 \footnote{https://www.python.org/dev/peps/pep-0008} has emerged as the style
+guide that most projects adhere to; it promotes a very readable and eye-pleasing coding style.
+Every Python developer should read it at some point; here are the most important points extracted:
+\begin{itemize}
+    \item Use 4-space indentation, and no tabs.
+    \item Wrap lines so that they don't exceed 79 characters.
+    \item Use blank lines to separate functions and classes, and larger blocks of code inside
+    functions.
+    \item When possible, put comments on a line of their own.
+    \item Use docstrings.
+    \item Use spaces around operators and after commas, but not directly inside bracketing
+    constructs: \texttt{a = f(1, 2) + g(3, 4)}.
+    \item Name your classes and functions consistently; the convention is to use \texttt{CamelCase}
+    for classes and \texttt{lower\_case\_with\_underscores} for functions and methods. Always use
+    \texttt{self} as the name for the first method argument.
+    \item Don't use fancy encodings if your code is meant to be used in international environments.
+    Plain ASCII works best in any case.
+\end{itemize}
+
+\section{Data Structures}
+\subsection{More on Lists}
+All of the methods of list objects:
+\begin{itemize}
+    \item \mintinline{Python}{list.append(x)} \\
+    Add an item to the end of the list; equivalent to \texttt{a[len(a):] = x}.
+    \item \mintinline{Python}{list.extend(L)} \\
+    Extend the list by appending all the items in the given list; equivalent to
+    \texttt{a[len(a):] = L}
+    \item \mintinline{Python}{list.insert(i, x)} \\
+    Insert an item at a given position. The first argument is the index of the element before which
+    to insert, so \texttt{a.insert(0, x)} inserts at the front of the list, and
+    \texttt{a.insert(len(a), x)} is equivalent to \texttt{a.append(x)}.
+    \item \mintinline{Python}{list.remove(x)} \\
+    Remove the first item from the list whose value is \texttt{x}.
+    \item \mintinline{Python}{list.pop([i])} \\
+    Remove the item at the given position in the list, and return it. If no index is specified,
+    \texttt{a.pop()} removes and returns the last item in the list. (The square brackets around the
+    \texttt{i} in the method signature denote that the parameter is optional, not that you should
+    type square brackets at that position. You will see this notation frequently in the Python
+    Library Reference.)
+    \item \mintinline{Python}{list.index(x)} \\
+    Return the index in the list of the first item whose value is \texttt{x}. It is an error if
+    there is no such item.
+    \item \mintinline{Python}{list.count(x)} \\
+    Return the number of times \texttt{x} appears in the list.
+    \item \mintinline{Python}{list.sort(cmp = None, key = None, reverse = False)} \\
+    Sort the items of the list in place (the arguments can be used for sort customization, see
+    \texttt{sorted} \footnote{https://docs.python.org/2.7/library/functions.html\#sorted} for their
+    explanation).
+    \item \mintinline{Python}{list.reverse()} \\
+    Reverse the elements of the list, in place.
+\end{itemize}
+
+An example that uses most of the list methods:
+\begin{minted}{bash}
+    >>> a = [66.25, 333, 333, 1, 1234.5]
+    >>> print a.count(333), a.count(66.25), a.count('x')
+    2 1 0
+    >>> a.insert(2, -1)
+    >>> a.append(333)
+    >>> a
+    [66.25, 333, -1, 333, 1, 1234.5, 333]
+    >>> a.index(333)
+    1
+    >>> a.remove(333)
+    >>> a
+    [66.25, -1, 333, 1, 1234.5, 333]
+    >>> a.reverse()
+    >>> a
+    [333, 1234.5, 1, 333, -1, 66.25]
+    >>> a.sort()
+    >>> a
+    [-1, 1, 66.25, 333, 333, 1234.5]
+    >>> a.pop()
+    1234.5
+    >>> a
+    [-1, 1, 66.25, 333, 333]
+\end{minted}
+
+You might have noticed that methods like \texttt{insert}, \texttt{remove} or \texttt{sort} that
+only modify the list have no return value printed --- they return the default \texttt{None}. This
+is a design principle for all mutable data structures in Python.
+
+\subsubsection{Using Lists as Stacks}
+The list methods make it very easy to use a list as a stack, where the last element added is the
+first element retrieved (``last-in, first-out''). To add an item to the top of the stack, use
+\texttt{append()}. To retrieve an item from the top of the stack, use \texttt{pop()} without an
+explicit index. For example:
+\begin{minted}{bash}
+    >>> stack = [3, 4, 5]
+    >>> stack.append(6)
+    >>> stack.append(7)
+    >>> stack
+    [3, 4, 5, 6, 7]
+    >>> stack.pop()
+    7
+    >>> stack
+    [3, 4, 5, 6]
+    >>> stack.pop()
+    6
+    >>> stack.pop()
+    5
+    >>> stack
+    [3, 4]
+\end{minted}
+
+\subsubsection{Using Lists as Queues}
+It is also possible to use a list as a queue, where the first element added is the first element
+retrieved (``first-in, first-out''); however, lists are not efficient for this purpose. While
+appends and pops from the end of list are fast, doing inserts or pops from the beginning of a list
+is slow (because all the other elements have to be shifted by one).
+
+To implement a queue, use \texttt{collections.deque} which was designed to have fast appends and
+pops from both ends. For example:
+\begin{minted}{bash}
+>>> from collections import deque
+    >>> queue = deque(["Eric", "John", "Michael"])
+    >>> queue.append("Terry")       # Terry arrives
+    >>> queue.append("Graham")      # Graham arrives
+    >>> queue.popleft()             # The first to arrive now leaves
+    'Eric'
+    >>> queue.popleft()             # The second to arrive now leaves
+    'John'
+    >>> queue                       # Remaining queue in order of arrival
+    deque(['Michael', 'Terry', 'Graham'])
+\end{minted}
+
+\subsubsection{Functional Programming Tools}
+There are three built-in functions that are very useful when used with lists: \texttt{filter()},
+\texttt{map()}, and \texttt{reduce()}.
+
+\texttt{filter(function, sequence)} returns a sequence consisting of those item from the sequence
+for which \texttt{function(item)} is true. If \texttt{sequence} is a \texttt{str}, \texttt{unicode}
+or \texttt{tuple}, the result will be of the same type; otherwise, it is always a \texttt{list}.
+For example, to compute a sequence of numbers divisible by 3 or 5:
+\begin{minted}{bash}
+    >>> def f(x) : return x % 3 == 0 or x % 5 == 0
+    ...
+    >>> filter(f, range(2, 25))
+    [3, 5, 6, 9, 10, 12, 15, 18, 20, 21, 24]
+\end{minted}
+
+\texttt{map(function, sequence)} calls function(item) for each of the sequence's items and returns
+a list of teh return values. For example, to compute some cubes:
+\begin{minted}{bash}
+    >>> def cube(x) : return x * x * x
+    ...
+    >>> map(cube, range(1, 11))
+    [1, 8, 27, 64, 125, 216, 343, 512, 729, 1000]
+\end{minted}
+
+More than one sequence may be passed; the function must then have as many arguments as there are
+sequences and is called with the corresponding item from each sequence (or \texttt{None} if some
+sequence is shorter than another). For example:
+\begin{minted}{bash}
+    >>> seq = range(8)
+    >>> def add(x, y) : return x + y
+    ...
+    >>> map(add, seq, seq)
+    [0, 2, 4, 6, 8, 10, 12, 14]
+\end{minted}
+
+\texttt{reduce(function, sequence)} returns a single value constructed by calling the binary
+function \texttt{function} on the first two items of teh sequence, then on the result and the next
+items, and so on. For examples, to compute the sum of the numbers 1 through 10:
+\begin{minted}{bash}
+    >>> def add(x, y) : return x + y
+    ...
+    >>> reduce(add, range(1, 11))
+    55
+    >>> reduce(add, range(1,2))
+    1
+    >>> reduce(add, range(1,1))
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: reduce() of empty sequence with no initial value
+\end{minted}
+
+A third argument can be passed to indicate the starting value. In this case the starting value is
+returned for an empty sequence, and the function is first applied to the starting value and the
+first sequence item, then to the result and the next item, and so on. For example,
+\begin{minted}{bash}
+    >>> def sum(seq):
+    ...     def add(x, y) : return x + y
+    ...     return reduce(add, seq, 0)
+    ...
+    >>> sum(range(1, 11))
+    55
+    >>> sum([])
+    0
+\end{minted}
+
+Don't use this example's definition of \texttt{sum()}: since summing nubmers is such a common need,
+a built-in function \texttt{sum(sequence)} is already provided, and works exactly like this.
+
+\subsubsection{List Comprehensions}
+List comprehensions provide a concise way to create lists. Common applications are to make new
+lists where each element is teh result of some operations applied to each member of another
+sequence or iterable, or to create a subsequence of those elements that satisfy a certain condition.
+
+For example, assume we want to create a list of squares, like:
+\begin{minted}{bash}
+>>> squares = []
+>>> for x in range(10):
+...     squares.append(x**2)
+...
+>>> squares
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+\end{minted}
+
+We can obtain the same result with:
+\begin{minted}{bash}
+    >>> squares = [x**2 for x in range(10)]
+    >>> squares
+    [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+\end{minted}
+This is also equivalent to \mintinline{Python}{squares = map(lambda x : x ** 2, range(10))}, but
+it's more concise and readable.
+
+A list comprehension consists of brackets containing an expression followed by a \texttt{for}
+clause, then zero or more \texttt{for} or \texttt{if} clauses. The result will be a new list
+resulting from evaluating the expression in the context of the \texttt{for} and \texttt{if} clauses
+which follow it. For example, this listcomp combines the elements of two lists if they are not
+equal:
+\begin{minted}{bash}
+    >>> [(x, y) for x in [1, 2, 3] for y in [3, 1, 4] if x != y]
+    [(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+\end{minted}
+and it's equivalent to:
+\begin{minted}{bash}
+    >>> combs = []
+    >>> for x in [1, 2, 3]:
+    ...     for y in [3, 1, 4]:
+    ...         if x != y:
+    ...             combs.append((x, y))
+    ...
+    >>> combs
+    [(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
+\end{minted}
+
+If the expression is a tuple (e.g. the \texttt{(x, y)} in the previous example), it must be
+parenthesized.
+\begin{minted}{bash}
+    >>> vec = [-4, -2, 0, 2, 4]
+    >>> # create a new list with the values doubled
+    ... [x*2 for x in vec]
+    [-8, -4, 0, 4, 8]
+    >>> # filter the list to exclude negative numbers
+    ... [x for x in vec if x >= 0]
+    [0, 2, 4]
+    >>> # apply a function to all the elements
+    ... [abs(x) for x in vec]
+    [4, 2, 0, 2, 4]
+    >>> # call a method on each element
+    ... freshfruit = ['  banana', '  loganberry ', 'passion fruit   ']
+    >>> [weapon.strip() for weapon in freshfruit]
+    ['banana', 'loganberry', 'passion fruit']
+    >>> # create a list of 2-tuples like (nubmer, square)
+    ... [(x, x**2) for x in range(6)]
+    [(0, 0), (1, 1), (2, 4), (3, 9), (4, 16), (5, 25)]
+    >>> # the tuple must be parenthesized, otherwise an error is raised
+    ... [x, x**2 for x in range(6)]
+      File "<stdin>", line 2
+        [x, x**2 for x in range(6)]
+                   ^
+    SyntaxError: invalid syntax
+    >>> # flatten a list using a listcomp with two 'for'
+    ... vec = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    >>> [num for elem in vec for num in elem]
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+\end{minted}
+
+List comprehension can contain complex expressions and nested functions:
+\begin{minted}{bash}
+    >>> from math import pi
+    >>> [str(round(pi, i)) for i in range(1, 6)]
+    ['3.1', '3.14', '3.142', '3.1416', '3.14159']
+\end{minted}
+
+The initial expression in a list comprehension can be any arbitrary expression, including another
+list comprehension.
+
+Consider the following example of a 3$\times$4 matrix implemented as a list of 3 lists of length 4:
+\begin{minted}{bash}
+    >>> matrix = [
+    ...     [1, 2, 3, 4],
+    ...     [5, 6, 7, 8],
+    ...     [9, 10, 11, 12]
+    ... ]
+\end{minted}
+
+The following list comprehension will transpose rows and columns:
+\begin{minted}{bash}
+    >>> [[row[i] for row in matrix] for i in range(4)]
+    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+\end{minted}
+
+As we saw in the previous section, the nested listcomp is evaluated in the context of the
+\texttt{for} that follows it, so this example is equivalent to:
+\begin{minted}{bash}
+    >>> transposed = []
+    >>> for i in range(4):
+    ...     transposed.append([row[i] for row in matrix])
+    ...
+    >>> transposed
+    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+\end{minted}
+
+which, in turn, is the same as:
+\begin{minted}{bash}
+    >>> transposed = []
+    >>> for i in range(4):
+    ...     # the following 3 lines implement the nested listcomp
+    ...     transposed_row = []
+    ...     for row in matrix:
+    ...         transposed_row.append(row[i])
+    ...     transposed.append(transposed_row)
+    ...
+    >>> transposed
+    [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
+\end{minted}
+
+In the real world, you should prefer built-in functions to complex flow statements. The
+\texttt{zip()} function would do a great job for this use case:
+\begin{minted}{bash}
+    >>> zip(*matrix)  # use * to unpack the arguments from matrix
+    [(1, 5, 9), (2, 6, 10), (3, 7, 11), (4, 8, 12)]
+\end{minted}
+
+\subsection{The \texttt{del} Statement}
+There is a way to remove an item from a list given its index instead of its value: the \texttt{del}
+statement. This differs from the \texttt{pop()} method which returns a value. The \texttt{del}
+statement can also be used to remove slices from a list or clear the entire list (which we did
+earlier by assignment of an empty list to the slice). For example:
+\begin{minted}{bash}
+    >>> a = [-1, 1, 66.25, 333, 333, 1234.5]
+    >>> del a[0]
+    >>> a
+    [1, 66.25, 333, 333, 1234.5]
+    >>> del a[2:4]
+    >>> a
+    [1, 66.25, 1234.5]
+    >>> del a[:]
+    >>> a
+    []
+\end{minted}
+
+\texttt{del} can also be used to delete entire variables. Referencing the name \texttt{a} hereafter
+is an error (at least until another value is assigned to it):
+\begin{minted}{bash}
+    >>> del a
+    >>> a
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    NameError: name 'a' is not defined
+\end{minted}
+
+\subsection{Tuples and Sequences}
+A tuple consists of a number of values separated by commas, for instance:
+\begin{minted}{bash}
+    >>> t = 12345, 54321, 'hello!'
+    >>> t[0]
+    12345
+    >>> t
+    (12345, 54321, 'hello!')
+    >>> # Tuples may be nested
+    ... u = t, (1, 2, 3, 4, 5)
+    >>> u
+    ((12345, 54321, 'hello!'), (1, 2, 3, 4, 5))
+    >>> # Tuples are immutable
+    ... t[0] = 88888
+    Traceback (most recent call last):
+      File "<stdin>", line 2, in <module>
+    TypeError: 'tuple' object does not support item assignment
+    >>> # but they can contain mutable objects
+    ... v = ([1, 2, 3], [3, 2, 1])
+    >>> v
+    ([1, 2, 3], [3, 2, 1])
+\end{minted}
+
+As you see, on output tuples are always enclosed in parentheses, so that nested tuples are
+interpreted correctly; they may be input with or without surrounding parentheses, although often
+parentheses are necessary anyway (if the tuple is part of a larger expression). It is not possible
+to assign to the individual items of a tuple, however it is possible to create tuples which contain
+mutable objects, such as lists.
+
+Though tuples may seem similar to lists, they are often used in different situations and for
+different purposes. Tuples are immutable, and usually contain a heterogeneous sequence of elements
+that are accessed via unpacking or indexing (or even by attribute in the case of
+\texttt{namedtuples}). Lists are mutable, and their elements are usually homogeneous and are
+accessed by iterating over the list.
+
+A special problem is the construction of tuples containing 0 or 1 items: the syntax has some extra
+quirks to accommodate these. Empty tuples are constructed by an empty pair of parentheses; a tuple
+with one item is constructed by following a value with a comma (it is not sufficient to enclose a
+single value in parentheses). Ugly, but effective. For example:
+\begin{minted}{bash}
+    >>> empty = ()
+    >>> singleton = 'hello',    # <-- note trailing comma
+    >>> len(singleton)
+    1
+    >>> singleton
+    ('hello',)
+    >>> singleton = 'hello'     # the type of singleton here is 'str'
+    >>> len(singleton)
+    5
+    >>> singleton
+    'hello'
+\end{minted}
+
+The statement \texttt{t = 12345, 54321, 'hello!'} is an example of \emph{tuple packing}: the values
+\texttt{12345}, \texttt{54321} and \texttt{'hello!'} are packed together in a tuple. The reverse
+operation is also possible:
+\begin{minted}{bash}
+    >>> x, y, z = t
+    >>> x
+    12345
+    >>> y
+    54321
+    >>> z
+    'hello!'
+\end{minted}
+
+This is called, appropriately enough, \emph{sequence unpacking} and works for any sequence on the
+right-hand side. Sequence unpacking requires the list of variables on the left to have the same
+number of elements as the length of the sequence. Note that multiple assignment is really just a
+combination of tuple packing and sequence unpacking.
+
+\subsection{Sets}
+Python also includes a data type for \emph{sets}. A set is an unsorted collection with no duplicate
+elements. Basic uses include membership testing and eliminating duplicate entries. Set objects also
+support mathematical operations like union, intersection, difference, and symmetric difference.
+
+Curly braces or the \texttt{set()} function can be used to create sets. Note: to create an empty
+set you have to use \texttt{set()}, not \texttt{\{\}}; the latter creates an empty dictionary.
+
+Here is a brief demonstration:
+    \begin{minted}{bash}
+    >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+    >>> fruit = set(basket)     # create a set without duplicates
+    >>> fruit
+    set(['orange', 'pear', 'apple', 'banana'])
+    >>> 'orange' in fruit       # fast membership testing
+    True
+    >>> 'crabgrass' in fruit
+    False
+
+    >>> # Demonstrate set operations on unique letters from two words
+    ...
+    >>> a = set('abracadabra')
+    >>> b = set('alacazam')
+    >>> a
+    set(['a', 'r', 'b', 'c', 'd'])
+    >>> b
+    set(['a', 'c', 'z', 'm', 'l'])
+    >>> a - b
+    set(['r', 'b', 'd'])
+    >>> a | b
+    set(['a', 'c', 'b', 'd', 'm', 'l', 'r', 'z'])
+    >>> a & b
+    set(['a', 'c'])
+    >>> a ^ b
+    set(['b', 'd', 'm', 'l', 'r', 'z'])
+\end{minted}
+
+Similarly to list comprehensions, set comprehensions are also supported:
+\begin{minted}{bash}
+    >>> a = {x for x in 'abracadabra' if x not in 'abc'}
+    >>> a
+    set(['r', 'd'])
+\end{minted}
+
+
+
+
+
 
 
 
