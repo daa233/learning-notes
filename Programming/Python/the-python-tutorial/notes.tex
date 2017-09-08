@@ -416,7 +416,7 @@ The built-in fucntion \texttt{len()} returns the length of a string:
 \end{minted}
 
 \subsubsection{Unicode Strings}
-Unicode has the advantege of providing one ordinal for every character in every script used in
+Unicode has the advantage of providing one ordinal for every character in every script used in
 modern and ancient texts.
 
 Creating Unicode strings in Python is just as simple as creating normal strings:
@@ -1555,7 +1555,7 @@ a key that is already in use, the old value associated with that key is forgotte
 to extract a value using a non-existent key.
 
 The \texttt{keys()} method of a dictionary object returns a list of all the keys used in the
-dictionary, in arbitray order (if you want it sorted, just apply the \texttt{sorted()} function to
+dictionary, in arbitrary order (if you want it sorted, just apply the \texttt{sorted()} function to
 it). To check whether a single key is in the dictionary, use \texttt{in} keyword.
 
 Here is a small example using a dictionary:
@@ -2200,12 +2200,403 @@ modules and subpackages contained in the package.
 While this feature is not often needed, it can be used to extend the set of modules found in a
 package.
 
+\section{Input and Output}
+\subsection{Fancier Output Formatting}
+So far we've encountered two ways of writing values: \emph{expression statements} and the
+\texttt{print} statement. (A third way is using the \texttt{write()} method of file objects; the
+standard output file can be referenced as \texttt{sys.stdout}.)
 
+Often you'll want more control over the formatting of your output than simply printing
+space-separated values. There are two ways to format your output; the first way is to do all the
+string handling yourself; using string slicing and concatenation operations you can create any
+layout you can imagine. The string types have some methods that perform useful operations for
+padding strings to a given colums width; these will be discussed shortly. The second way is to use
+the \texttt{str.format()} method.
 
+The \texttt{string} module contains a \texttt{Template} class which offers yet another way to
+substitute values into strings.
 
+One question remains, of course: how do you convert values to strings? Luckily, Python has ways to
+convert any value to string: pass it to \texttt{repr()} or \texttt{str()} functions.
 
+The \texttt{str()} function is meant to return representations of values which are fairly
+human-readable, which \texttt{repr()} is meant to generate representations which can be read by the
+interpreter (or will force a \texttt{SyntaxError} if there is no equivalent syntax). For objects
+which don't have a particular representation for human consumption, \texttt{str()} will return the
+same value as \texttt{repr()}. Many values, such as numbers or structures like lists and
+dictionaries, have the same representation using either function. Strings and floating point
+numbers, in particular, have two distinct representations.
 
+Some examples:
+\begin{minted}{bash}
+    >>> s = 'Hello, world.'
+    >>> str(s)
+    'Hello, world.'
+    >>> repr(s)
+    "'Hello, world.'"
+    >>> str(1.0/7.0)
+    '0.142857142857'
+    >>> repr(1.0/7.0)
+    '0.14285714285714285'
+    >>> x = 10 * 3.25
+    >>> y = 200 * 200
+    >>> s = 'The value of x is ' + repr(x) + ', and y is ' + repr(y) + '...'
+    >>> print s
+    The value of x is 32.5, and y is 40000...
+    >>> # The repr() of a string adds string quotes and backslashes:
+    ... hello = 'hello, world\n'
+    >>> hellos = repr(hello)
+    >>> print hellos
+    'hello, world\n'
+    >>> # The argument to repr() may be any Python object:
+    ... repr((x, y, ('spam', 'eggs')))
+    "(32.5, 40000, ('spam', 'eggs'))"
+\end{minted}
 
+Here are two ways to write a table of squares and cubes:
+\begin{minted}{bash}
+    >>> for x in range(1, 11):
+    ...     # S.rjust(width) returns S right-justified in a string of length width
+    ...     print repr(x).rjust(2), repr(x*x).rjust(3),
+    ...     # Note trailing comma on previous line
+    ...     print repr(x*x*x).rjust(4)
+    ...
+     1   1    1
+     2   4    8
+     3   9   27
+     4  16   64
+     5  25  125
+     6  36  216
+     7  49  343
+     8  64  512
+     9  81  729
+    10 100 1000
+
+    >>> for x in range(1, 11):
+    ...     print '{0:2d} {1:3d} {2:4d}'.format(x, x*x, x*x*x)
+    ...
+     1   1    1
+     2   4    8
+     3   9   27
+     4  16   64
+     5  25  125
+     6  36  216
+     7  49  343
+     8  64  512
+     9  81  729
+    10 100 1000
+\end{minted}
+(Note that in the first example, one space between each column was added by the way \texttt{print}
+works: it always adds spaces between its arguments.)
+
+This example demonstrates the \texttt{str.rjust()} method of strign objects, which right-justifies
+a string in a field of a given width by padding it with spaces on the left. There are similar
+methods \texttt{str.ljust()} and \texttt{str.center()}. These methods do not write anything, they
+just return a new string. If the input string is too long, they don't truncate it, but return it
+unchanged; this will mess up your column layout but that's usually better than the alternative,
+which would be lying about a value. (If you really want truncation you can always add a slice
+operation, as in \texttt{x.ljust(n)[:n]}.)
+
+There is another method, \texttt{str.zfill(width)}, which pads a numeric string on the left with
+zeros. It understands about plus and minus signs. The original string is returned if width is less
+than or equal to \texttt{len(str)}.
+\begin{minted}{bash}
+    >>> '12'.zfill(5)
+    '00012'
+    >>> '-3.14'.zfill(7)
+    '-003.14'
+    >>> '3.14159265359'.zfill(5)
+    '3.14159265359'
+\end{minted}
+
+Basic usage of \texttt{str.format()} method looks like this:
+\begin{minted}{bash}
+    >>> print 'We are the {} whos say "{}!"'.format('knights', 'Ni')
+    We are the knights whos say "Ni!"
+\end{minted}
+
+The brackets and characters within them (called format fields) are replaced with the objects passed
+into the \texttt{str.format()} method. A number in the brackets refers to the position of the
+object passed into the \texttt{str.format()} method.
+\begin{minted}{bash}
+    >>> print '{0} and {1}'.format('spam', 'eggs')
+    spam and eggs
+    >>> print '{1} and {0}'.format('spam', 'eggs')
+    eggs and spam
+\end{minted}
+
+If keyword arguments are used in the \texttt{str.format()} method, their values are referred to by
+using the name of the arguments.
+\begin{minted}{bash}
+    >>> print 'This {food} is {adjective}.'.format(
+    ...       food = 'spam', adjective = 'absolutely horrible')
+    This spam is absolutely horrible.
+\end{minted}
+
+Positional and keyword arguments can be arbitrary combined:
+\begin{minted}{bash}
+    >>> print 'The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred', other = 'Georg')
+    The story of Bill, Manfred, and Georg.
+    >>> print 'The story of {0}, {1}, and {other}.'.format('Bill', other = 'Georg', 'Manfred')
+      File "<stdin>", line 1
+    SyntaxError: non-keyword arg after keyword arg
+\end{minted}
+
+\texttt{'!s'} (apply \texttt{str()}) and \texttt{'!r'} (apply \texttt{repr()}) can be used to
+convert the value before it is formatted.
+\begin{minted}{bash}
+    >>> import math
+    >>> print 'The value of PI is approximately {}.'.format(math.pi)
+    The value of PI is approximately 3.14159265359.
+    >>> print 'The value of PI is approximately {!s}.'.format(math.pi)
+    The value of PI is approximately 3.14159265359.
+    >>> print 'The value of PI is approximately {!r}.'.format(math.pi)
+    The value of PI is approximately 3.141592653589793.
+\end{minted}
+
+An optional \texttt{':'} and format specifier can follow the field name. This allows greater
+control over how the value is formatted. The following example rounds Pi to three palces after the
+decimal.
+\begin{minted}{bash}
+    >>> print 'The value of PI is approximately {0:.3f}.'.format(math.pi)
+    The value of PI is approximately 3.142.
+\end{minted}
+
+Passing an integer after the \texttt{':'} will cause that field to be a minimum number of
+characters wide. This is useful for making tables pretty.
+\begin{minted}{bash}
+    >>> for name, phone in table.items():
+    ...     print '{0:10} ==> {1:10d}'.format(name, phone)
+    ...
+    Dcab       ==>       7678
+    Sjored     ==>       4127
+    Jack       ==>       4098
+\end{minted}
+
+If you have a really long format string that you don't want to split up, it would be nice if you
+could reference the variables to be formatted by name instead of by position. This can be done by
+simply passing the dict and using square brackets \texttt{'[]'} to access the keys.
+\begin{minted}{bash}
+    >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+    >>> print ('Jack: {0[Jack]:d}; Sjoerd: {0[Sjoerd]:d}; '
+    ...        'Dcab: {0[Dcab]:d}'.format(table))
+    Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+\end{minted}
+
+This could also be done by passing the table as keyword arguments with the \texttt{**} notation.
+\begin{minted}{bash}
+    >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
+    >>> print 'Jack: {Jack:d}; Sjoerd: {Sjoerd:d}; Dcab: {Dcab:d}'.format(**table)
+    Jack: 4098; Sjoerd: 4127; Dcab: 8637678
+\end{minted}
+
+This is particularly useful in combination with the built-in function \texttt{vars()}, which
+returns a dictionary containing all local variables.
+
+\subsubsection{Old string formatting}
+The \texttt{\%} operator can also be used for string formatting. It interprets the left argument
+much like a \texttt{sprintf()}-style format string to be applied to the right argument, and returns
+the string resulting from this formatting operation. For example:
+\begin{minted}{bash}
+    >>> import math
+    >>> print 'The value of PI is approximately %5.3f.' % math.pi
+    The value of PI is approximately 3.142.
+\end{minted}
+
+\subsection{Reading and Writing Files}
+\mintinline{python}{open()} returns a file object, and is most commonly used with two arguments:
+\mintinline{python}{open(filename, mode)}.
+\begin{minted}{bash}
+    >>> f = open('workfile', 'w')
+    >>> print f
+    <open file 'workfile', mode 'w' at 0x107dfc5d0>
+\end{minted}
+The first argument is a string containing the filename. The second argument is another string
+containing a few characters  describing the way in which the file will be used. \emph{mode} can be
+\texttt{'r'} when the file will only be read, \texttt{'w'} for only writing (an exsisting file with
+the same name will be erased), and \texttt{'a'} opens the file for appending; any data wirtten to
+the file is automatically added to the end. \texttt{'r+'} opens the file for both reading and
+writing. The \emph{mode} argument is optional; \texttt{'r'} will be assumed if it's omitted.
+
+On Windows, \texttt{'b'} appended to the mode opens the file in binary mode, so there are also
+modes like \texttt{'rb'}, \texttt{'wb'}, and \texttt{'r+b'}. Python on Windows makes a distinction
+between text and binary files; the end-of-line character in text files are automatically altered
+slightly when data is read or written. This behind-the-scenes modification to file data is fine for
+ASCII text files, but it'll corrupt binary data like that in \texttt{JPEG} or \texttt{EXE} files.
+Be very careful to use binary mode when reading and writing such files. On Unix, it dosen't hurt to
+append a \texttt{'b'} to the mode, so you can use it platform-independently for all binary files.
+
+\subsubsection{Methods of File Objects}
+The rest of the examples in this section will assume that a file object called \texttt{f} has
+already been created.
+
+To read a file's contents, call \mintinline{python}{f.read(size)}, which reads some quantity of
+data and returns it as a string. \emph{size} is an optional numeric argument. When \emph{size} is
+omitted or negative, the entire contents of the file will be read and returned; it's your problem
+if the file is twice as large as your machine's memory. Otherwise, at most \emph{size} bytes are
+read and returned. If the end of the file has been reached, \mintinline{python}{f.read()} will
+return an empty string (\texttt{""}).
+\begin{minted}{bash}
+    >>> f.read()
+    'This is the entire file.\n'
+    >>> f.read()
+    ''
+\end{minted}
+
+\mintinline{python}{f.readline()} reads a single line from the file; a newline character
+\mintinline{python}{'\n'} is left at the end of the string, and is only omitted on the last line of
+the file if the file doesn't end in a newline. This makes the return value unambiguous; if
+\texttt{f.readline()} returns an empty string, the end of the file has been reached, while a blank
+line is represented by \mintinline{python}{'\n'}, a string containing only a single newline.
+\begin{minted}{bash}
+    >>> # the file doesn't end in a newline
+    ... f.readline()
+    'This is the first line of the file.\n'
+    >>> f.readline()
+    'Second line of the file.\n'
+    >>> f.readline()
+    ''
+
+    >>> # the file ends in a newline
+    ... f.readline()
+    'This is the first line of the file.\n'
+    >>> f.readline()
+    'Second line of the file.\n'
+    >>> f.readline()
+    '\n'
+    >>> f.readline()
+    ''
+\end{minted}
+
+For reading lines from a file, you can loop over the file object. This is memory efficient, fast,
+and leads to simple code:
+\begin{minted}{bash}
+    >>> for line in f:
+    ...     print line,
+    ...
+    This is the first line of the file.
+    Second line of the file.
+\end{minted}
+
+If you want to read all the lines of a file in a list you can also use \mintinline{python}{list(f)}
+or \mintinline{python}{f.readline()}.
+
+\mintinline{python}{f.write(string)} writes the contents of \emph{string} to the file, returning
+\mintinline{python}{None}.
+\begin{minted}{bash}
+    >>> f.write('This is a test\n')
+\end{minted}
+
+To write something other than a string, it needs to be converted to a string first:
+\begin{minted}{bash}
+    >>> value = ('the answer', 42)
+    >>> s = str(value)
+    >>> f.write(s)
+\end{minted}
+
+\mintinline{python}{f.tell()} returns an integer giving the file object's current position in the
+file, measured in bytes from the beginning of the file. To change the file object's position, use
+\mintinline{python}{f.seek(offset, from_what)}. The position is computed from adding \emph{offset}
+to a reference point; the reference point is selected by the \emph{from\_what} argument. A
+\emph{from\_what} value of 0 measures from the beginning of the file, 1 uses the current file
+position, and 2 uses the end of the file as the reference point. \emph{from\_what} can be omitted
+and defaults to 0, using the beginning of the file as the reference point.
+\begin{minted}{bash}
+    >>> f = open('workfile', 'r+')
+    >>> f.write('0123456789abcdef')
+    >>> f.seek(5)
+    >>> f.read(1)
+    '5'
+    >>> f.seek(-3, 2)
+    >>> f.read(1)
+    'd'
+\end{minted}
+
+When you're done with a file, call \mintinline{python}{f.close()} to close it and free up any
+system resources taken up by the open file. After calling \mintinline{python}{f.close()}, attempts
+to use the file object will automatically fail.
+\begin{minted}{bash}
+    >>> f.close()
+    >>> f.read()
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    ValueError: I/O operation on closed file
+\end{minted}
+
+It is a good practice to use the \mintinline{python}{with} keyword when dealing with file objects.
+This has the advantage that the file is properly closed after its suite finishes, even if an
+exception is raised on the way. It is also much shorter than writing equivalent
+\mintinline{python}{try}-\mintinline{python}{finally} blocks:
+\begin{minted}{bash}
+    >>> with open('workfile', 'r') as f:
+    ...     read_data = f.read()
+    ...
+    >>> f.closed
+    True
+    >>> read_data
+    '0123456789abcdef'
+\end{minted}
+
+File objects have some additional methods, such as \texttt{isatty()} and \texttt{truncate()} which
+are less frequently used; consult the Library Reference for a complete guide to file objects.
+
+\subsubsection{Saving structured data with \texttt{json}}
+Strings can easily be written to and read from a file. Numbers take a bit more effort, since the
+\texttt{read()} method only returns strings, which will have to be passed to a function like
+\texttt{int()}, which takes a string like '123' and returns its numeric value 123. When you want to
+save more complex data types like nested lists and dictionaries, parsing and serializing by hand
+becomes complicated.
+
+Rather than having users constantly writing and debugging code to save complicated data types to
+files, Python allows you to use the popular data interchange format called JSON (JavaScript Object
+Notation). The standard module called \texttt{json} can take Python data hierachies, and convert
+them to string representations; this process is called \emph{serializing}. Reconstructing the data
+from the string representation is called \emph{deserializing}. Between serializing and
+deserializing, the string representing the object may have been stored in a file or data, or sent
+over a network connection to some distant machine.
+
+\textbf{Note:} The JSON format is commonly used by modern applications to allow for data exchange.
+Many programmers are already familiar with it, which makes it a good choice for interoperability.
+
+If you have an object \texttt{x}, you can view its JSON string representation with a simple line of
+code:
+\begin{minted}{bash}
+    >>> import json
+    >>> json.dumps([1, 'simple', 'list'])
+    '[1, "simple", "list"]'
+\end{minted}
+
+Another variant of the \texttt{dumps()} function, called \texttt{dump()}, simply serializes the
+object to a file. So if \texttt{f} is a file object opened for writing, we can do this:
+\begin{minted}{bash}
+    >>> x = json.dumps([1, 'simple', 'list'])
+    >>> f = open('workfile', 'r+')
+    >>> json.dump(x, f)
+    >>> f.seek(0)
+    >>> f.readlines()
+    ['"[1, \\"simple\\", \\"list\\"]"']
+    >>> f.close()
+\end{minted}
+
+To decode the object again, if \texttt{f} is a file object which has been opened for reading:
+\begin{minted}{bash}
+    >>> with open('workfile', 'r') as f:
+    ...     x = json.load(f)
+    ...
+    >>> x
+    u'[1, "simple", "list"]'
+\end{minted}
+
+This simple serialization technique can handle lists and dictionaries, but serializing arbitrary
+class instances in JSON requires a bit of extra effort. The reference for the \texttt{json} module
+contains an explanation of this.
+
+\textbf{See also:} \texttt{pickle} - the pickle module \\
+Contrary to JSON, \emph{pickle} is a protocol which allows the serialization of arbitrary complex
+Python objects. As such, it is specific to Python and cannot be used to communicate with
+applications written in other languages. It is also insecure by default: deserializing pickle data
+coming from an untrusted source can execute arbitrary code, if the data was crafted by a skilled
+attacker.
 
 
 
