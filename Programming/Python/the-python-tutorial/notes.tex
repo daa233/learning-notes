@@ -8,7 +8,8 @@
 \usepackage{hyperref}
 \usepackage{indentfirst} % to indent the first paragraph of a section
 
-\title{The Python Tutorial Notes}
+\title{The Python Tutorial \\
+        Learning Notes}
 \author{Du Ang \\ \texttt{du2ang233@gmail.com} }
 \date{\today}
 
@@ -99,7 +100,7 @@ By default, Python source files are treated as encoded in UTF-8.
 
 To declare an encoding other than the default one, a special comment line should be added as the
 first line of the file. The syntax is as follows:
-\begin{minted}{Python}
+\begin{minted}{python}
     # -*- coding: encoding -*-
 \end{minted}
 where \emph{encoding} is one of the valid \texttt{codes} supported by Python.
@@ -111,7 +112,7 @@ In the following examples, input and output are distinguished by the presence or
 Comments in Python start with the hash character \texttt{\#}, and extend to the end of the physical
 line. A hash character in a string literal is just a hash character.
 
-\begin{minted}{Python}
+\begin{minted}{python}
     # this is the first comment
     spam = 1    # and this the second comment
                 # and now a third!
@@ -550,7 +551,7 @@ We can write an initial sub-sequence of the \emph{Fibonacci} series as follows:
 
 In Python, like in C, any non-zero integer value is true; zero is false. The condition of the
 \texttt{while} loop may also be a string or list value, in fact any sequence; anything with a
-non-zero length is true, empty sequences are false. The standard comparision operators are written
+non-zero length is true, empty sequences are false. The standard comparison operators are written
 the same as in C: \texttt{<} (less than), \texttt{>} (greater than), \texttt{==} (equal to),
 \texttt{<=} (less than or equal to), \texttt{>=} (greater than or equal to) and \texttt{!=} (not
 equal to).
@@ -1057,7 +1058,7 @@ Here is an example of a multi-line docstring:
 
 \end{minted}
 
-\section{Intermezzo: Coding Style}
+\subsection{Intermezzo: Coding Style}
 Making it easy for others to read your code is always a good a idea, and adopting a nice coding
 style helps tremendously for that.
 
@@ -1532,6 +1533,678 @@ Similarly to list comprehensions, set comprehensions are also supported:
     >>> a
     set(['r', 'd'])
 \end{minted}
+
+\subsection{Dictionaries}
+Another useful data type built into Python is the \emph{dictionary}. Dictionaries are sometimes
+found in other languages as "associative memories" or "associative arrays". Unlike sequences, which
+are indexed by a range of numbers, dictionaries are indexed by \emph{keys}, which can be any
+immutable types; strings and numbers can always be keys. Tuples can be used as keys if they contain
+only strings, numbers, or tuples; if a tuple contain any mutable object either directly or
+indirectly, it cannot be used as a key. You can't use lists as keys, since lists can modified in
+place using index assignments, slice assignments, or methods like \texttt{append()} and
+\texttt{extend()}.
+
+It is best to think of a dictionary an unsorted set of \emph{key: value} pairs, with the
+requirement that the keys are unique (within one dictionary). A pair of braces creates an empty
+dictionary: \texttt{\{\}}. Placing a comma-separated list of key:value pairs within the braces adds
+initial key:value pairs to the dictionary; this is also the way dictionaries are written on output.
+
+The main operations on a dictionary are storing a value with some key and extracting the value
+given the key. It is also possible to delete a key:value pair with \texttt{del}. If you store using
+a key that is already in use, the old value associated with that key is forgotten. It is an error
+to extract a value using a non-existent key.
+
+The \texttt{keys()} method of a dictionary object returns a list of all the keys used in the
+dictionary, in arbitray order (if you want it sorted, just apply the \texttt{sorted()} function to
+it). To check whether a single key is in the dictionary, use \texttt{in} keyword.
+
+Here is a small example using a dictionary:
+\begin{minted}{bash}
+    >>> tel = {'jack': 4098, 'sape': 4139}
+    >>> tel['guido'] = 4127
+    >>> tel
+    {'sape': 4139, 'jack': 4098, 'guido': 4127}
+    >>> tel['jack']
+    4098
+    >>> del tel['sape']
+    >>> tel['irv'] = 4127
+    >>> tel
+    {'jack': 4098, 'irv': 4127, 'guido': 4127}
+    >>> tel.keys()
+    ['jack', 'irv', 'guido']
+    >>> 'guido' in tel
+    True
+    >>> 'tom' in tel
+    False
+\end{minted}
+
+The \texttt{dict()} constructor builds dictionaries from sequences of key-value pairs:
+\begin{minted}{bash}
+    >>> dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
+    {'sape': 4139, 'jack': 4098, 'guido': 4127}
+\end{minted}
+
+In addition, dict comprehensions can be used to create dictionaries from arbitrary key and value
+expressions:
+\begin{minted}{bash}
+    >>> {x: x**2 for x in (2, 4, 6)}
+    {2: 4, 4: 16, 6: 36}
+\end{minted}
+
+When the keys are simple strings, it is sometimes easier to specify pairs using keyword arguments:
+\begin{minted}{bash}
+    >>> dict(sape=4139, guido=4127, jack=4098)
+    {'sape': 4139, 'jack': 4098, 'guido': 4127}
+\end{minted}
+
+\subsection{Looping Techniques}
+When looping through a sequence, the position index and corresponding value can be retrieved at the
+same time using the \texttt{enumerate()} function.
+\begin{minted}{bash}
+    >>> for i, v in enumerate(['tic', 'tac', 'toe']):
+    ...     print i, v
+    ...
+    0 tic
+    1 tac
+    2 toe
+\end{minted}
+
+To loop over two or more sequences at the same time, the entries can be paired with the
+\texttt{zip()} function.
+\begin{minted}{bash}
+    >>> questions = ['name', 'quest', 'favorite color']
+    >>> answers = ['lancelot', 'the holy grail', 'blue']
+    >>> for q, a in zip(questions, answers):
+    ...     print 'What is your {0}? It is {1}.'.format(q, a)
+    ...
+    What is your name? It is lancelot.
+    What is your quest? It is the holy grail.
+    What is your favorite color? It is blue.
+\end{minted}
+
+To loop over a sequence in reverse, first specify the sequence in a forward direction and then
+call the \texttt{reversed()} fucntion.
+\begin{minted}{bash}
+    >>> for i in reversed(xrange(1, 10, 2)):
+    ...     print i
+    ...
+    9
+    7
+    5
+    3
+    1
+\end{minted}
+
+To loop over a sequence in sorted order, use the \texttt{sorted()} function which returns a new
+sorted list while leaving the source unaltered.
+\begin{minted}{bash}
+    >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+    >>> for f in sorted(set(basket)):
+    ...     print f
+    ...
+    apple
+    banana
+    orange
+    pear
+    >>> basket
+    ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+\end{minted}
+
+When looping through dictionaries, the key and corresponding value can be retrieved at the same
+time using the \texttt{iteritems()} method.
+\begin{minted}{bash}
+    >>> knights = {'gallahad': 'the pure', 'robin': 'the brave'}
+    >>> for k, v in knights.iteritems():
+    ...     print k, v
+    ...
+    gallahad the pure
+    robin the brave
+\end{minted}
+
+It is sometimes tempting to change a list while you are looping over it; however, it is often
+simpler and safer to create a new list instead.
+\begin{minted}{bash}
+    >>> import math
+    >>> raw_data = [56.2, float('NaN'), 51,7, 55.3, 52.5, float('NaN'), 47.8]
+    >>> filtered_data = []
+    >>> for value in raw_data:
+    ...     if not math.isnan(value):
+    ...         filtered_data.append(value)
+    ...
+    >>> filtered_data
+    [56.2, 51, 7, 55.3, 52.5, 47.8]
+\end{minted}
+
+\subsection{More on Conditions}
+The conditions used in \texttt{while} and \texttt{if} statements can contain any operators, not
+just comparisons.
+
+The comparison operators \texttt{in} and \texttt{not in} check whether a value occurs (does not
+occur) in a sequence. The operators \texttt{is} and \texttt{is not} compare whether two objects are
+really the same object; this only matters for mutable objects like lists. All comparison operators
+have the same priority, which is lower than that of all numerical operators.
+
+Comparisons can be chained. For example, \texttt{a < b == c} tests whether \texttt{a} is less than
+\texttt{b} and moreover \texttt{b} equals \texttt{c}.
+
+Comparisons may be combined using the Boolean operators \texttt{and} and \texttt{or}, and the
+outcome of a comparison (or of any other Boolean expression) may be negated with \texttt{not}.
+These have lower priorities than comparison operators; between them, \texttt{not} has the highest
+priority and \texttt{or} the lowest, so that \texttt{A and B not B or C} is equivalent to
+\texttt{(A and (not B)) or C}. As always, parentheses can be used to express the desired
+composition.
+
+The Boolean operators \texttt{and} and \texttt{or} are so-called \emph{short-circuit} operators:
+their arguments are evaluated from left to right, and evaluation stops as soon as the outcome is
+determined. For example, if \texttt{A} and \texttt{C} are true but \texttt{B} is false,
+\texttt{A and b and C} does not evaluate the expression \texttt{C}. When used as a general value
+and not as a Boolean, the return value of a short-circuit operator is the last evaluted argument.
+
+\begin{minted}{bash}
+    >>> 3 and 5 and 6 and 7
+    7
+    >>> 3 or 4 or 5
+    3
+    >>> 0 or 6 or 7
+    6
+\end{minted}
+
+It is possible to assign the result of a comparison or other Boolean expression to a variable. For
+example,
+\begin{minted}{bash}
+    >>> string1, string2, string3 = '', 'Trondheim', 'Hammer Dance'
+    >>> non_null = string1 or string2 or string3
+    >>> non_null
+    'Trondheim'
+\end{minted}
+
+Note that in Python, unlike C, assignment cannot occur inside expressions. C programmers may
+grumble about this, but it avoids a common class of problems encountered in C programs: typing
+\texttt{=} in an expression when \texttt{==} was intended.
+\footnote{https://stackoverflow.com/questions/2603956/can-we-have-assignment-in-a-condition}
+
+\subsection{Comparing Sequences and Other Types}
+Sequence objects may be compared to other objects with the same sequence type. The comparison uses
+\emph{lexicographical} ordering: first the first two items are compared, and if they differ this
+determines the outcome of the comparison; if they are equal, the next two items are compared, and
+so on, until either sequence is exhausted. If two items to be compared are themselves sequences of
+the same type, the lexicographical comparison is carried out recursively. If all items of two
+sequence compare equal, the sequences are considered equal. If one sequence is an initial
+sub-sequence of the other, the shorter sequence is the smaller (lesser) one. Lexicographical
+ordering for strings uses the ASCII ordering for individual characters. Some examples of
+comparisons between sequences of the same type:
+\begin{minted}{bash}
+    >>> (1, 2, 3) < (1, 2, 4)
+    >>> [1, 2, 3] < [1, 2, 4]
+    >>> 'ABC' < 'C' < 'Pascal' < 'Python'
+    >>> (1, 2, 3, 4) < (1, 2, 4)
+    >>> (1, 2) < (1, 2, -1)
+    >>> (1, 2, 3) == (1.0, 2.0, 3.0)
+    >>> (1, 2, ('aa', 'ab')) < (1, 2, ('abc', 'a'), 4)
+\end{minted}
+
+Note that comparing objects of different types is leagal. The outcome is deterministic but
+arbitrary: the types are ordered by their name. Thus, a list is always smaller than a string, a
+string is always smaller than a tuple, etc. Mixed numeric types are compared according to their
+numeric value, so 0 equals 0.0, etc.
+
+\section{Modules}
+If you quit from the Python interpreter and enter it again, the definitions you have made
+(functions and variables) are lost. Therefore, if you want to write a somewhat longer program, you
+are better off using a text editor to prepare the input for the interpreter and running it with
+that file as input instead. This is known as creating a \emph{script}. As your program gets longer,
+you may want to split it into several files for easier maintenance. You may also want to use a
+handy function that you've written in several programs without copying its definitions into each
+program.
+
+To support this, Python has a way to put definitions in a file and use them in a script or in an
+interactive instance of the interpreter. Such a file is called a \emph{module}; definitions from a
+module can be \emph{imported} into other modules or into the \emph{main} module (the collection of
+variables that you have access to in a script executed at the top level and in calculator mode).
+
+A module is a file containing Python definitions and statements. The file name is the module name
+with the suffix \texttt{.py} appended. Within a module, the module's name (as a string) is
+available as the value of the global variable \texttt{\_\_name\_\_}. For instance, use your favorite
+text editor to create a file called \texttt{fibo.py} in the current directory with the following
+contents:
+\begin{minted}{python}
+    # Fibonacci numbers module
+
+    def fib(n):     # write Fibonacci series up to n
+        a, b = 0, 1
+        while b < n:
+            print b,
+            a, b = b, a+b
+
+    def fib2(n):    # return Fibonacci series up to n
+        result = []
+        a, b = 0, 1
+        while b < n:
+            result.append(b)
+            a, b = b, a+b
+        return result
+\end{minted}
+
+Now enter the Python interpreter and import this module with the following command:
+\begin{minted}{bash}
+    >>> import fibo
+\end{minted}
+
+This does not enter the names of the functions defined in \texttt{fibo} directly in the current
+symbol table; it only enters the module name \texttt{fibo} there. Using the module name you can
+access the functions:
+\begin{minted}{bash}
+    >>> fibo.fib(1000)
+    1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
+    >>> fibo.fib2(100)
+    [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+    >>> fibo.__name__
+    fibo
+\end{minted}
+
+If you intend to use a function often you can assign it to a local name:
+\begin{minted}{bash}
+    >>> fib = fibo.fib
+    >>> fib(500)
+    1 1 2 3 5 8 13 21 34 55 89 144 233 377
+\end{minted}
+
+\subsection{More on Modules}
+A module can contain executable statements as well as function definitions. These statements are
+intended to initialize the module. They are executed only the \emph{first} time the module name is
+encountered in an import statement. (They are also run if the file is executed as a script.)
+
+Each module has its own private symbol table, which is used as the global symbol table by all
+functions defined in the module. Thus, the author of a module can use global variables in the
+module without worrying about accidental clashes with a user's global variables. On the other hand,
+if you know what you are doing you can touch a module's global variables with the name notation
+used to refer to its functions, \texttt{modname.itemname}.
+
+Modules can import other modules. It is customary but not required to place all \texttt{import}
+statements at the beginning of a module (or script, for that matter). The imported module names are
+placed in the importing modules's global symbol table.
+
+There is a variant of the \texttt{import} statement that imports names from a module directly into
+the importing module's symbol table. For example:
+\begin{minted}{bash}
+    >>> from fibo import fib, fib2
+    >>> fib(500)
+    1 1 2 3 5 8 13 21 34 55 89 144 233 377
+\end{minted}
+This does not introduce the module name from which the imports are taken in the local symbol table
+(so in the example, \texttt{fibo} is not defined).
+
+There is even a variant to import all names that a module defines:
+\begin{minted}{bash}
+    >>> from fibo import *
+    >>> fib(500)
+    1 1 2 3 5 8 13 21 34 55 89 144 233 377
+\end{minted}
+This imports all names except those beginning with an underscore(\texttt{\_}).
+
+Note that in general the practice of importing \texttt{*} from a module or package is frowned upon,
+since it often causes poorly readable code. However, it is okay to use it to save typing in
+interactive sessions.
+
+\textbf{Note:} For efficiency reasons, each module is only imported once per interpreter session.
+Therefore, if you change your modules, you must restart the interpreter --- or, if it's just one
+module you want to test interactively, use \texttt{reload()}, e.g. \texttt{reload(modulename)}.
+
+\subsubsection{Executing modules as scripts}
+When you run a Python module with \mintinline{Python}{python fibo.py <arguments>} the code in the
+module will be executed, just as if you imported it, but with the \texttt{\_\_name\_\_} set to
+"\_\_main\_\_". That means that by adding this code at the end of your module:
+\begin{minted}{python}
+    if __name__ == "__main__":
+        import sys
+        fib(int(sys.argv[1]))
+\end{minted}
+you can make the file usable as a script as well as an importable module, because the code that
+parses the command line only runs if the module is executed as the "main" file:
+\begin{minted}{bash}
+    duangdeiMac:6 duang$ python fibo.py 50
+    1 1 2 3 5 8 13 21 34
+\end{minted}
+
+If the module is imported, the code is not run:
+\begin{minted}{bash}
+    >>> import fibo
+    >>>
+\end{minted}
+This is often used either to provide a convenient user interface to a module, or for testing
+purposes (running the module as a script executes a test suite).
+
+\subsubsection{The Module Search Path}
+When a module named \texttt{spam} is imported, the interpreter first searches for a built-in module
+with that name. If not found, it then searches for a file named \texttt{spam.py} in a list of
+directories given by the variable \texttt{sys.path}. \texttt{sys.path} is initialized from these
+locations:
+\begin{itemize}
+    \item the directory containing the input script (or the current directory)
+    \item \texttt{PYTHONPATH} (a list a directory names, with the same syntax as the shell variable
+    \texttt{PATH})
+    \item the installation-dependent default
+\end{itemize}
+
+After initialization, Python programs can modify \texttt{sys.path}. The directory containing the
+script being run is placed at the begining of the search path, ahead of the standard library path.
+This means that scripts in that directory will be loaded instead of modules of the same name in the
+library directory. This is an error unless the replacement is intended.
+
+\subsubsection{``Compiled'' Python files}
+As an important speed-up of the start-up time for short programs that use a lot of standard modules,
+if a file called \texttt{spam.pyc} exists in the directory where \texttt{spam.py} is found, this is
+assumed to contain an already-"byte-compiled" version of the module \texttt{spam}. The mofication
+time of the version of \texttt{spam.py} used to create \texttt{spam.pyc} is recorded in
+\texttt{spam.pyc}, and the \texttt{.pyc} file is ignored if these don't match.
+
+Normally, you don't need to do anything to create the \texttt{spam.pyc} file. Whenever
+\texttt{spam.py} is successfully compiled, an attempt is made to write the compiled version to
+\texttt{spam.pyc}. It is not an error if this attempt fails; if for any reason the file is not
+written completely, the resulting \texttt{spam.pyc} file will be recognized as invalid and thus
+ignored later. The contents of the \texttt{spam.pyc} file are platform independent, so a Python
+module directory can be shared by machines of different architectures.
+
+Some tips for experts:
+\begin{itemize}
+    \item When the Python interpreter is invoked with the \texttt{-o} flag, optimized code is
+    generated and stored in \texttt{.pyo} files. The optimizer currently doesn't help much; it only
+    removes \texttt{assert} statements. When \texttt{-o} is used, all bytecode is optimized;
+    \texttt{.pyc} files are ignored and \texttt{.py} files are compiled to optimized bytecode.
+    \item Passing two \texttt{-o} flags to the Python interpreter (\texttt{-oo}) will cause the
+    bytecode compiler to perform optimizations that could in some rare cases result in
+    malfunctioning programs. Currently only \texttt{\_\_doc\_\_} strings are removed from the
+    bytecode, resulting in more compact \texttt{.pyo} files. Since some programs may rely on having
+    these available, you should only use this option if you know what you're doing.
+    \item A program doesn't run any faster when it is read from a \texttt{.pyc} or \texttt{.pyo}
+    file than when it is read from \texttt{.py} file; the only thing that's faster about
+    \texttt{.pyc} or \texttt{.pyo} files is the speed which they are loaded.
+    \item When a script is run by giving its name of the command line, the bytecode for the script
+    is never written to a \texttt{.pyc} or \texttt{.pyo} file. Thus, the startup time of a script
+    may be reduced by moving most of its code to a module and having a small bootstrap script that
+    imports that module. It is also possible to name a \texttt{.pyc} or \texttt{.pyo} file directly
+    on the command line.
+    \item It is possible to have a file called \texttt{spam.pyc} (or \texttt{spam.pyo} when
+    \texttt{-o} is used) without a file \texttt{spam.py} for the same module. This can be used to
+    distribute a library of Python code in a form that is moderately hard to reverse engineer.
+    \item The module \texttt{compileall} can create \texttt{.pyc} files (or \texttt{.pyo} files
+    when \texttt{-o} is used) for all modules in a directory.
+\end{itemize}
+
+\subsection{Standard Modules}
+Python comes with a library of standard modules, described in a separated document, the Python
+Library Reference. Some modules are built into the interpreter; these provide access to operations
+that are not part of the core of the language but are nevertheless built in, either for efficiency
+or to provide access to operating system primitives such as system calls. The set of such modules
+is a configuration option which also depends on the underlying platform. For example, the
+\texttt{winreg} module is only provided on Windows systems. One particular module deserves some
+attention: \texttt{sys}, which is built into every Python interpreter. The variables
+\texttt{sys.ps1} and \texttt{sys.ps2} define the strings used as primary and secondary prompts:
+\begin{minted}{bash}
+    >>> import sys
+    >>> sys.ps1
+    '>>> '
+    >>> sys.ps2
+    '... '
+    >>> sys.ps3
+    >>> sys.ps1 = 'C> '
+    C> print 'Yuck!'
+    Yuck!
+\end{minted}
+
+These two variables are only defined if the interpreter is in interactive mode.
+
+The variable \texttt{sys.path} is a list of strings that determines the interpreter's search path
+for modules. It is initialized to a default path taken from the environment variable
+\texttt{PYTHONPATH}, or from a built-in default if \texttt{PYTHONPATH} is not set. You can modify
+it using standard list operations:
+\begin{minted}{bash}
+    >>> import sys
+    >>> sys.path.append('/ufs/gudio/lib/python')
+\end{minted}
+
+\subsection{The \texttt{dir()} Function}
+The built-in function \texttt{dir()} is used to find out which names a module defines. It returns a
+sorted list of strings:
+\begin{minted}{bash}
+    >>> import fibo, sys
+    >>> dir(fibo)
+    ['__builtins__', '__doc__', '__file__', '__name__', '__package__', 'fib', 'fib2']
+    >>> dir(sys)
+    ['__displayhook__', '__doc__', '__egginsert', '__excepthook__', '__name__', '__package__',
+    '__plen', '__stderr__', '__stdin__', '__stdout__', '_clear_type_cache', '_current_frames',
+    '_getframe', '_mercurial', 'api_version', 'argv', 'builtin_module_names', 'byteorder',
+    'call_tracing', 'callstats', 'copyright', 'displayhook', 'dont_write_bytecode',
+    'exc_clear', 'exc_info', 'exc_type', 'excepthook', 'exec_prefix', 'executable', 'exit',
+    'flags', 'float_info', 'float_repr_style', 'getcheckinterval', 'getdefaultencoding',
+    'getdlopenflags', 'getfilesystemencoding', 'getprofile', 'getrecursionlimit', 'getrefcount',
+    'getsizeof', 'gettrace', 'hexversion', 'last_traceback', 'last_type', 'last_value',
+    'long_info', 'maxint', 'maxsize', 'maxunicode', 'meta_path', 'modules', 'path', 'path_hooks',
+    'path_importer_cache', 'platform', 'prefix', 'ps1', 'ps2', 'py3kwarning', 'setcheckinterval',
+    'setdlopenflags', 'setprofile', 'setrecursionlimit', 'settrace', 'stderr', 'stdin',
+    'stdout', 'subversion', 'version', 'version_info', 'warnoptions']
+\end{minted}
+
+Without arguments, \texttt{dir()} lists the names you have defined currently:
+\begin{minted}{bash}
+    >>> a = [1, 2, 3, 4, 5]
+    >>> import fibo
+    >>> fib = fibo.fib
+    >>> dir()
+    ['__builtins__', '__doc__', '__name__', '__package__', 'a', 'fib', 'fibo']
+\end{minted}
+
+Note that it lists all types of names: variables, modules, functions, etc.
+
+\texttt{dir()} does not list the names of built-in functions and variables. If you want a list of
+those, they are defined in the standard module \texttt{\_\_builtin\_\_}:
+\begin{minted}{bash}
+>>> import __builtin__
+>>> dir(__builtin__)
+['ArithmeticError', 'AssertionError', 'AttributeError', 'BaseException', 'BufferError',
+'BytesWarning', 'DeprecationWarning', 'EOFError', 'Ellipsis', 'EnvironmentError', 'Exception',
+'False', 'FloatingPointError', 'FutureWarning', 'GeneratorExit', 'IOError', 'ImportError',
+'ImportWarning', 'IndentationError', 'IndexError', 'KeyError', 'KeyboardInterrupt',
+'LookupError', 'MemoryError', 'NameError', 'None', 'NotImplemented', 'NotImplementedError',
+'OSError', 'OverflowError', 'PendingDeprecationWarning', 'ReferenceError', 'RuntimeError',
+'RuntimeWarning', 'StandardError', 'StopIteration', 'SyntaxError', 'SyntaxWarning',
+'SystemError', 'SystemExit', 'TabError', 'True', 'TypeError', 'UnboundLocalError',
+'UnicodeDecodeError', 'UnicodeEncodeError', 'UnicodeError', 'UnicodeTranslateError',
+'UnicodeWarning', 'UserWarning', 'ValueError', 'Warning', 'ZeroDivisionError', '_',
+'__debug__', '__doc__', '__import__', '__name__', '__package__', 'abs', 'all', 'any', 'apply',
+'basestring', 'bin', 'bool', 'buffer', 'bytearray', 'bytes', 'callable', 'chr', 'classmethod',
+'cmp', 'coerce', 'compile', 'complex', 'copyright', 'credits', 'delattr', 'dict', 'dir',
+'divmod', 'enumerate', 'eval', 'execfile', 'exit', 'file', 'filter', 'float', 'format',
+'frozenset', 'getattr', 'globals', 'hasattr', 'hash', 'help', 'hex', 'id', 'input', 'int',
+'intern', 'isinstance', 'issubclass', 'iter', 'len', 'license', 'list', 'locals', 'long',
+'map', 'max', 'memoryview', 'min', 'next', 'object', 'oct', 'open', 'ord', 'pow', 'print',
+'property', 'quit', 'range', 'raw_input', 'reduce', 'reload', 'repr', 'reversed', 'round',
+'set', 'setattr', 'slice', 'sorted', 'staticmethod', 'str', 'sum', 'super', 'tuple', 'type',
+'unichr', 'unicode', 'vars', 'xrange', 'zip']
+\end{minted}
+
+\subsection{Packages}
+Packages are a way of structuring Python's module namespace by using "dotted module names". For
+example, the module name \texttt{A.B} designates a submodule named \texttt{B} in a package named
+\texttt{A}. Just like the use of modules saves the authors of different moduels from having to
+worry about each other's global variable names, the use of dotted module names saves the authors of
+multi-module package like NumPy or the Python Imaging Library from having to worry about each
+other's moudule names.
+
+
+Suppose you want to design a collection of modules (a ``package'') for the uniform handling of
+sound files and sound data. There are many different sound file formats (usually recognized by
+their extension, for example: \texttt{.wav}, \texttt{.aiff}, \texttt{.au}), so you may need to
+create and maintain a growing collection of modules for the conversion between the various file
+formats. There are also many different operations you might want to perform on sound data (such
+as mixing, adding echo, applying an equalizer function, creating an artificial stereo effect), so
+in addition you'll be writing a never-ending stream of modules to perform these operations. Here's
+a possible structure for your package (expressed in terms of a hierarchical filesystem):
+\begin{minted}{text}
+    sound/                          Top-level package
+          __init__.py               Initialize the sound package
+          formats/                  Subpackage for file format conversions
+                  __init__.py
+                  wavread.py
+                  wavwrite.py
+                  aiffread.py
+                  aiffwrite.py
+                  auread.py
+                  auwrite.py
+                  ...
+          effects/                  Subpackage for sound effects
+                  __init__.py
+                  echo.py
+                  surround.py
+                  reverse.py
+                  ...
+          filters/                  Subpackage for filters
+                  __init__.py
+                  equalizer.py
+                  vocoder.py
+                  karaoke.py
+                  ...
+\end{minted}
+
+When importing the package, Python searches through the directories on \texttt{sys.path} looking
+for the package subdirectory.
+
+The \texttt{\_\_init\_\_.py} files are required to make Python treat the directories as containing
+packages; this is done to prevent directories with a common name, such as \texttt{string}, from
+unintentionally hiding valid modules taht occur later on the module search path. In the simplest
+case, \texttt{\_\_init\_\_.py} can just be an empty file, but it can also execute initialization
+code for the package or set the \texttt{\_\_all\_\_} variable, described later.
+
+Users of the package can import individual modules from the package, for example:
+\begin{minted}{python}
+    import sound.effects.echo
+\end{minted}
+
+This loads the submodule \texttt{sound.effects.echo}. It must be referened with its full name.
+\begin{minted}{python}
+    sound.effects.echo.echofilter(input, output, delay = 0.7, atten = 4)
+\end{minted}
+
+An alternative way of importing the submodule is:
+\begin{minted}{python}
+    from sound.effects import echo
+\end{minted}
+
+This also loads the submodule \texttt{echo}, and makes it available without its package prefix, so
+it can be used as follows:
+\begin{minted}{python}
+    echo.echofilter(input, output, delay = 0.7, atten = 4)
+\end{minted}
+
+Yet another variation is to import the desired function or variable directly:
+\begin{minted}{python}
+    from sound.effects.echo import echofilter
+\end{minted}
+
+Again, this loads the submodule \texttt{echo}, but this makes its function \texttt{echofilter()}
+directly available:
+\begin{minted}{python}
+    echofilter(input, output, delay = 0.7, atten = 4)
+\end{minted}
+
+Note that when using \mintinline{python}{from package import item}, the item can be either a
+submodule (or subpackage) of the package, or some other anme defined in the package, like a
+function, class or variable. The \texttt{import} statement first tests whether the item is defined
+in the package; if not, it assumes it is a module and attempts to load it. If it fails to find it,
+an \texttt{ImportError} exception is raised.
+
+Contrarily, when using syntax like \mintinline{python}{import item.subitem.subsubitem}, each item
+except for the last must be a package; the last item can be a module or a package but can't be a
+class or a function or variable defined in the previous item.
+
+\subsubsection{Importing \texttt{*} From a Package}
+Now what happens when the user writes \mintinline{python}{from sound.effects import *}? Ideally,
+one would hope that this somehow goes out the filesystem, finds which submodules are present in the
+package, and imports them all. This could take a long time and importing sub-modules might have
+unwanted side-effects that should only happen when the sub-module is explicitly imported.
+
+The only solution is for the package author to provide an explicit index of the package. The
+\mintinline{python}{import} statement uses the following convention: if a package's
+\mintinline{python}{__init.py__} code defines a list named \mintinline{python}{__all__}, it is
+taken to be the list of module names that should be imported when
+\mintinline{python}{from package import *} is encountered. It is up to the package author to keep
+this list up-to-date when a new version of the package is released. Package authors may also decide
+not to support it, if they don't see a use for importing \texttt{*} from their package. For example,
+the file \texttt{sound/effects/\_\_init\_\_.py} could contain the following code:
+\begin{minted}{python}
+    __all__ = ["echo", "surround", "reverse"]
+\end{minted}
+
+This would mean that \mintinline{python}{from sound.effects import *} would import the three named
+submodules of the \texttt{sound} package.
+
+If \texttt{\_\_all\_\_} is not defined, the statement \mintinline{python}{from sound.effects import
+*} does \emph{not} import all submodules from the package \texttt{sound.effects} into the current
+namespace; it only ensures that the package \texttt{sound.effects} has been imported (possibly
+running any initialization code in \texttt{\_\_init.py\_\_}) and then imports whatever names are
+defined in the package. This includes any names defined (and submodules explicitly loaded) by
+\texttt{\_\_init\_\_.py}. It also includes any submodules of the package that were explicitly
+loaded by previous \texttt{import} statements. Consider this code:
+\begin{minted}{python}
+    import sound.effects.echo
+    import sound.effects.surround
+    from sound.effects import *
+\end{minted}
+In this example, the \texttt{echo} and \texttt{surround} modules are imported in the current
+namespace because they are defined by in the \texttt{sound.effects} package when the
+\mintinline{python}{from...import} statement is executed. (This also works when
+\texttt{\_\_all\_\_} is defined.)
+
+Although certain modules are designed to export only names that follow certain patterns when you
+use \mintinline{python}{import *}, it is still considered bad practice in production code.
+
+Remember, there is nothing wrong with using \mintinline{python}{from package import
+specific_submodule}! In fact, this the recommended notation unless the importing module needs to
+use submodules with the same name from different packages.
+
+\subsubsection{Intra-package References}
+The submodules often needs to refer to each other. For example, the \texttt{surround} module might
+use the \texttt{echo} module. In fact, such references are so common that the \texttt{import}
+statement first looks in the containing package before looking in the standard module search path.
+Thus, the \texttt{surround} module can simply use \mintinline{python}{imort echo} or
+\mintinline{python}{from echo import echofilter}. If the imported module is not found in the current
+package (the package of which the current module is a submodule), the \texttt{import} statement
+looks for top-level module with the given name.
+
+When packages are structured into subpackages (as with teh \texttt{sound} package in the example),
+you can use absolute imports to refer to submodules of siblings packages. For example, if the
+module \texttt{sound.filters.vocoder} needs to use the \texttt{echo} module in the
+\texttt{sound.effects} package, it can use \mintinline{python}{from sound.effects import echo}.
+
+Starting with Python 2.5, in addition to the implicit relative imports described above, you can
+write explicit relative imports with the \mintinline{python}{from module import name} form of
+import statement. These explicit relative imports use leading dots to indicate the current and
+parent packages involed in the relative import. From the \texttt{surround} module for example, you
+might use:
+\begin{minted}{python}
+    from . import echo
+    from .. import formats
+    from ..filters import equalizer
+\end{minted}
+
+Note that both explicit and implicit relative imports are bases on the name of the current module.
+Since the name of the main module is always ``\texttt{\_\_main\_\_}'', modules intended for use as
+the main module of a Python application should always use absolute imports.
+
+\subsubsection{Packages in Multiple Directories}
+Packages support one more special attribute, \texttt{\_\_path\_\_}. This is initialized to be a
+list containing the name of the diretory holding the package's \texttt{\_\_init\_\_.py} before the
+code in that file is executed. This variable can be modified; doing so affects future searches for
+modules and subpackages contained in the package.
+
+While this feature is not often needed, it can be used to extend the set of modules found in a
+package.
+
+
+
+
+
+
 
 
 
