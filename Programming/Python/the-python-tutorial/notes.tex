@@ -2598,6 +2598,368 @@ applications written in other languages. It is also insecure by default: deseria
 coming from an untrusted source can execute arbitrary code, if the data was crafted by a skilled
 attacker.
 
+\section{Errors and Exceptions}
+Until now error messages haven't been more than mentioned, but if you have tried out the examples
+you have probably seen some. There are (at least) two distinguishable kinds of errors:
+\emph{syntax errors} and \emph{exceptions}.
+
+\subsection{Syntax Errors}
+Syntax errors, also known as parsing errors, are perhaps the most common kind of complaint you get
+while you are still learning Python:
+\begin{minted}{bash}
+    >>> while True print 'Hello world'
+      File "<stdin>", line 1
+        while True print 'Hello world'
+                       ^
+    SyntaxError: invalid syntax
+\end{minted}
+
+The parser repeats the offending line and displays a little `arrow' pointing at the earliest point
+in the line where the error was detected. The error iss caused by (or at least detected at) the
+token \emph{preceding} the arrow: in the example, the error is detected at the keyword
+\mintinline{python}{print}, since a colon (\texttt{':'}) is missing before it. File name and line
+number are printed so you know where to look in case the input came from a script.
+
+\subsection{Exceptions}
+Even if statement or expression is syntactically correct, it may cause an error when an attempt is
+made to execute it. Errors detected during execution are called \emph{exceptions} and are not
+unconditionally fatal: you will soon learn how to handle them in Python programs. Most exceptions
+are not handled by programs, however, and result in error messages as shown here:
+\begin{minted}{bash}
+    >>> 10 * (1 / 0)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    ZeroDivisionError: integer division or modulo by zero
+    >>> 4 + spam * 3
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    NameError: name 'spam' is not defined
+    >>> '2' + 2
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: cannot concatenate 'str' and 'int' objects
+\end{minted}
+
+The last line of the error message indicates what happened. Exceptions come in different types, and
+the type is printed as part of the message: the types in the example are \texttt{ZeroDivisionError},
+\texttt{NameError} and \texttt{TypeError}. The string printed as the exception type is the name of
+the built-in exception that occurred. This is true for all built-in exceptions, but need not be
+true for userdefined exceptions (although it is a useful convention). Standard exception names are
+built-in indetifiers (not reserved keywords).
+
+The rest of the line provides detail based on the type of exception and what caused it.
+
+The preceding part of the error message shows the context where the exception happened, in the form
+of a stack traceback. In general it contains a stack traceback listing source lines; however, it
+will not display lines read from standard input.
+
+Built-in Exceptions lists the built-in exceptions and their meanings.
+
+\subsection{Handling Exceptions}
+It is possible to write programs that handle selected exceptions. Look at the following example,
+which asks the user for input until a valid integer has been entered, but allows the user to
+interrupt the program (using \texttt{Control-C} or whatever the operating system supports); note
+that a user-generated interruption is signalled by raising the \texttt{KeyboardInterrupt} exception.
+\begin{minted}{bash}
+    >>> while True:
+    ...     try:
+    ...         x = int(raw_input("Please enter a number: "))
+    ...         break
+    ...     except ValueError:
+    ...         print "Oops! That was no valid number. Try again..."
+    ...
+    Please enter a number: j
+    Oops! That was no valid number. Try again...
+\end{minted}
+
+The \texttt{try} statement works as follows:
+\begin{itemize}
+     \item First, the \emph{try clause} (the statement(s) between the \texttt{try} and
+     \texttt{except} keywords) is executed.
+     \item If no exception occurs during execution of the try clause, the rest of the clause is
+     skipped. Then if its type matches the exception named after the \texttt{except} keyword, the
+     except clause is executed, and then execution continues after the \texttt{try} statement.
+     \item If an exception occurs which does not match the exception named in the except clause, it
+     is passed on to outer \texttt{try} statement; if no handler is found, it is an \emph{unhandled
+     exception} and execution stops with a message as shown above.
+\end{itemize}
+
+A \texttt{try} statement may have more than one except clause, to specify handles for different
+exceptions. At most one handler will be executed. Handlers only handle exceptions that occur in the
+corresponding try clause, not in other handlers of the same \texttt{try} statement. An except
+clause may name multiple exceptions as a parenthesized tuple, for example:
+\begin{minted}{bash}
+    ... except (RuntimeError, TypeError, NameError):
+    ...     pass
+\end{minted}
+
+Note that the parentheses aroundt this tuple are required, because
+\mintinline{python}{except ValueError, e:} was the syntax used for what is normally written as
+\mintinline{python}{except ValueError as e:} in modern Python (described below). The old syntax is
+still supported for backwards compatibility. This means
+\mintinline{python}{except RuntimeError, TypeError} is not equivalent to
+\mintinline{python}{except (RuntimeError, TypeError):} but to
+\mintinline{python}{except RuntimeError as TypeError:} which is not what you want.
+
+The last except clause may omit exceptions name(s), to serve as a wildcard. Use this with extreme
+caution, since it is easy to mask a real programming error in this way! It can also be used to
+print an error message and then re-raise exception (allowing a caller to handle the exception as
+well):
+\begin{minted}{python}
+    import sys
+
+    try:
+        f = open('myfile.txt')
+        s = f.readline()
+        i = int(s.strip())
+    except IOError as e:
+        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+    except ValueError:
+        print "Could not convert data to an integer."
+    except:
+        print "Unexpected error:", sys.exc_info()[0]
+        raise
+\end{minted}
+
+The \texttt{try} ... \texttt{except} statement has an optional \emph{else clause}, which, when
+present, must follow all except clauses. It it useful for code that must be executed if the try
+clause does not raise an exception. For example:
+\begin{minted}{python}
+    for arg in sys.argv[1:]:
+        try:
+            f = open(arg, 'r')
+        except IOError:
+            print 'cannot open', arg
+        else:
+            print arg, 'has', len(f.readlines()),  'lines'
+            f.close()
+\end{minted}
+
+The use of the \texttt{else} clause is better than adding additional code to the \texttt{try}
+clause because it avoids accidentally catching an exception that wasn't raised by the code being
+protected by the \texttt{try} ... \texttt{except} statement.
+
+When an exception occurs, it may have an associated value, also known as the exception's
+\emph{argument}. The presence and type of the argument depend on the exception type.
+
+The except clause may specify a variable after the exception name (or tuple). The variable is bound
+to an exception instance with the arguments stored in \texttt{instance.args}. For convenience, the
+exception instance defines \texttt{\_\_str\_\_()} so the arguments can be printed directly without
+having to reference \texttt{.args}.
+
+One may also instantiate an exception first before raising it and add any attributes to it as
+desired.
+\begin{minted}{bash}
+    >>> try:
+    ...     raise Exception('spam', 'eggs')
+    ... except Exception as inst:
+    ...     print type(inst)    # the exception instance
+    ...     print inst.args     # arguments stored in .args
+    ...     print inst          # __str__ allows args to be printed directly
+    ...     x, y = inst.args
+    ...     print 'x =', x
+    ...     print 'y =', y
+    ...
+    <type 'exceptions.Exception'>
+    ('spam', 'eggs')
+    ('spam', 'eggs')
+    x = spam
+    y = eggs
+\end{minted}
+
+If an exception has an argument, it is printed as the last part (`detail') of the message for
+unhandled exceptions.
+
+Exception handlers don't just handle exceptions if they occur immediately in the try clause, but
+also if they occur inside functions that are called (even indirectly) in the try clause. For
+example:
+\begin{minted}{bash}
+    >>> def this_fails():
+    ...     x = 1 / 0
+    ...
+    >>> try:
+    ...     this_fails()
+    ... except ZeroDivisionError as detail:
+    ...     print 'Handling run-time error:', detail
+    ...
+    Handling run-time error: integer division or modulo by zero
+\end{minted}
+
+\subsection{Raising Exceptions}
+The \mintinline{python}{raise} statement allows the programmers to force a specified exception to
+occur. For example:
+\begin{minted}{bash}
+    >>> raise NameError('HiThere')
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    NameError: HiThere
+\end{minted}
+
+The sole argument to \mintinline{python}{raise} indicates the exception to be raised. This must be
+either an exception instance or an exception (a class that derives from \texttt{Exception}):
+\begin{minted}{bash}
+    >>> try:
+    ...     raise NameError('HiThere')
+    ... except NameError:
+    ...     print 'An exception flew by!'
+    ...     raise   # re-raise the exception to see if there is a exception
+    ...
+    An exception flew by!
+    Traceback (most recent call last):
+      File "<stdin>", line 2, in <module>
+    NameError: HiThere
+\end{minted}
+
+\subsection{User-defined Exceptions}
+Programs may name their own exceptions by creating a new exception class (see Classes for more
+about Python classes). Exceptions should typically be derived from the \texttt{Exceptions} class,
+either directly or indirectly. For example:
+\begin{minted}{bash}
+    >>> class MyError(Exception):
+    ...     def __init__(self, value):
+    ...         self.value = value
+    ...     def __str__(self):
+    ...         return repr(self.value)
+    ...
+    >>> try:
+    ...     raise MyError(2*2)
+    ... except MyError as e:
+    ...     print 'My exception occurred, value:', e.value
+    ...
+    My exception occurred, value: 4
+    >>> raise MyError('oops!')
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    __main__.MyError: 'oops!'
+\end{minted}
+
+In this example, the default \texttt{\_\_init()\_\_} of \texttt{Exception} has been overridden.
+The new behavior simply creates the \emph{value} attribute. This replaces the default behavior of
+creating the \emph{args} attribute.
+
+Exception classes can be defined which do anything any other class can do, but are usually kept
+simple, often only offering a nubmer of attributes that allow information about the error to be
+extracted by handles for the exception. When creating a module that can raise several distinct
+errors, a common practice is to create a base class for exceptions defined by that module, and
+subclass that to create specific exception classes for different error conditions:
+\begin{minted}{python}
+    class Error(Exception):
+        """Base class for exceptions in this module."""
+        pass
+
+    class InputError(Error):
+        """Exceptions raised for errors in the input.
+
+        Attributes:
+            expr -- input expression in which the error occurred
+            msg  -- explanation of the error
+        """
+
+        def __init__(self, expr, msg):
+            self.expr = expr
+            self.msg = msg
+
+    class TransitionError(Error):
+        """Raised when an operation attempts a state transition that's not allowed.
+
+        Attributes:
+            prev -- state at beginning of transition
+            next -- attempted new state
+            msg  -- explanation of why the specific transition is not allowed
+        """
+
+        def __init__(self, prev, next, msg):
+            self.prev = prev
+            self.next = next
+            self.msg = msg
+\end{minted}
+
+Most exceptions are defined with names that end in ``Error'', similar to the naming of the standard
+exceptions.
+
+Many standard modules define their own exceptions to report errors that may occur in functions they
+define.
+
+\subsection{Defining Clean-up Actions}
+The \texttt{try} statement has another optional clause which is intended to define clean-up actions
+that must be executed under all circumstances. For example:
+\begin{minted}{bash}
+    >>> try:
+    ...     raise KeyboardInterrupt
+    ... finally:
+    ...     print 'Goodbye, world!'
+    ...
+    Goodbye, world!
+    Traceback (most recent call last):
+      File "<stdin>", line 2, in <module>
+    KeyboardInterrupt
+\end{minted}
+
+A \emph{finally clause} is always executed before leaving the \texttt{try} statement, whether an
+exception has occurred or not. When an exception has occurred in the \texttt{try} clause and has
+not been handled by an \texttt{except} clause (or it has occurred in an \texttt{except} or
+\texttt{else} clause), it is re-raised after the \texttt{finally} clause has been executed. The
+\texttt{finally} clause is also executed ``on the way out'' when any other clause of the
+\texttt{try} statement is left via a \texttt{break}, \texttt{continue} or \texttt{return} statement.
+A more complicated example (having \texttt{except} and \texttt{finally} clauses in the same
+\texttt{try} statement works as of Python 2.5):
+\begin{minted}{bash}
+    >>> def divide(x, y):
+    ...     try:
+    ...         result = x / y
+    ...     except ZeroDivisionError:
+    ...         print "division by zero!"
+    ...     else:
+    ...         print "result is", result
+    ...     finally:
+    ...         print "executing finally clauses"
+    ...
+    >>> divide(2, 1)
+    result is 2
+    executing finally clauses
+    >>> divide(2, 0)
+    division by zero!
+    executing finally clauses
+    >>> divide("2", "1")
+    executing finally clauses
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "<stdin>", line 3, in divide
+    TypeError: unsupported operand type(s) for /: 'str' and 'str'
+\end{minted}
+
+As you can see, the \texttt{finally} clause is executed in any event. The \texttt{TypeError} raised
+by dividing two strings is not handled by the \texttt{except} clause and therefore re-raised after
+the \texttt{finally} clause has been executed.
+
+In real world applications, the \texttt{finally} clause is useful for releasing external resources
+(such as files or network connections), regardless of whether the use of the resource was
+successful.
+
+\subsection{Predefined Clean-up Actions}
+Some objects define standard clean-up actions to be undertaken when the object is no longer needed,
+regardless of whether or not the operation using the object succeeded or failed. Look at the
+following example, which tries to open a file and print its contents to the screen.
+\begin{minted}{python}
+    for line in open("myfile.txt"):
+        print line,
+\end{minted}
+
+The problem with this code is that it leaves the file open for an interminate amount of time after
+the code has finished executing. This is not an issue in simple scripts, but can be a problem for
+larger applications. The \texttt{with} statement allows objects like files to be used in a way that
+ensures they are always cleaned up promptly and correctly.
+\begin{minted}{python}
+    with open("myfile.txt") as f:
+        for line in f:
+            print line,
+\end{minted}
+
+After the statement is executed, the file \texttt{f} is always closed, even if a problem was
+encountered while processing the lines. Other objects which provide predefined clean-up actions
+will indicate this in their documentation.
+
+
 
 
 
