@@ -2549,7 +2549,7 @@ becomes complicated.
 
 Rather than having users constantly writing and debugging code to save complicated data types to
 files, Python allows you to use the popular data interchange format called JSON (JavaScript Object
-Notation). The standard module called \texttt{json} can take Python data hierachies, and convert
+Notation). The standard module called \texttt{json} can take Python data hierarchies, and convert
 them to string representations; this process is called \emph{serializing}. Reconstructing the data
 from the string representation is called \emph{deserializing}. Between serializing and
 deserializing, the string representing the object may have been stored in a file or data, or sent
@@ -2962,7 +2962,7 @@ will indicate this in their documentation.
 \section{Classes}
 Compared with other programming languages, Python's class mechanism adds classes with a minimum of
 new syntax and semantics. It is a mixture of the class mechanisms found in C++ and Modula-3. Python
-classes provide all the standard features of Objext Oriented Programming: the class inheritance
+classes provide all the standard features of Object Oriented Programming: the class inheritance
 mechanism allows multiple base classes, a derived class can override any methods of its base class
 or classes, and a method can call the method of a base class with the same name. Objects can
 contain arbitrary amounts and kinds of data. As is true for modules, classes partake of the dynamic
@@ -3009,7 +3009,7 @@ name.
 By the way, I use the word \emph{attribute} for any name following a dot --- for example, in the
 expression \texttt{z.real}, \texttt{real} is an attribute of the object \texttt{z}. Strictly
 speaking, references to names in modules are attribute references: in the expression
-\texttt{expression.funcname}, \texttt{modname} is a module object and \texttt{funcname} is an
+\texttt{modname.funcname}, \texttt{modname} is a module object and \texttt{funcname} is an
 attribute of it. In this case there happens to be a straightforward mapping between the module's
 attribute and the global names defined in the module: they share the same namespace!
 
@@ -3029,7 +3029,7 @@ names actually also live in a module; this is called \texttt{\_\_builtin\_\_}.)
 The local namespace for a function is created when the function is called, and deleted when the
 function returns or raises an exception that is not handled within the function. (Actually,
 forgetting would be a better way to describe what actually happens.) Of course, recursive
-invovations each have their own local namespace.
+invocations each have their own local namespace.
 
 A \emph{scope} is textual region of a Python program where a namespace is directly accessible.
 ``Directly accessible'' here means that an unqualified reference to a name attempts to find the
@@ -3090,7 +3090,7 @@ statement, or inside a function.)
 In practice, the statements inside a class definition will usually be function definitions, but
 other statements are allowed, and sometimes useful --- we'll come back to this later. The function
 definitions inside a class normally have a peculiar form of argument list, dictated by the calling
-convetions for methods --- again, this is explained later.
+conventions for methods --- again, this is explained later.
 
 When a class definition is entered, a new namespace is created, and used as the local scope ---
 thus, all assignments to local variables go into this new namespace. In particular, function
@@ -3121,9 +3121,9 @@ and a function object, respectively. Class attributes can also be assigned to, s
 the value of \texttt{MyClass.i} by assignment. \texttt{\_\_doc\_\_} is also a valid attribute,
 returning the docstring belonging to the class: \texttt{"A simple example class"}.
 
-If you write the definition of \texttt{MyClass} in \texttt{MyClass.py} script, then you can use it
-by command \mintinline{python}{import MyClass}. However, when I tried to use it in the interpreter
-with \texttt{x = MyClass()}, I got the following error message:
+If you write the definition of the class \texttt{MyClass} in script \texttt{MyClass.py}, then you
+can use it by command \mintinline{python}{import MyClass}. However, when I tried to use it in the
+interpreter with \texttt{x = MyClass()}, I got the following error message:
 \begin{minted}{bash}
     >>> x = MyClass()
     Traceback (most recent call last):
@@ -3132,8 +3132,8 @@ with \texttt{x = MyClass()}, I got the following error message:
 \end{minted}
 
 That's because the clause \mintinline{python}{import MyClass} is importing a \emph{module} named
-\texttt{MyClass} instead of the class \texttt{MyClass}
-\footnote{https://stackoverflow.com/questions/16780510/}. So we can call the class \texttt{MyClass}
+\texttt{MyClass} instead of the class \texttt{MyClass}.
+\footnote{https://stackoverflow.com/questions/16780510/} So we can call the class \texttt{MyClass}
 by the following way:
 \begin{minted}{bash}
     >>> import MyClass
@@ -3235,9 +3235,9 @@ requires an argument is called without any --- even if the argument isn't actual
 
 Actully, you may have guessed the answer: the special thing about methods is that the object is
 passed as the first argument of the function. In our example, the call \texttt{x.f()} is exactly
-equivalent to \texttt{MyClass.f(x)}. In general, calling a method with a list of \emph{n} arguments
-is equivalent to calling the corresponding function with an argument list that is created by
-inserting the method's object before the first argument.
+equivalent to \texttt{MyClass.f(x)}. \textbf{In general, calling a method with a list of \emph{n}
+arguments is equivalent to calling the corresponding function with an argument list that is created
+by inserting the method's object before the first argument.}
 
 If you still don't understand how methods work, a look at the implementation can perhaps clarify
 matters. When an instance attribute is referenced that isn't a data attribute, its class is
@@ -3389,6 +3389,339 @@ we'll find some good reasons why a method would want to reference its own class.
 
 Each value is an object, and therefore has a \emph{class} (also called its \emph{type}). It is
 stored as \texttt{object.\_\_class\_\_}.
+
+\subsection{Inheritance}
+Of course, a language feature would not be worthy of the name ``class'' without supporting
+inheritance. The syntax for a derived class definition looks like this:
+\begin{minted}{python}
+    class DerivedClassName(BaseClassName):
+        <statement-1>
+        .
+        .
+        .
+        <statement-N>
+\end{minted}
+
+The name \texttt{BaseClassName} must be defined in a scope containing the derived class definition.
+In place of a base class name, other arbitrary expressions are also allowed. This can be useful,
+for example, when the base class is defined in another module:
+\mintinline{python}{class DerivedClassName(modname.BaseClassName):}
+
+Execution of a derived class definition proceeds the same as for a base class. When the class
+object is constructed, the base class is remembered. This is used for resolving attribute
+references: if a requested attribute is not found in the class, the search proceeds to look in the
+base class. This rule is applied recursively if the base class itself is derived from some other
+class.
+
+There's nothing special about instantiation of derived classes: \texttt{DerivedClassName()} creates
+a new instance of the class. Method references are resovled as follows: the corresponding class
+attribute is searched, descending down the chain of base classes if necessary, and the mothod
+reference is valid if this yields a function object.
+
+Derived classes may override methods of their base classes. Because methods have no special
+priviliges when calling other methods of the same object, a method of a base class that calls
+another method defined in the same base class may end up calling a method of a derived class that
+overrides it. (For C++ programmers: all methods in Python are effectively \texttt{virtual}.)
+
+An overriding method in a derived class may in fact want to extend rather than simply replace the
+base class method of the same name. There is a simple way to call the base class method directly:
+just call \texttt{BaseClassName.methodname(self, arguments)}. This is occasionally useful to
+clients as well. (Note that this only works if the base class is accessible as
+\texttt{BaseClassName} in the global scope.)
+
+Python has two built-in functions that work with inheritance:
+\begin{itemize}
+    \item Use \texttt{isinstance()} to check an instance's type: \texttt{isinstance(obj, int)} will
+    be \texttt{True} only if \texttt{obj.\_\_class\_\_} is \texttt{int} or some class derived from
+    \texttt{int}.
+    \item Use \texttt{issubclass()} to check class inheritance: \texttt{issubclass(bool, int)} is
+    \texttt{True} since bool is a subclass of \texttt{int}. However,
+    \texttt{issubclass(unicode, str)} is \texttt{False} since \texttt{unicode} is not a subclass of
+    \texttt{str} (they only share a common ancestor, \texttt{basestring}).
+\end{itemize}
+
+\subsubsection{Multiple Inheritance}
+Python supports a limited form of multiple inheritance as well. A class definition with multiple
+base classes looks like this:
+\begin{minted}{python}
+    class DerivedClassName(Base1, Base2, Base3):
+        <statement-1>
+        .
+        .
+        .
+        <statement-N>
+\end{minted}
+
+For old-style classes, the only rule is depth-first, left-to-right. Thus, if an attribute is not
+found in \texttt{DerivedClassName}, it is searched in \texttt{Base1}, then (recursively) in the
+base classes of \texttt{Base1}, and only if it is not found there, it is searched in \texttt{Base2},
+and so on.
+
+(To some people breadth first --- searching \texttt{Base2} and \texttt{Base3} before the base
+classes of \texttt{Base1} --- looks more natural. However, this would require you to know whether a
+particular attribute of \texttt{Base1} is actully defined in \texttt{Base1} or in one of its base
+classes before you can figure out the consequences of a name conflict with an attribute of
+\texttt{Base2}. The depth-first rule makes no different between direct and inherited attributes of
+\texttt{Base1}.)
+
+For new-style classes, the method resolution order changes dynamically to support cooperative calls
+to super(). This approach is known in some other multiple-inheritance languages as call-next-method
+and is more powerful than the super call found in single-inheritance languages.
+
+With new-style classes, dynamic ordering is necessary because all cases of multiple inheritance
+exhibit one or more diamond relationships (where at least one of the parent classes can be accessed
+through multiple paths from the bottommost class). For example, all new-style classes inherit from
+\texttt{object}, so any case of multiple inheritance provides more than one path to reach
+\texttt{object}. To keep the base classes from being accessed more than once, the dynamic algorithm
+linearizes the search order in a way that preserves the left-to-right ordering specified in each
+class, that calls each parent only once, and that is monotonic (meaning that a class can be
+subclassed without affecting the precedence order of its parents). Taken together, these properties
+make it possible to design reliable and extensible classes with multiple inheritance.
+
+\subsection{Private Variables and Class-local References}
+``Private'' instance variables that cannot be accessed except from inside an object don't exist in
+Python. However, there is a convention that is followed by most Python code: a name prefixed with
+an underscore (e.g. \texttt{\_spam}) should be treated as a non-public part of the API (whether it
+is a function, a method or a data memeber). It should be considered an implementation detail and
+subject to change without notice.
+
+Since there is a valid use-case for class-private members (namely to avoid name clashes of names
+with names defined by subclasses), there is limited support for such a mechanism, called \emph{name
+mangling}. Any identifier of the form \texttt{\_\_spam} (at least two underscores, at most one
+trailing underscore) is textually replaced with \texttt{\_classname\_\_spam}, where
+\texttt{classname} is the current class name with leading underscore(s) stripped. This mangling is
+done without regard to the syntactic position of the identifier, as long as it occurs within the
+definition of a class.
+
+Name mangling is helpful for letting subclasses override methods without breaking intraclass method
+calls. For example:
+\begin{minted}{python}
+    class Mapping:
+        def __init__(self, iterable):
+            self.items_list = []
+            self.__update(iterable)
+
+        def update(self, iterable):
+            for item in iterable:
+                self.items_list.append(item)
+
+        __update = update       # private copy of original update() method
+
+    class MappingSubclass(Mapping):
+
+        def update(self, keys, values):
+            # provides new signature for update()
+            # but does not break __init__()
+            for item in zip(keys, values):
+                self.items_list.append(item)
+\end{minted}
+
+Note that the mangling rules are designed mostly to avoid accidents; it still is possible to access
+or modify a variable that is considered private. This can even be useful in special circumstances,
+such as in the debugeger.
+
+Notice that code passed to \texttt{exec}, \texttt{eval()} or \texttt{execfile()} does not consider
+the classname of the invoking class to be the current class; this is similar to the effect of the
+\texttt{global} statement, the effect of which is likewise restricted to code that is byte-compiled
+together. The same restriction applies to \texttt{getattr()}, \texttt{setattr()}, and
+\texttt{delattr()}, as well as when referencing \texttt{\_\_dict\_\_} directly.
+
+\subsection{Odds and Ends}
+Sometimes it is useful to have a data type similar to the Pascal ``record'' or C ``struct'',
+building together a few named data items. As empty class definition will do nicely:
+\begin{minted}{python}
+    class Employee:
+        pass
+
+    john = Employee()   # Create an empty employee record
+
+    # Fill the fields of the record
+    john.name = 'John Doe'
+    john.dept = 'computer lab'
+    john.salary = 1000
+\end{minted}
+
+A piece of Python code that expects a particular abstract data type can often be passed a class
+that emulates the methods of that data type instead. For instance, if you have a function that
+formats some data from a file object, you can define a class with methods \texttt{read()} and
+\texttt{readline()} that get the data from a string buffer instead, and pass it as an argument.
+
+Instance method objects have attributes, too: \texttt{m.im\_self} is the instance object with the
+method \texttt{m()}, and \texttt{m.im\_func} is the function object corresponding to the method.
+
+\subsection{Exceptions Are Classes Too}
+User-defined exceptions are identified by classes as well. Using this mechanism it is possible to
+create extensible hierarchies of exceptions.
+
+There are two new valid (semantic) forms for the \texttt{raise} statement:
+\begin{minted}{python}
+    raise Class, instance
+    raise instance
+\end{minted}
+
+In the first form, \texttt{instance} must be an instance of \texttt{Class} or of a class derived
+from it. The second form is a shorthand for:
+\begin{minted}{python}
+    raise instance.__class__, instance
+\end{minted}
+
+A class in an \texttt{except} clause is compatible with an excpetion if it is the same class or a
+base class thereof (but not the other way around --- an except clause listing a derived class is
+not compatible with a base class). For example, the following code will print B, C, D in that
+order:
+\begin{minted}{python}
+    class B:
+        pass
+
+    class C(B):
+        pass
+
+    class D(C):
+        pass
+
+    for c in [B, C, D]:
+        try:
+            raise c()
+        except D:
+            print "D"
+        except C:
+            print "C"
+        except B:
+            print "B"
+\end{minted}
+
+Note that if the except clauses were reversed (with \texttt{except B} first), it would have printed
+B, B, B --- the first matching except clause is triggered.
+
+When an error message is printed for an unhandled exception, the exception's class name is printed,
+then a colon and a space, and finally the instance converted to a string using the built-in
+function \texttt{str()}.
+
+\subsection{Iterators}
+By now you have probably noticed that most container objects can be looped over using a \texttt{for}
+statement:
+\begin{minted}{python}
+    for element in [1, 2, 3]:
+        print element
+    for element in (1, 2, 3):
+        print element
+    for key in {'one': 1, 'two': 2}:
+        print key
+    for char in "123":
+        print char
+    for line in open("myfile.txt"):
+        print line,
+\end{minted}
+
+This style of access is clear, concise, and convenient. The use of iterators pervades and unifies
+Python. Behind the scenes, the \texttt{for} statement calls \texttt{iter()} on the container object.
+The function returns an iterator object that defines the method \texttt{next()} which accesses
+elements in the container one at a time. When there are no more elements, \texttt{next()} raises a
+\texttt{StopIteration} exception which tells the \texttt{for} loop to terminate. This example shows
+how it all works:
+\begin{minted}{bash}
+    >>> s = 'abc'
+    >>> it = iter(s)
+    >>> it
+    <iterator object at 0x109ceb950>
+    >>> it.next()
+    'a'
+    >>> it.next()
+    'b'
+    >>> it.next()
+    'c'
+    >>> it.next()
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    StopIteration
+\end{minted}
+
+Having seen the mechanics behind the iterator protocol, it is easy to add iterator behavior to your
+classes. Define an \texttt{\_\_iter\_\_()} method which returns an object with a \texttt{next()}
+method. If the class defines \texttt{next()}, then \texttt{\_\_iter()\_\_} can just return
+\texttt{self}:
+\begin{minted}{bash}
+    >>> from reverse import Reverse
+    >>> rev = Reverse('spam')
+    >>> iter(rev)
+    <reverse.Reverse instance at 0x10dcd1488>
+    >>> for char in rev:
+    ...     print char
+    ...
+    m
+    a
+    p
+    s
+\end{minted}
+
+\subsection{Generators}
+Generators are a simple and powerful tool for creating iterators. They are written like regular
+functions but use the \texttt{yield} statement whenever they want to return data. Each time
+\texttt{next()} is called on it, the generator resumes where it left off (it remembers all the data
+values and which statement was last executed). An example shows that generators can be trivially
+easy to create:
+\begin{minted}{python}
+    def reverse(data):
+        for index in range(len(data)-1, -1, -1):
+            yield data[index]
+\end{minted}
+\begin{minted}{bash}
+    >>> for char in reverse('golf'):
+    ...     print char
+    ...
+    f
+    l
+    o
+    g
+\end{minted}
+
+Anthing that can be done with generators can also be done with class-based iterators as described
+in the previous section. What makes generators so compact is that the \texttt{\_\_iter()\_\_} and
+\texttt{next()} methods are created automatically.
+
+Another key feature is that the local variable and execution state are automatically saved between
+calls. This made the function easier to write and much more clear than an approach using instance
+variables like \texttt{self.index} and \texttt{self.data}.
+
+In addition to automatic method creation and saving program state, when generators terminate, they
+automatically raise \texttt{StopIteration}. In combination, these features make it easy to create
+iterators with no more effort than writing a regular function.
+
+\subsection{Generator Expressions}
+Some simple generators can be coded succinctly as expressions using a syntax similar to list
+comprehensions but with parentheses instead of brackets. These expressions are designed for
+situations where the generators is used right away by an enclosing function. Generator expressions
+are more compact but less versatile than full generator definitions and tend to be more memory
+friendly than equivalent list comprehensions.
+
+Examples:
+\begin{minted}{bash}
+    >>> sum(i*i for i in range(10))             # sum of squares
+    285
+
+    >>> xvec = [10, 20, 30]
+    >>> yvec = [7, 5, 3]
+    >>> sum(x*y for x, y in zip(xvec, yvec))    # dot product
+    260
+
+    >>> from math import pi, sin
+    >>> sine_table = dict((x, sin(x*pi/180)) for x in range(0, 91))
+
+    >>> unique_words = set(word  for line in page  for word in line.split())
+
+    >>> valedictorian = max((student.gpa, student.name) for student in graduates)
+
+    >>> data = 'golf'
+    >>> list(data[i] for i in range(len(data)-1, -1, -1))
+    ['f', 'l', 'o', 'g']
+\end{minted}
+
+
+
+
+
+
+
 
 
 
