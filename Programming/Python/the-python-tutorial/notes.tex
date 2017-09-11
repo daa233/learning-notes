@@ -3716,15 +3716,304 @@ Examples:
     ['f', 'l', 'o', 'g']
 \end{minted}
 
+\section{Brief Tour of the Standard Library}
+\subsection{Operating System Interface}
+The \texttt{os} module provides dozens of functions for interacting with the operating system:
+\begin{minted}{bash}
+    >>> import os
+    >>> os.getcwd()     # Return the current working directory
+    '/Users/duang/Documents/learning-notes/Programming/Python/the-python-tutorial/9'
+    >>> os.chdir('..')  # Change the current working directory
+    >>> os.getcwd()
+    '/Users/duang/Documents/learning-notes/Programming/Python/the-python-tutorial'
+    >>> os.system('mkdir today')    # Run the command mkdir in the system shell
+    0
+\end{minted}
 
+Be sure to use the \mintinline{python}{import os} style instead of
+\mintinline{python}{from os import *}. This will keep \texttt{os.oepn()} from shadowing the
+built-in \texttt{open()} function which operates much differently.
 
+The built-in \texttt{dir()} and \texttt{help()} functions are useful as interactive aids for
+working with large modules like \texttt{os}:
+\begin{minted}{bash}
+    >>> import os
+    >>> dir(os)
+    <returns a list of all module functions>
+    >>> help(os)
+    <returns an extensive manual page created from the module's docstrings>
+\end{minted}
 
+For daily file and directory management tasks, the \texttt{shutil} module provides a higher level
+interface that is easier to use:
+\begin{minted}{bash}
+    >>> import shutil
+    >>> shutil.copyfile('bag.py', 'bag_copy.py')
+    >>> shutil.move('bag_copy.py', '../bag_copy.py')
+\end{minted}
 
+\subsection{File Wildcards}
+The \texttt{glob} module provides a function for making file lists from directory wildcard searches:
+\begin{minted}{bash}
+    >>> import glob
+    >>> glob.glob('*.py')
+    ['bag.py', 'dog.py', 'employee.py', 'exception_classes.py', 'mapping.py', 'my_class.py',
+    'my_complex.py', 'random_remarks.py', 'reverse.py']
+\end{minted}
 
+\subsection{Command Line Arguments}
+Common utility scripts often need to process command line arguments. These arguments are stored in
+\texttt{sys} module's \emph{argv} attribute as a list. For instance the following output results
+from running \mintinline{bash}{python demo.py one two three} at the command line:
+\begin{minted}{bash}
+    duangdeiMac:9 duang$ python -i bag.py one two three
+    >>> import sys
+    >>> print sys.argv
+    ['bag.py', 'one', 'two', 'three']
+\end{minted}
 
+The \texttt{getopt} module processes \emph{sys.argv} using the conventions of the Unix
+\texttt{getopt()} function. More powerful and flexible command line processing is provided by the
+\texttt{argparse} module.
 
+\subsection{Error Output Redirection and Program Termination}
+The \texttt{sys} module also has attributes for \emph{stdin}, \emph{stdout}, \emph{stderr}. The
+latter is useful for emitting warnings and error messages to make them visible even when
+\emph{stdout} has been redirected:
+\begin{minted}{bash}
+    >>> sys.stderr.write('Warning, log file not found starting a new one\n')
+    Warning, log file not found starting a new one
+\end{minted}
 
+The most direct way to terminate a script is to use \texttt{sys.exit()}.
 
+\subsection{String Pattern Matching}
+The \texttt{re} module provides regular expression tools for advanced string processing. For
+complex matching and manipulation, regular expression offer succinct, optimized solutions:
+\begin{minted}{bash}
+    >>> import re
+    >>> re.findall(r'\bf[a-z]*', 'which foot or hand fell fastest')
+    ['foot', 'fell', 'fastest']
+    >>> re.sub(r'(\b[a-z]+) \1', r'\1', 'cat in the hat')
+    'cat in the hat'
+\end{minted}
+
+When only simple capabilities are needed, string methods are perferred because they are easier to
+read and debug:
+\begin{minted}{bash}
+    >>> 'tea for too'.replace('too', 'two')
+    'tea for two'
+\end{minted}
+
+\subsection{Mathmatics}
+The \texttt{math} module gives access to the underlying C library functions for floating point math:
+\begin{minted}{bash}
+    >>> import math
+    >>> math.cos(math.pi / 4.0)
+    0.7071067811865476
+    >>> math.log(1024, 2)
+    10.0
+\end{minted}
+
+The \texttt{random} module provides tools for making random selections:
+\begin{minted}{bash}
+    >>> import random
+    >>> random.choice(['apple', 'pear', 'banana'])
+    'apple'
+    >>> random.sample(xrange(100), 10)
+    [87, 8, 32, 89, 80, 42, 74, 66, 70, 78]
+    >>> random.random()
+    0.629621838712391
+    >>> random.randrange(6)
+    5
+\end{minted}
+
+\subsection{Internet Access}
+There are a number of modules for accessing the internet and processing internet protocols. Two of
+the simplest are \texttt{urllib2} for retrieving data from URLs and \texttt{smtplib} for sending
+mail:
+\begin{minted}{bash}
+    >>> import urllib2
+    >>> for line in urllib2.urlopen('http://tycho.usno.navy.mil/cgi-bin/timer.pl'):
+    ...     if 'EST' in line or 'EDT' in line:  # look for Eastern Time
+    ...         print line
+
+    <BR>Nov. 25, 09:43:32 PM EST
+
+    >>> import smtplib
+    >>> server = smtplib.SMTP('localhost')
+    >>> server.sendmail('soothsayer@example.org', 'jcaesar@example.org',
+    ... """To: jcaesar@example.org
+    ... From: soothsayer@example.org
+    ...
+    ... Beware the Ides of March.
+    ... """)
+    >>> server.quit()
+\end{minted}
+(Note that the first website is not accessable for me, and the second example needs a mailserver
+running on localhost.)
+
+So I wrote an example by myself, to get tomorrow's weather in Qingdao:
+\begin{minted}{python}
+    import urllib2
+
+    count = 0
+    flag = False
+
+    for line in urllib2.urlopen('http://www.weather.com.cn/weather/101120201.shtml'):
+        if flag:
+            count = count + 1
+
+        if '（Tomorrow）' in line:
+            flag = True
+
+        if count == 3:
+            print line
+\end{minted}
+
+Note: I didn't process the output string, so it will display some HTML labels like:
+\begin{minted}{html}
+    <p title="Sunny" class="wea">Sunny</p>'
+\end{minted}
+
+\subsection{Dates and Times}
+The \texttt{datetime} module supplies classes for manipulating dates and times in both simple and
+complex ways. While date and time arithmetic is supported, the focus of the implementation is on
+efficient member extraction member extraction for output formatting and manipulation. The module
+also supports objects that are timezone aware.
+\begin{minted}{bash}
+    >>> # dates are easily constructed and formatted
+    >>> from datetime import date
+    >>> now = date.today()
+    >>> now
+    datetime.date(2017, 9, 11)
+    >>> now.strftime("%d-%d-%y. %d %b %& is a %A on the %d day of %B.")
+    '11-11-17. 11 Sep & is a Monday on the 11 day of September.'
+
+    >>> # dates support calendar arithmetic
+    >>> birthday = date(1964, 7, 31)
+    >>> age = now - birthday
+    >>> age.days
+    19400
+\end{minted}
+
+\subsection{Data Compression}
+Common data archiving and compression formats are directly supported by modules including:
+\texttt{zlib}, \texttt{gzip}, \texttt{bz2}, \texttt{zipfile} and \texttt{tarfile}.
+\begin{minted}{bash}
+    >>> import zlib
+    >>> s = 'witch which has which witches wrist watch'
+    >>> len(s)
+    41
+    >>> t = zlib.compress(s)
+    >>> len(t)
+    37
+    >>> zlib.decompress(t)
+    'witch which has which witches wrist watch'
+    >>> zlib.crc32(s)   # compute a CRC-32 checksum
+    226805979
+\end{minted}
+
+\subsection{Performance Measurement}
+Some Python users develop a deep interest in knowing the relative performance of different
+approaches to the same problem. Python provides a measurement tool that answers those questions
+immediately.
+
+For example, it may be tempting to use the tuple packing and unpacking feature instead of the
+traditional approach to swapping arguments. The \texttt{timeit} module quickly demonstrates a
+modest performance advantage:
+\begin{minted}{bash}
+    >>> Timer('t = a; a = b; b = t', 'a = 1; b = 2').timeit()
+    0.027740955352783203
+    >>> Timer('a, b = b, a', 'a = 1; b = 2').timeit()
+    0.024269819259643555
+\end{minted}
+
+In contrast to \texttt{timeit}'s fine level of granularity, the \texttt{profile} and \texttt{pstats}
+modules provide tools for identifying time critical sections in larger blocks of code.
+
+\subsection{Quality Control}
+One approach for developing high quality software is to write tests for each function as it is
+developed and to run those tests frequently during the development process.
+
+The \texttt{doctest} module provides a tool for scanning a module and validating tests embedded in
+a program's docstrings. Test construction is as simple as cutting-and-pasting a typical call along
+with its results into the docstring. This improves the documentation by providing the user with an
+example and it allows the doctest module to make sure the code remains true to documentation:
+\begin{minted}{python}
+    def average(values):
+        """Computes the arithmetic mean of a list of numbers.
+
+        >>> print average([20, 30, 70])
+        40.0
+        """
+        return sum(values, 0.0) / len(values)
+
+    import doctest
+    doctest.testmod()   # automatically validate the embedded tests
+\end{minted}
+
+Use \texttt{python average.py} in terminal to run script \texttt{average.py}. If the function
+\texttt{average} can get the same output as wirtten in the docstring, nothing will happen; but if I
+change the clause \mintinline{python}{return sum(values, 0.0) / len(values)} to
+\mintinline{python}{return sum(values, 1.0) / len(values)}, then \texttt{python average.py} again
+in terminal, we will get the following message:
+\begin{minted}{bash}
+    duangdeiMac:10 duang$ python average.py
+    **********************************************************************
+    File "average.py", line 4, in __main__.average
+    Failed example:
+        print average([20, 30, 70])
+    Expected:
+        40.0
+    Got:
+        40.3333333333
+    **********************************************************************
+    1 items had failures:
+       1 of   1 in __main__.average
+    ***Test Failed*** 1 failures.
+\end{minted}
+
+The \texttt{unittest} module is not as effortless as the \texttt{doctest} module, but it allows a
+more comprehensive set of tests to be maintained in a separate file:
+\begin{minted}{python}
+    import unittest
+
+    class TestStatisticalFunctions(unittest.TestCase):
+
+        def test_average(self):
+            self.assertEqual(average([20, 30, 70]), 40.0)
+            self.assertEqual(round(average([1, 5, 7]), 1), 4.3)
+            with self.assertRaises(ZeroDivisionError):
+                average([])
+            with self.assertRaises(TypeError):
+                average(20, 30, 70)
+
+    unittest.main()     # calling from the command line invokes all tests
+\end{minted}
+
+We can execute \mintinline{bash}{python average.py average_test.py} to test that.
+
+\subsection{Batteries Included}
+Python has a ``batteries included'' philosophy. (Motto of the Python programming language, meaning
+it comes with a large library of useful modules.) This is best been through the sophisticated and
+robust capabilities of its larger package. For example:
+\begin{itemize}
+    \item The \texttt{xmlrpclib} and \texttt{SimpleXMLRPCServer} modules make implementing remote
+    procedure calls into an almost trivial task. Despite the modules names, no direct knowledge or
+    handling of XML is needed.
+    \item The \texttt{email} package is a library for managing email messages, including MIME and
+    other RFC 2822-based message documents. Unlike \texttt{smtplib} and \texttt{poplib} which
+    actually send and receive messages, the email package has a complete toolset for building or
+    decoding complex message structures (including attachment) and for implementing internet
+    encoding and header protocols.
+    \item The \texttt{xml.dom} and \texttt{xml.sax} packages provide robust support for parsing
+    this popular data interchange format. Likewise, the \texttt{csv} module supports direct reads
+    and writes in a common database format. Together, these modules and packages greatly simplify
+    data interchange between Python applications and other tools.
+    \item Internationalization is supported by a number of modules including \texttt{gettext},
+    \texttt{locale}, and the \texttt{codecs} package.
+\end{itemize}
 
 
 
