@@ -8,6 +8,11 @@
 \usepackage{hyperref}
 \usepackage{indentfirst} % to indent the first paragraph of a section
 
+% for Roman numerals
+\newcommand{\RN}[1]{%
+  \textup{\uppercase\expandafter{\romannumeral#1}}%
+}
+
 \title{The Python Tutorial \\
         Learning Notes}
 \author{Du Ang \\ \texttt{du2ang233@gmail.com} }
@@ -79,13 +84,13 @@ processing but left in \texttt{sys.argv} for the command or module to handle.
 \subsubsection{Interactive Mode}
 \begin{itemize}
     \item \emph{primary prompt}: \texttt{>>>}
-    \begin{minted}{bash}
+    \begin{minted}{python}
     Python 2.7.10 (default, Feb  7 2017, 00:08:15)
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
     \end{minted}
     \item \emph{secondary prompt}: \texttt{...}
-    \begin{minted}{bash}
+    \begin{minted}{python}
     >>> the_world_is_flat = 1
     >>> if the_world_is_flat:
     ...     print "Be careful not to fall off!"
@@ -121,7 +126,7 @@ line. A hash character in a string literal is just a hash character.
 
 \subsection{Using Python as a Calculator}
 \subsubsection{Numbers}
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 2 + 2
     4
     >>> 50 - 5 * 6
@@ -140,7 +145,7 @@ of type \texttt{int}, floor division is performed and an \texttt{int} is returne
 operand is a float, classic division is performed and a float is returned. The \texttt{//} operator
 is also provided for doing floor divsion no matter what the operands are. The remainder can be
 calculated with the \texttt{\%} operator:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 17 / 3    # int / int -> int
     5
     >>> 17 / 3.0  # int / float -> float
@@ -152,7 +157,7 @@ calculated with the \texttt{\%} operator:
 \end{minted}
 
 With Python, it is possible to use \texttt{**} operator to calculate powers:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 5 ** 2  # 5 squared
     25
     >>> 2 ** 7  # 2 to the power of 7
@@ -161,7 +166,7 @@ With Python, it is possible to use \texttt{**} operator to calculate powers:
 
 The equal sign (\texttt{=}) is used to assign a value to a variable. Afterwards, no results is
 displayed before the next interactive prompt:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> width = 20
     >>> height = 5 * 9
     >>> width * height
@@ -169,7 +174,7 @@ displayed before the next interactive prompt:
 \end{minted}
 
 If a variable is not "defined" (assigned a value), trying to use it will give you an error:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> n   # try to access an undefined variable
     Traceback (most recent call last):
     File "<stdin>", line 1, in <module>
@@ -178,7 +183,7 @@ If a variable is not "defined" (assigned a value), trying to use it will give yo
 
 There is full support for floating point; operators with mixed type operands convert the integer
 operand to floating point:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 3 * 3.75 / 1.5
     7.5
     >>> 7.0 / 2
@@ -186,7 +191,7 @@ operand to floating point:
 \end{minted}
 
 In interactive mode, the last printed expression is assigned to the variable \texttt{\_}.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> tax = 12.5 / 100
     >>> price = 100.50
     >>> price * tax
@@ -209,7 +214,7 @@ uses the \texttt{j} or \texttt{J} suffix to indicate the imaginary part (e.g. \t
 Python can also manipulate strigns, which should be enclosed in single quotes (\texttt{'...'}) or
 double quotes (\texttt{"..."}) with the same result. \texttt{\textbackslash} can be used to escape
 quotes.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 'spam eggs'  # single quotes
     'spam eggs'
     >>> 'doesn\'t'   # use \' to escape the single quote...
@@ -226,7 +231,7 @@ quotes.
 
 The \texttt{print} statement produces a more readable output, by omitting the enclosing quotes and
 by printing escaped and special characters:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> '"Isn\'t," she said.'
     '"Isn\'t," she said.'
     >>> print '"Isn\'t," she said.'
@@ -241,7 +246,7 @@ by printing escaped and special characters:
 
 If you don't want characters prefaced by \texttt{\textbackslash} to be interpreted as special
 characters, you can use \emph{raw strings} by adding an \texttt{r} before the first quote:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print 'C:\some\name'  # here \n means newline!
     C:\some
     ame
@@ -252,7 +257,7 @@ characters, you can use \emph{raw strings} by adding an \texttt{r} before the fi
 String literals can span multiple lines. One way is using triple-quotes: \texttt{"""..."""} or
 \texttt{'''...'''}. End of lines are automatically included in the string, but it's possible to
 prevent this by adding a \texttt{\textbackslash} at the end of the line:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print """
     ... Usage: thingy [OPTIONS]
     ...     -h              Display this usage message
@@ -275,21 +280,21 @@ prevent this by adding a \texttt{\textbackslash} at the end of the line:
 \end{minted}
 
 Strings can be concatenated (glued together) with \texttt{+} operator, and repeated with \texttt{*}:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> # 3 times 'un', followed by 'ium'
     ... 3 * 'un' + 'ium'
     'unununium'
 \end{minted}
 
 Two or more string literals next to each other are automatically concatenated:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 'Py' 'thon'
     'Python'
 \end{minted}
 
 This only works with two literals though, not with variables or expressions. If you want to
 concatenate variables or a variable and a literal, use \texttt{+}.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> prefix = 'Py'
     >>> prefix 'thon'  # can't concatenate a variable and string literal
       File "<stdin>", line 1
@@ -302,7 +307,7 @@ concatenate variables or a variable and a literal, use \texttt{+}.
 \end{minted}
 
 This feature is particularly useful when you want to break long strings:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> text = ('Put several string within parentheses '
     ...         'to have them joined together.')
     >>> text
@@ -311,7 +316,7 @@ This feature is particularly useful when you want to break long strings:
 
 Strings can be indexed(subscripted), with the first character having index 0. There is no separate
 character type; a character is simple a string a size one:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word  = 'Python'
     >>> word[0]     # character in position 0
     'P'
@@ -320,7 +325,7 @@ character type; a character is simple a string a size one:
 \end{minted}
 
 Indices may also be negative nubmers, to start counting from the right:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word[-1]    # last character
     'n'
     >>> word[-2]    # second-last character
@@ -332,7 +337,7 @@ Note that since -0 is the same as 0, negative indices start from -1.
 
 In addition to indexing, \emph{slicing} is also supported. While indexing is used to obtain
 individual characters, \emph{slicing} allows you to obtain a substring:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word[0:2]   # characters from position 0 (included) to 2 (excluded)
     'Py'
     >>> word[2:5]   # characters from position 2 (included) to 5 (excluded)
@@ -341,7 +346,7 @@ individual characters, \emph{slicing} allows you to obtain a substring:
 
 Since indices have useful defaults; an omitted first index defaults to zero, an ommited second
 index defaults to the size of the string being sliced.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word[:2]    # character from the beginning to position 2 (excluded)
     'Py'
     >>> word[4:]    # character from the position 4 (included) to the end
@@ -352,7 +357,7 @@ index defaults to the size of the string being sliced.
 
 Note how the start is always included, and the end always excluded. This makes sure that
 \texttt{s[:i] + s[i:]} is always equal to \texttt{s}:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word[:2] + word[2:]
     'Python'
     >>> word[:4] + word[4:]
@@ -371,7 +376,7 @@ character of a string of n characters has index \emph{n}, for example:
 \end{minted}
 
 Attempting to use an index that is too large will result in an error:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word[42]
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
@@ -379,7 +384,7 @@ Attempting to use an index that is too large will result in an error:
 \end{minted}
 
 However, out of range slice indices are handled gracefully when used for slicing:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> word[4:42]
     'on'
     >>> word[42:]
@@ -388,7 +393,7 @@ However, out of range slice indices are handled gracefully when used for slicing
 
 Python strings cannot be changed --- they are immutable. Therefore, assigning to a indexed position
 in the string results in an error:
-\begin{minted}{bash}
+\begin{minted}{python}
 >>> word[0] = 'J'
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
@@ -401,7 +406,7 @@ in the string results in an error:
 \end{minted}
 
 If you need a different string, you should create a new one:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 'J' + word[1:]
     'Jython'
     >>> word[:2] + 'py'
@@ -409,7 +414,7 @@ If you need a different string, you should create a new one:
 \end{minted}
 
 The built-in fucntion \texttt{len()} returns the length of a string:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> s = 'supercalifragilisticexpialidocious'
     >>> len(s)
     34
@@ -420,7 +425,7 @@ Unicode has the advantage of providing one ordinal for every character in every 
 modern and ancient texts.
 
 Creating Unicode strings in Python is just as simple as creating normal strings:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> u'Hello World!'
     u'Hello World!'
 \end{minted}
@@ -428,7 +433,7 @@ Creating Unicode strings in Python is just as simple as creating normal strings:
 The small \texttt{'u'} in front of the quote indicates that a Unicode string is supposed to be
 created. If you want to include special characters in the string, you can do so by using the
 Python \emph{Unicode-Escape} encoding. The following example shows how:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> u'Hello\u0020World!'
     u'Hello World!'
 \end{minted}
@@ -441,14 +446,14 @@ versatile is the \emph{list}, which can be written as a list of comma-separated 
 between square brackets. Lists might contain items of different types, but usually the items all
 have the same type.
 
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> squares = [1, 4, 9, 16, 25]
     >>> squares
     [1, 4, 9, 16, 25]
 \end{minted}
 
 Like strings (and all other built-in sequence type), lists can be indexed and sliced:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> squares[0]      # indexing returns the item
     1
     >>> squares[-1]
@@ -459,20 +464,20 @@ Like strings (and all other built-in sequence type), lists can be indexed and sl
 
 All slice operations return a new list containing the requested elements. This means that the
 following slice returns a new (shallow) copy of the list:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> squares[:]
     [1, 4, 9, 16, 25]
 \end{minted}
 
 Lists also supports operations like concatenation:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> squares + [36, 49, 64, 81, 100]
     [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
 \end{minted}
 
 Unlike strings, which are immutable, lists are a mutable type, i.e. it is possible to change their
 content:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> cubes = [1, 8, 27, 65, 125] # something's wrong here
     >>> 4 ** 3  # the cube of 4 is 64, not 65!
     64
@@ -482,7 +487,7 @@ content:
 \end{minted}
 
 You can also add new items at the end of the list, by using the \texttt{append()} method:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> cubes.append(216)           # add the cube of 6
     >>> cubes.append(7 ** 3)        # add the cube of 7
     >>> cubes
@@ -491,7 +496,7 @@ You can also add new items at the end of the list, by using the \texttt{append()
 
 Assignment to slices is also possible, and this can even change the size of the list or clear it
 entirely:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
     >>> letters
     ['a', 'b', 'c', 'd', 'e', 'f', 'g']
@@ -510,14 +515,14 @@ entirely:
 \end{minted}
 
 The built-in function \texttt{len()} also applies to lists:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> letters = ['a', 'b', 'c', 'd']
     >>> len(letters)
     4
 \end{minted}
 
 It is possible to nest lists (create lists containing other lists), for example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a = ['a', 'b', 'c']
     >>> n = [1, 2, 3]
     >>> x = [a, n]
@@ -533,7 +538,7 @@ It is possible to nest lists (create lists containing other lists), for example:
 
 \subsection{First Steps Towards Programming}
 We can write an initial sub-sequence of the \emph{Fibonacci} series as follows:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> # Fibonacci series:
     ... # the sum of two elements defines the next
     ... a, b = 0, 1     # multiple assignment
@@ -563,14 +568,14 @@ The \texttt{print} statement writes the value of the expression(s) it is given. 
 just writing the expression you want to write in the way it handles multiple expressions and
 strings. Strings are pointer without quotes, and a space is inserted between items, so you can
 format things nicely, like this:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> i = 256 * 256
     >>> print 'The value of i is', i
     The value of i is 65536
 \end{minted}
 
 A trailing comma avoids the newline after the output:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a, b = 0, 1
     >>> while b < 1000:
     ...     print b,
@@ -581,7 +586,7 @@ A trailing comma avoids the newline after the output:
 
 \section{More Control Flow Tools}
 \subsection{\texttt{if} Statements}
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> x = int(raw_input("Please enter an integer: "))
     Please enter an integer: 42
     >>> if x < 0:
@@ -603,7 +608,7 @@ Rather than always iterating over an arithmetic progression of numbers (like in 
 the user the ability to define both the iteration step and halting condition (as C), Python's
 \texttt{for} statement iterates over the items of any sequence (a list or a string), in the order
 that they appear in the sequence. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> # Measure some strings:
     ... words = ['cat', 'window', 'defenestrate']
     >>> for w in words:
@@ -617,7 +622,7 @@ that they appear in the sequence. For example:
 If you need to modify the sequence you are iterating over while inside the loop, it is recommended
 that you first make a copy. Iterating over a sequence does not implicitly make a copy. The slice
 notation makes this especially convenient:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for w in words[:]:
     ...     if len(w) > 6:
     ...         words.insert(0, w)
@@ -642,7 +647,7 @@ in handy. It generates lists containing arithmetic progressions:
 
 To iterate over the indices of a sequence, you can combine \texttt{range()} and \texttt{len()} as
 follows:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a = ['Mary', 'had', 'a', 'little', 'lamb']
     >>> for i in range(len(a)):
     ...     print i, a[i]
@@ -662,7 +667,7 @@ Loop statements may have an \texttt{else} clause; it is exected when the loop te
 exhaustion of the list (with \texttt{for}) or when the condition becomes false (with
 \texttt{while}), but not when the loop is terminated by a \texttt{break} statement. This is
 exemplified by the following loop, which searches for prime numbers:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for n in range(2, 10):
     ...     for x in range(2, n):
     ...         if n % x == 0:
@@ -689,7 +694,7 @@ a \texttt{try} statement than it does that of \texttt{if} statements: a \texttt{
 
 The \texttt{continue} statement, also borrowed from C, continues with the next iteration of the
 loop:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for num in range(2, 10):
     ...     if num % 2 == 0:
     ...         print "Found an even number", num
@@ -709,7 +714,7 @@ loop:
 \subsection{\texttt{pass} Statements}
 The \texttt{pass} statement does nothing. It can be used when a statement is required syntactically
 but the program requires no action. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> while True:
     ...     pass    # Busy-wait for keyboard interrupt (Ctrl + C)
     ...
@@ -719,7 +724,7 @@ but the program requires no action. For example:
 \end{minted}
 
 This is commonly used for creating minimal classes:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> class MyEmpthClass:
     ...     pass
     ...
@@ -728,7 +733,7 @@ This is commonly used for creating minimal classes:
 Another place \texttt{pass} can be used is as a place-holder for a function or conditional body
 when you are working on new code, allowing you to keep thinking at a more abstract level. The
 \texttt{pass} is silently ignored:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def initlog(*args):
     ...     pass    # Remember to implement this!
     ...
@@ -736,7 +741,7 @@ when you are working on new code, allowing you to keep thinking at a more abstra
 
 \subsection{Defining Functions}
 We can create a function that writes the Fibonacci series to an arbitrary boundary:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def fib(n):     # write Fibonacci series up to n
     ...     """Print a Fibonacci series up to n."""
     ...     a, b = 0, 1
@@ -775,7 +780,7 @@ A function definition introduces the function name in the current symbol table. 
 function name has a type that is recognized by the interpreter as a userdefined function. This
 value can be assigned to another name which can be used as a function. This serves as a general
 renaming mechanism:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> fib
     <function fib at 0x106cd8140>
     >>> f = fib
@@ -788,7 +793,7 @@ since it doesn't return a value. In fact, even functions without a \texttt{retur
 return a value, albeit a rather boring one. This value is called \texttt{None} (It's a built-in
 name). Writing the value \texttt{None} is normally suppressed by the interpreter if it would be the
 only value written. You can see if you really want to using \texttt{print}:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> fib(0)
     >>> print fib(0)
     None
@@ -796,7 +801,7 @@ only value written. You can see if you really want to using \texttt{print}:
 
 It is simple to write a function that returns a list of the numbers of the Fibonacci series,
 instead of printing it:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def fib2(n):
     ...     """Return a list containing the Fibonacci series up to n."""
     ...     result = []
@@ -831,7 +836,7 @@ which can be comined.
 The most useful form is to specify a default value for one or more arguments. The default arguments
 can't be followed by non-default arguments. This creates a function that can be called with fewer
 arguments than it is defined to allow. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def ask_ok(prompt, retries = 4, complaint = "Yes or no, please!"):
     ...     while True:
     ...         ok = raw_input(prompt)
@@ -860,7 +865,7 @@ The keyword \texttt{in} can test whether or not a sequence contains a certain va
 The default values are evaluated at the point of function definition in the \emph{defining} scope.
 In other words, default parameter values are always evaluated when, and only when, the \texttt{def}
 statement they belong to is executed, so that
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> i = 5
     >>> def f(arg = i):
     ...     print arg
@@ -878,7 +883,7 @@ the default is a mutable object
 \footnote{https://codehabitude.com/2013/12/24/python-objects-mutable-vs-immutable/}
 such as a list, dictionary, or instances of most classes. For example, the following function
 accumulates the arguments passed to it on subsequent calls:
-\begin{minted}{bash}
+\begin{minted}{python}
 >>> def f(a, L = []):
     ...     L.append(a)
     ...     return L
@@ -893,7 +898,7 @@ accumulates the arguments passed to it on subsequent calls:
 
 If you don't want the default to be shared between subsequent calls, you can write the function
 like this instead:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def f(a, L = None):
     ...     if L is None:
     ...         L = []
@@ -911,7 +916,7 @@ like this instead:
 \subsubsection{Keyword Arguments}
 Functions can also be called using keyword arguments of the form \texttt{kwarg = value}.
 
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def parrot(voltage, state = 'a stiff', action = 'voom', type = 'Norwegian Blue'):
     ...     print "-- This parrot wouldn't", action,
     ...     print "if you put", voltage, "volts through it."
@@ -921,7 +926,7 @@ Functions can also be called using keyword arguments of the form \texttt{kwarg =
 \end{minted}
 
 This function can be called in any of the following ways:
-\begin{minted}{bash}
+\begin{minted}{python}
     parrot(1000)                                          # 1 positional argument
     parrot(voltage=1000)                                  # 1 keyword argument
     parrot(voltage=1000000, action='VOOOOOM')             # 2 keyword arguments
@@ -930,7 +935,7 @@ This function can be called in any of the following ways:
     parrot('a thousand', state='pushing up the daisies')  # 1 positional, 1 keyword
 \end{minted}
 but all the following calls would be invalid:
-\begin{minted}{bash}
+\begin{minted}{python}
     parrot()                     # required argument missing
     parrot(voltage=5.0, 'dead')  # non-keyword argument after a keyword argument
     parrot(110, voltage=220)     # duplicate value for the same argument
@@ -942,7 +947,7 @@ containing all keyword arguments except for those corresponding to a formal para
 contained with a formal parameter of the form \texttt{*name} which receives a tuple containing the
 positional arguments beyond the formal parameter list. (\texttt{*name} must occur before
 \texttt{**name}.) For example, if we define a function like this:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def cheeseshop(kind, *arguments, **keywords):
     ...     print "-- Do you have any", kind + "?"
     ...     print "-- I'm sorry, we're all out of", kind
@@ -978,7 +983,7 @@ unpacked for a function call requiring separate positional arguments. For instan
 \texttt{range()} function expects separate \emph{start} and \emph{stop} arguments. If they are not
 available separately, write the function call with the \texttt{*}-operator to unpack the arguments
 out of a list or tuple:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> range(3, 6)
     [3, 4, 5]
     >>> args = [3, 6]
@@ -987,7 +992,7 @@ out of a list or tuple:
 \end{minted}
 
 In the same fashion, dictionaries can deliver keyword arguments with the \texttt{**}-operator:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def parrot(voltage, state = 'a stiff', action = 'voom'):
     ...     print "-- This parrot wouldn't", action,
     ...     print "if you put", voltage, "volts through it.",
@@ -1004,7 +1009,7 @@ the sum of its two arguments: \mintinline{Python}{lambda a, b : a + b}. Lambda f
 used wherever function objects are required. They are syntactically restricted to a single
 expression. Semantically, they are just syntactic sugar for a normal function definition. Like
 nested function definitions, lambda functions can reference variables from the containing scope:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def make_incrementor(n):
     ...     return lambda x : x + n     # return a function
     ...
@@ -1017,7 +1022,7 @@ nested function definitions, lambda functions can reference variables from the c
 
 The above example uses a lambda expression to return a function. Another use is to pass a small
 function as an argument:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> pairs = [(1, 'one'), (2, 'two'), (3, 'three'), (4, 'four')]
     >>> pairs.sort(key = lambda pair : pair[1])
     >>> pairs
@@ -1043,7 +1048,7 @@ amount of indentation for the entire documentation string. Whitespace ``equivale
 indentation is then stripped from the start of all lines of the string.
 
 Here is an example of a multi-line docstring:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def my_function():
     ...     """Do nothing, but document it.
     ...
@@ -1116,7 +1121,7 @@ All of the methods of list objects:
 \end{itemize}
 
 An example that uses most of the list methods:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a = [66.25, 333, 333, 1, 1234.5]
     >>> print a.count(333), a.count(66.25), a.count('x')
     2 1 0
@@ -1150,7 +1155,7 @@ The list methods make it very easy to use a list as a stack, where the last elem
 first element retrieved (``last-in, first-out''). To add an item to the top of the stack, use
 \texttt{append()}. To retrieve an item from the top of the stack, use \texttt{pop()} without an
 explicit index. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> stack = [3, 4, 5]
     >>> stack.append(6)
     >>> stack.append(7)
@@ -1176,7 +1181,7 @@ is slow (because all the other elements have to be shifted by one).
 
 To implement a queue, use \texttt{collections.deque} which was designed to have fast appends and
 pops from both ends. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
 >>> from collections import deque
     >>> queue = deque(["Eric", "John", "Michael"])
     >>> queue.append("Terry")       # Terry arrives
@@ -1197,7 +1202,7 @@ There are three built-in functions that are very useful when used with lists: \t
 for which \texttt{function(item)} is true. If \texttt{sequence} is a \texttt{str}, \texttt{unicode}
 or \texttt{tuple}, the result will be of the same type; otherwise, it is always a \texttt{list}.
 For example, to compute a sequence of numbers divisible by 3 or 5:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def f(x) : return x % 3 == 0 or x % 5 == 0
     ...
     >>> filter(f, range(2, 25))
@@ -1206,7 +1211,7 @@ For example, to compute a sequence of numbers divisible by 3 or 5:
 
 \texttt{map(function, sequence)} calls function(item) for each of the sequence's items and returns
 a list of teh return values. For example, to compute some cubes:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def cube(x) : return x * x * x
     ...
     >>> map(cube, range(1, 11))
@@ -1216,7 +1221,7 @@ a list of teh return values. For example, to compute some cubes:
 More than one sequence may be passed; the function must then have as many arguments as there are
 sequences and is called with the corresponding item from each sequence (or \texttt{None} if some
 sequence is shorter than another). For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> seq = range(8)
     >>> def add(x, y) : return x + y
     ...
@@ -1227,7 +1232,7 @@ sequence is shorter than another). For example:
 \texttt{reduce(function, sequence)} returns a single value constructed by calling the binary
 function \texttt{function} on the first two items of teh sequence, then on the result and the next
 items, and so on. For examples, to compute the sum of the numbers 1 through 10:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def add(x, y) : return x + y
     ...
     >>> reduce(add, range(1, 11))
@@ -1243,7 +1248,7 @@ items, and so on. For examples, to compute the sum of the numbers 1 through 10:
 A third argument can be passed to indicate the starting value. In this case the starting value is
 returned for an empty sequence, and the function is first applied to the starting value and the
 first sequence item, then to the result and the next item, and so on. For example,
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def sum(seq):
     ...     def add(x, y) : return x + y
     ...     return reduce(add, seq, 0)
@@ -1263,17 +1268,17 @@ lists where each element is teh result of some operations applied to each member
 sequence or iterable, or to create a subsequence of those elements that satisfy a certain condition.
 
 For example, assume we want to create a list of squares, like:
-\begin{minted}{bash}
->>> squares = []
->>> for x in range(10):
-...     squares.append(x**2)
-...
->>> squares
-[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+\begin{minted}{python}
+    >>> squares = []
+    >>> for x in range(10):
+    ...     squares.append(x**2)
+    ...
+    >>> squares
+    [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 \end{minted}
 
 We can obtain the same result with:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> squares = [x**2 for x in range(10)]
     >>> squares
     [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
@@ -1286,12 +1291,12 @@ clause, then zero or more \texttt{for} or \texttt{if} clauses. The result will b
 resulting from evaluating the expression in the context of the \texttt{for} and \texttt{if} clauses
 which follow it. For example, this listcomp combines the elements of two lists if they are not
 equal:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> [(x, y) for x in [1, 2, 3] for y in [3, 1, 4] if x != y]
     [(1, 3), (1, 4), (2, 3), (2, 1), (2, 4), (3, 1), (3, 4)]
 \end{minted}
 and it's equivalent to:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> combs = []
     >>> for x in [1, 2, 3]:
     ...     for y in [3, 1, 4]:
@@ -1304,7 +1309,7 @@ and it's equivalent to:
 
 If the expression is a tuple (e.g. the \texttt{(x, y)} in the previous example), it must be
 parenthesized.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> vec = [-4, -2, 0, 2, 4]
     >>> # create a new list with the values doubled
     ... [x*2 for x in vec]
@@ -1335,7 +1340,7 @@ parenthesized.
 \end{minted}
 
 List comprehension can contain complex expressions and nested functions:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> from math import pi
     >>> [str(round(pi, i)) for i in range(1, 6)]
     ['3.1', '3.14', '3.142', '3.1416', '3.14159']
@@ -1345,7 +1350,7 @@ The initial expression in a list comprehension can be any arbitrary expression, 
 list comprehension.
 
 Consider the following example of a 3$\times$4 matrix implemented as a list of 3 lists of length 4:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> matrix = [
     ...     [1, 2, 3, 4],
     ...     [5, 6, 7, 8],
@@ -1354,14 +1359,14 @@ Consider the following example of a 3$\times$4 matrix implemented as a list of 3
 \end{minted}
 
 The following list comprehension will transpose rows and columns:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> [[row[i] for row in matrix] for i in range(4)]
     [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]]
 \end{minted}
 
 As we saw in the previous section, the nested listcomp is evaluated in the context of the
 \texttt{for} that follows it, so this example is equivalent to:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> transposed = []
     >>> for i in range(4):
     ...     transposed.append([row[i] for row in matrix])
@@ -1371,7 +1376,7 @@ As we saw in the previous section, the nested listcomp is evaluated in the conte
 \end{minted}
 
 which, in turn, is the same as:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> transposed = []
     >>> for i in range(4):
     ...     # the following 3 lines implement the nested listcomp
@@ -1386,7 +1391,7 @@ which, in turn, is the same as:
 
 In the real world, you should prefer built-in functions to complex flow statements. The
 \texttt{zip()} function would do a great job for this use case:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> zip(*matrix)  # use * to unpack the arguments from matrix
     [(1, 5, 9), (2, 6, 10), (3, 7, 11), (4, 8, 12)]
 \end{minted}
@@ -1396,7 +1401,7 @@ There is a way to remove an item from a list given its index instead of its valu
 statement. This differs from the \texttt{pop()} method which returns a value. The \texttt{del}
 statement can also be used to remove slices from a list or clear the entire list (which we did
 earlier by assignment of an empty list to the slice). For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a = [-1, 1, 66.25, 333, 333, 1234.5]
     >>> del a[0]
     >>> a
@@ -1411,7 +1416,7 @@ earlier by assignment of an empty list to the slice). For example:
 
 \texttt{del} can also be used to delete entire variables. Referencing the name \texttt{a} hereafter
 is an error (at least until another value is assigned to it):
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> del a
     >>> a
     Traceback (most recent call last):
@@ -1421,7 +1426,7 @@ is an error (at least until another value is assigned to it):
 
 \subsection{Tuples and Sequences}
 A tuple consists of a number of values separated by commas, for instance:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> t = 12345, 54321, 'hello!'
     >>> t[0]
     12345
@@ -1458,7 +1463,7 @@ A special problem is the construction of tuples containing 0 or 1 items: the syn
 quirks to accommodate these. Empty tuples are constructed by an empty pair of parentheses; a tuple
 with one item is constructed by following a value with a comma (it is not sufficient to enclose a
 single value in parentheses). Ugly, but effective. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> empty = ()
     >>> singleton = 'hello',    # <-- note trailing comma
     >>> len(singleton)
@@ -1475,7 +1480,7 @@ single value in parentheses). Ugly, but effective. For example:
 The statement \texttt{t = 12345, 54321, 'hello!'} is an example of \emph{tuple packing}: the values
 \texttt{12345}, \texttt{54321} and \texttt{'hello!'} are packed together in a tuple. The reverse
 operation is also possible:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> x, y, z = t
     >>> x
     12345
@@ -1499,7 +1504,7 @@ Curly braces or the \texttt{set()} function can be used to create sets. Note: to
 set you have to use \texttt{set()}, not \texttt{\{\}}; the latter creates an empty dictionary.
 
 Here is a brief demonstration:
-    \begin{minted}{bash}
+    \begin{minted}{python}
     >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
     >>> fruit = set(basket)     # create a set without duplicates
     >>> fruit
@@ -1528,7 +1533,7 @@ Here is a brief demonstration:
 \end{minted}
 
 Similarly to list comprehensions, set comprehensions are also supported:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a = {x for x in 'abracadabra' if x not in 'abc'}
     >>> a
     set(['r', 'd'])
@@ -1579,20 +1584,20 @@ Here is a small example using a dictionary:
 \end{minted}
 
 The \texttt{dict()} constructor builds dictionaries from sequences of key-value pairs:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
     {'sape': 4139, 'jack': 4098, 'guido': 4127}
 \end{minted}
 
 In addition, dict comprehensions can be used to create dictionaries from arbitrary key and value
 expressions:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> {x: x**2 for x in (2, 4, 6)}
     {2: 4, 4: 16, 6: 36}
 \end{minted}
 
 When the keys are simple strings, it is sometimes easier to specify pairs using keyword arguments:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> dict(sape=4139, guido=4127, jack=4098)
     {'sape': 4139, 'jack': 4098, 'guido': 4127}
 \end{minted}
@@ -1600,7 +1605,7 @@ When the keys are simple strings, it is sometimes easier to specify pairs using 
 \subsection{Looping Techniques}
 When looping through a sequence, the position index and corresponding value can be retrieved at the
 same time using the \texttt{enumerate()} function.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for i, v in enumerate(['tic', 'tac', 'toe']):
     ...     print i, v
     ...
@@ -1611,7 +1616,7 @@ same time using the \texttt{enumerate()} function.
 
 To loop over two or more sequences at the same time, the entries can be paired with the
 \texttt{zip()} function.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> questions = ['name', 'quest', 'favorite color']
     >>> answers = ['lancelot', 'the holy grail', 'blue']
     >>> for q, a in zip(questions, answers):
@@ -1624,7 +1629,7 @@ To loop over two or more sequences at the same time, the entries can be paired w
 
 To loop over a sequence in reverse, first specify the sequence in a forward direction and then
 call the \texttt{reversed()} fucntion.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for i in reversed(xrange(1, 10, 2)):
     ...     print i
     ...
@@ -1637,7 +1642,7 @@ call the \texttt{reversed()} fucntion.
 
 To loop over a sequence in sorted order, use the \texttt{sorted()} function which returns a new
 sorted list while leaving the source unaltered.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
     >>> for f in sorted(set(basket)):
     ...     print f
@@ -1652,7 +1657,7 @@ sorted list while leaving the source unaltered.
 
 When looping through dictionaries, the key and corresponding value can be retrieved at the same
 time using the \texttt{iteritems()} method.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> knights = {'gallahad': 'the pure', 'robin': 'the brave'}
     >>> for k, v in knights.iteritems():
     ...     print k, v
@@ -1663,7 +1668,7 @@ time using the \texttt{iteritems()} method.
 
 It is sometimes tempting to change a list while you are looping over it; however, it is often
 simpler and safer to create a new list instead.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import math
     >>> raw_data = [56.2, float('NaN'), 51,7, 55.3, 52.5, float('NaN'), 47.8]
     >>> filtered_data = []
@@ -1700,7 +1705,7 @@ determined. For example, if \texttt{A} and \texttt{C} are true but \texttt{B} is
 \texttt{A and b and C} does not evaluate the expression \texttt{C}. When used as a general value
 and not as a Boolean, the return value of a short-circuit operator is the last evaluted argument.
 
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 3 and 5 and 6 and 7
     7
     >>> 3 or 4 or 5
@@ -1711,7 +1716,7 @@ and not as a Boolean, the return value of a short-circuit operator is the last e
 
 It is possible to assign the result of a comparison or other Boolean expression to a variable. For
 example,
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> string1, string2, string3 = '', 'Trondheim', 'Hammer Dance'
     >>> non_null = string1 or string2 or string3
     >>> non_null
@@ -1733,7 +1738,7 @@ sequence compare equal, the sequences are considered equal. If one sequence is a
 sub-sequence of the other, the shorter sequence is the smaller (lesser) one. Lexicographical
 ordering for strings uses the ASCII ordering for individual characters. Some examples of
 comparisons between sequences of the same type:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> (1, 2, 3) < (1, 2, 4)
     >>> [1, 2, 3] < [1, 2, 4]
     >>> 'ABC' < 'C' < 'Pascal' < 'Python'
@@ -1786,14 +1791,14 @@ contents:
 \end{minted}
 
 Now enter the Python interpreter and import this module with the following command:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import fibo
 \end{minted}
 
 This does not enter the names of the functions defined in \texttt{fibo} directly in the current
 symbol table; it only enters the module name \texttt{fibo} there. Using the module name you can
 access the functions:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> fibo.fib(1000)
     1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
     >>> fibo.fib2(100)
@@ -1803,7 +1808,7 @@ access the functions:
 \end{minted}
 
 If you intend to use a function often you can assign it to a local name:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> fib = fibo.fib
     >>> fib(500)
     1 1 2 3 5 8 13 21 34 55 89 144 233 377
@@ -1826,7 +1831,7 @@ placed in the importing modules's global symbol table.
 
 There is a variant of the \texttt{import} statement that imports names from a module directly into
 the importing module's symbol table. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> from fibo import fib, fib2
     >>> fib(500)
     1 1 2 3 5 8 13 21 34 55 89 144 233 377
@@ -1835,7 +1840,7 @@ This does not introduce the module name from which the imports are taken in the 
 (so in the example, \texttt{fibo} is not defined).
 
 There is even a variant to import all names that a module defines:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> from fibo import *
     >>> fib(500)
     1 1 2 3 5 8 13 21 34 55 89 144 233 377
@@ -1861,13 +1866,13 @@ module will be executed, just as if you imported it, but with the \texttt{\_\_na
 \end{minted}
 you can make the file usable as a script as well as an importable module, because the code that
 parses the command line only runs if the module is executed as the "main" file:
-\begin{minted}{bash}
+\begin{minted}{python}
     duangdeiMac:6 duang$ python fibo.py 50
     1 1 2 3 5 8 13 21 34
 \end{minted}
 
 If the module is imported, the code is not run:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import fibo
     >>>
 \end{minted}
@@ -1940,7 +1945,7 @@ is a configuration option which also depends on the underlying platform. For exa
 \texttt{winreg} module is only provided on Windows systems. One particular module deserves some
 attention: \texttt{sys}, which is built into every Python interpreter. The variables
 \texttt{sys.ps1} and \texttt{sys.ps2} define the strings used as primary and secondary prompts:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import sys
     >>> sys.ps1
     '>>> '
@@ -1958,7 +1963,7 @@ The variable \texttt{sys.path} is a list of strings that determines the interpre
 for modules. It is initialized to a default path taken from the environment variable
 \texttt{PYTHONPATH}, or from a built-in default if \texttt{PYTHONPATH} is not set. You can modify
 it using standard list operations:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import sys
     >>> sys.path.append('/ufs/gudio/lib/python')
 \end{minted}
@@ -1966,7 +1971,7 @@ it using standard list operations:
 \subsection{The \texttt{dir()} Function}
 The built-in function \texttt{dir()} is used to find out which names a module defines. It returns a
 sorted list of strings:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import fibo, sys
     >>> dir(fibo)
     ['__builtins__', '__doc__', '__file__', '__name__', '__package__', 'fib', 'fib2']
@@ -1986,7 +1991,7 @@ sorted list of strings:
 \end{minted}
 
 Without arguments, \texttt{dir()} lists the names you have defined currently:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> a = [1, 2, 3, 4, 5]
     >>> import fibo
     >>> fib = fibo.fib
@@ -1998,7 +2003,7 @@ Note that it lists all types of names: variables, modules, functions, etc.
 
 \texttt{dir()} does not list the names of built-in functions and variables. If you want a list of
 those, they are defined in the standard module \texttt{\_\_builtin\_\_}:
-\begin{minted}{bash}
+\begin{minted}{python}
 >>> import __builtin__
 >>> dir(__builtin__)
 ['ArithmeticError', 'AssertionError', 'AttributeError', 'BaseException', 'BufferError',
@@ -2228,7 +2233,7 @@ dictionaries, have the same representation using either function. Strings and fl
 numbers, in particular, have two distinct representations.
 
 Some examples:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> s = 'Hello, world.'
     >>> str(s)
     'Hello, world.'
@@ -2254,7 +2259,7 @@ Some examples:
 \end{minted}
 
 Here are two ways to write a table of squares and cubes:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for x in range(1, 11):
     ...     # S.rjust(width) returns S right-justified in a string of length width
     ...     print repr(x).rjust(2), repr(x*x).rjust(3),
@@ -2300,7 +2305,7 @@ operation, as in \texttt{x.ljust(n)[:n]}.)
 There is another method, \texttt{str.zfill(width)}, which pads a numeric string on the left with
 zeros. It understands about plus and minus signs. The original string is returned if width is less
 than or equal to \texttt{len(str)}.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> '12'.zfill(5)
     '00012'
     >>> '-3.14'.zfill(7)
@@ -2310,7 +2315,7 @@ than or equal to \texttt{len(str)}.
 \end{minted}
 
 Basic usage of \texttt{str.format()} method looks like this:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print 'We are the {} whos say "{}!"'.format('knights', 'Ni')
     We are the knights whos say "Ni!"
 \end{minted}
@@ -2318,7 +2323,7 @@ Basic usage of \texttt{str.format()} method looks like this:
 The brackets and characters within them (called format fields) are replaced with the objects passed
 into the \texttt{str.format()} method. A number in the brackets refers to the position of the
 object passed into the \texttt{str.format()} method.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print '{0} and {1}'.format('spam', 'eggs')
     spam and eggs
     >>> print '{1} and {0}'.format('spam', 'eggs')
@@ -2327,14 +2332,14 @@ object passed into the \texttt{str.format()} method.
 
 If keyword arguments are used in the \texttt{str.format()} method, their values are referred to by
 using the name of the arguments.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print 'This {food} is {adjective}.'.format(
     ...       food = 'spam', adjective = 'absolutely horrible')
     This spam is absolutely horrible.
 \end{minted}
 
 Positional and keyword arguments can be arbitrary combined:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print 'The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred', other = 'Georg')
     The story of Bill, Manfred, and Georg.
     >>> print 'The story of {0}, {1}, and {other}.'.format('Bill', other = 'Georg', 'Manfred')
@@ -2344,7 +2349,7 @@ Positional and keyword arguments can be arbitrary combined:
 
 \texttt{'!s'} (apply \texttt{str()}) and \texttt{'!r'} (apply \texttt{repr()}) can be used to
 convert the value before it is formatted.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import math
     >>> print 'The value of PI is approximately {}.'.format(math.pi)
     The value of PI is approximately 3.14159265359.
@@ -2357,14 +2362,14 @@ convert the value before it is formatted.
 An optional \texttt{':'} and format specifier can follow the field name. This allows greater
 control over how the value is formatted. The following example rounds Pi to three palces after the
 decimal.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> print 'The value of PI is approximately {0:.3f}.'.format(math.pi)
     The value of PI is approximately 3.142.
 \end{minted}
 
 Passing an integer after the \texttt{':'} will cause that field to be a minimum number of
 characters wide. This is useful for making tables pretty.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for name, phone in table.items():
     ...     print '{0:10} ==> {1:10d}'.format(name, phone)
     ...
@@ -2376,7 +2381,7 @@ characters wide. This is useful for making tables pretty.
 If you have a really long format string that you don't want to split up, it would be nice if you
 could reference the variables to be formatted by name instead of by position. This can be done by
 simply passing the dict and using square brackets \texttt{'[]'} to access the keys.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
     >>> print ('Jack: {0[Jack]:d}; Sjoerd: {0[Sjoerd]:d}; '
     ...        'Dcab: {0[Dcab]:d}'.format(table))
@@ -2384,7 +2389,7 @@ simply passing the dict and using square brackets \texttt{'[]'} to access the ke
 \end{minted}
 
 This could also be done by passing the table as keyword arguments with the \texttt{**} notation.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 8637678}
     >>> print 'Jack: {Jack:d}; Sjoerd: {Sjoerd:d}; Dcab: {Dcab:d}'.format(**table)
     Jack: 4098; Sjoerd: 4127; Dcab: 8637678
@@ -2397,7 +2402,7 @@ returns a dictionary containing all local variables.
 The \texttt{\%} operator can also be used for string formatting. It interprets the left argument
 much like a \texttt{sprintf()}-style format string to be applied to the right argument, and returns
 the string resulting from this formatting operation. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import math
     >>> print 'The value of PI is approximately %5.3f.' % math.pi
     The value of PI is approximately 3.142.
@@ -2406,7 +2411,7 @@ the string resulting from this formatting operation. For example:
 \subsection{Reading and Writing Files}
 \mintinline{python}{open()} returns a file object, and is most commonly used with two arguments:
 \mintinline{python}{open(filename, mode)}.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> f = open('workfile', 'w')
     >>> print f
     <open file 'workfile', mode 'w' at 0x107dfc5d0>
@@ -2436,7 +2441,7 @@ omitted or negative, the entire contents of the file will be read and returned; 
 if the file is twice as large as your machine's memory. Otherwise, at most \emph{size} bytes are
 read and returned. If the end of the file has been reached, \mintinline{python}{f.read()} will
 return an empty string (\texttt{""}).
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> f.read()
     'This is the entire file.\n'
     >>> f.read()
@@ -2448,7 +2453,7 @@ return an empty string (\texttt{""}).
 the file if the file doesn't end in a newline. This makes the return value unambiguous; if
 \texttt{f.readline()} returns an empty string, the end of the file has been reached, while a blank
 line is represented by \mintinline{python}{'\n'}, a string containing only a single newline.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> # the file doesn't end in a newline
     ... f.readline()
     'This is the first line of the file.\n'
@@ -2470,7 +2475,7 @@ line is represented by \mintinline{python}{'\n'}, a string containing only a sin
 
 For reading lines from a file, you can loop over the file object. This is memory efficient, fast,
 and leads to simple code:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for line in f:
     ...     print line,
     ...
@@ -2483,12 +2488,12 @@ or \mintinline{python}{f.readline()}.
 
 \mintinline{python}{f.write(string)} writes the contents of \emph{string} to the file, returning
 \mintinline{python}{None}.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> f.write('This is a test\n')
 \end{minted}
 
 To write something other than a string, it needs to be converted to a string first:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> value = ('the answer', 42)
     >>> s = str(value)
     >>> f.write(s)
@@ -2501,7 +2506,7 @@ to a reference point; the reference point is selected by the \emph{from\_what} a
 \emph{from\_what} value of 0 measures from the beginning of the file, 1 uses the current file
 position, and 2 uses the end of the file as the reference point. \emph{from\_what} can be omitted
 and defaults to 0, using the beginning of the file as the reference point.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> f = open('workfile', 'r+')
     >>> f.write('0123456789abcdef')
     >>> f.seek(5)
@@ -2515,7 +2520,7 @@ and defaults to 0, using the beginning of the file as the reference point.
 When you're done with a file, call \mintinline{python}{f.close()} to close it and free up any
 system resources taken up by the open file. After calling \mintinline{python}{f.close()}, attempts
 to use the file object will automatically fail.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> f.close()
     >>> f.read()
     Traceback (most recent call last):
@@ -2527,7 +2532,7 @@ It is a good practice to use the \mintinline{python}{with} keyword when dealing 
 This has the advantage that the file is properly closed after its suite finishes, even if an
 exception is raised on the way. It is also much shorter than writing equivalent
 \mintinline{python}{try}-\mintinline{python}{finally} blocks:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> with open('workfile', 'r') as f:
     ...     read_data = f.read()
     ...
@@ -2560,7 +2565,7 @@ Many programmers are already familiar with it, which makes it a good choice for 
 
 If you have an object \texttt{x}, you can view its JSON string representation with a simple line of
 code:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import json
     >>> json.dumps([1, 'simple', 'list'])
     '[1, "simple", "list"]'
@@ -2579,7 +2584,7 @@ object to a file. So if \texttt{f} is a file object opened for writing, we can d
 \end{minted}
 
 To decode the object again, if \texttt{f} is a file object which has been opened for reading:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> with open('workfile', 'r') as f:
     ...     x = json.load(f)
     ...
@@ -2606,7 +2611,7 @@ you have probably seen some. There are (at least) two distinguishable kinds of e
 \subsection{Syntax Errors}
 Syntax errors, also known as parsing errors, are perhaps the most common kind of complaint you get
 while you are still learning Python:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> while True print 'Hello world'
       File "<stdin>", line 1
         while True print 'Hello world'
@@ -2625,7 +2630,7 @@ Even if statement or expression is syntactically correct, it may cause an error 
 made to execute it. Errors detected during execution are called \emph{exceptions} and are not
 unconditionally fatal: you will soon learn how to handle them in Python programs. Most exceptions
 are not handled by programs, however, and result in error messages as shown here:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 10 * (1 / 0)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
@@ -2660,7 +2665,7 @@ It is possible to write programs that handle selected exceptions. Look at the fo
 which asks the user for input until a valid integer has been entered, but allows the user to
 interrupt the program (using \texttt{Control-C} or whatever the operating system supports); note
 that a user-generated interruption is signalled by raising the \texttt{KeyboardInterrupt} exception.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> while True:
     ...     try:
     ...         x = int(raw_input("Please enter a number: "))
@@ -2688,7 +2693,7 @@ A \texttt{try} statement may have more than one except clause, to specify handle
 exceptions. At most one handler will be executed. Handlers only handle exceptions that occur in the
 corresponding try clause, not in other handlers of the same \texttt{try} statement. An except
 clause may name multiple exceptions as a parenthesized tuple, for example:
-\begin{minted}{bash}
+\begin{minted}{python}
     ... except (RuntimeError, TypeError, NameError):
     ...     pass
 \end{minted}
@@ -2749,7 +2754,7 @@ having to reference \texttt{.args}.
 
 One may also instantiate an exception first before raising it and add any attributes to it as
 desired.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> try:
     ...     raise Exception('spam', 'eggs')
     ... except Exception as inst:
@@ -2773,7 +2778,7 @@ unhandled exceptions.
 Exception handlers don't just handle exceptions if they occur immediately in the try clause, but
 also if they occur inside functions that are called (even indirectly) in the try clause. For
 example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def this_fails():
     ...     x = 1 / 0
     ...
@@ -2788,7 +2793,7 @@ example:
 \subsection{Raising Exceptions}
 The \mintinline{python}{raise} statement allows the programmers to force a specified exception to
 occur. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> raise NameError('HiThere')
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
@@ -2797,7 +2802,7 @@ occur. For example:
 
 The sole argument to \mintinline{python}{raise} indicates the exception to be raised. This must be
 either an exception instance or an exception (a class that derives from \texttt{Exception}):
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> try:
     ...     raise NameError('HiThere')
     ... except NameError:
@@ -2814,7 +2819,7 @@ either an exception instance or an exception (a class that derives from \texttt{
 Programs may name their own exceptions by creating a new exception class (see Classes for more
 about Python classes). Exceptions should typically be derived from the \texttt{Exceptions} class,
 either directly or indirectly. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> class MyError(Exception):
     ...     def __init__(self, value):
     ...         self.value = value
@@ -2883,7 +2888,7 @@ define.
 \subsection{Defining Clean-up Actions}
 The \texttt{try} statement has another optional clause which is intended to define clean-up actions
 that must be executed under all circumstances. For example:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> try:
     ...     raise KeyboardInterrupt
     ... finally:
@@ -2903,7 +2908,7 @@ not been handled by an \texttt{except} clause (or it has occurred in an \texttt{
 \texttt{try} statement is left via a \texttt{break}, \texttt{continue} or \texttt{return} statement.
 A more complicated example (having \texttt{except} and \texttt{finally} clauses in the same
 \texttt{try} statement works as of Python 2.5):
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> def divide(x, y):
     ...     try:
     ...         result = x / y
@@ -2992,7 +2997,7 @@ two different argument passing mechanisms as in Pascal.
 Before introducing classes, I first have to tell you something about Python's scope rules. Class
 definitions play some neat tricks with namespaces, and you need to know how scopes and namespaces
 work to fully understand what's going on. Incidently, knowledge about this subject is useful for
-any advandced Python programmer.
+any advanced Python programmer.
 
 Let's begin with some definitions.
 
@@ -3124,7 +3129,7 @@ returning the docstring belonging to the class: \texttt{"A simple example class"
 If you write the definition of the class \texttt{MyClass} in script \texttt{MyClass.py}, then you
 can use it by command \mintinline{python}{import MyClass}. However, when I tried to use it in the
 interpreter with \texttt{x = MyClass()}, I got the following error message:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> x = MyClass()
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
@@ -3135,13 +3140,13 @@ That's because the clause \mintinline{python}{import MyClass} is importing a \em
 \texttt{MyClass} instead of the class \texttt{MyClass}.
 \footnote{https://stackoverflow.com/questions/16780510/} So we can call the class \texttt{MyClass}
 by the following way:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import MyClass
     >>> x = MyClass.MyClass()
 \end{minted}
 
 Alternatively, we can use \mintinline{python}{from MyClass import MyClass}, like the following code:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> from MyClass import MyClass
     >>> x = MyClass()
     >>> x.i
@@ -3170,7 +3175,7 @@ initialized instance can be obtained by: \mintinline{python}{x = MyClass()}
 Of course, the \texttt{\_\_init\_\_()} method may have arguments for greater flexibility. In that
 case, arguments given to the class instantiation operator are passed on to \texttt{\_\_init\_\_()}.
 For example,
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> class Complex:
     ...     def __init__(self, realpart, imagpart):
     ...         self.r = realpart
@@ -3257,7 +3262,7 @@ for attributes and methods shared by all instances of the class:
         def __init__(self, name):
             self.name = name    # instance variable unique to each instance
 \end{minted}
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> d = Dog('Fido')
     >>> e = Dog('Buddy')
     >>> d.kind
@@ -3285,7 +3290,7 @@ shared by all \emph{Dog} instances:
         def add_trick(self, trick):
             self.tricks.append(trick)
 \end{minted}
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> d = Dog('Fido')
     >>> e = Dog('Buddy')
     >>> d.add_trick('roll over')
@@ -3304,7 +3309,7 @@ Correct design of the class should use an instance variable instead:
         def add_trick(self, trick):
             self.tricks.append(trick)
 \end{minted}
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> d = Dog('Fido')
     >>> e = Dog('Buddy')
     >>> d.add_trick('roll over')
@@ -3619,7 +3624,7 @@ The function returns an iterator object that defines the method \texttt{next()} 
 elements in the container one at a time. When there are no more elements, \texttt{next()} raises a
 \texttt{StopIteration} exception which tells the \texttt{for} loop to terminate. This example shows
 how it all works:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> s = 'abc'
     >>> it = iter(s)
     >>> it
@@ -3640,7 +3645,7 @@ Having seen the mechanics behind the iterator protocol, it is easy to add iterat
 classes. Define an \texttt{\_\_iter\_\_()} method which returns an object with a \texttt{next()}
 method. If the class defines \texttt{next()}, then \texttt{\_\_iter()\_\_} can just return
 \texttt{self}:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> from reverse import Reverse
     >>> rev = Reverse('spam')
     >>> iter(rev)
@@ -3665,7 +3670,7 @@ easy to create:
         for index in range(len(data)-1, -1, -1):
             yield data[index]
 \end{minted}
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> for char in reverse('golf'):
     ...     print char
     ...
@@ -3695,7 +3700,7 @@ are more compact but less versatile than full generator definitions and tend to 
 friendly than equivalent list comprehensions.
 
 Examples:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> sum(i*i for i in range(10))             # sum of squares
     285
 
@@ -3719,7 +3724,7 @@ Examples:
 \section{Brief Tour of the Standard Library}
 \subsection{Operating System Interface}
 The \texttt{os} module provides dozens of functions for interacting with the operating system:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import os
     >>> os.getcwd()     # Return the current working directory
     '/Users/duang/Documents/learning-notes/Programming/Python/the-python-tutorial/9'
@@ -3736,7 +3741,7 @@ built-in \texttt{open()} function which operates much differently.
 
 The built-in \texttt{dir()} and \texttt{help()} functions are useful as interactive aids for
 working with large modules like \texttt{os}:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import os
     >>> dir(os)
     <returns a list of all module functions>
@@ -3746,7 +3751,7 @@ working with large modules like \texttt{os}:
 
 For daily file and directory management tasks, the \texttt{shutil} module provides a higher level
 interface that is easier to use:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import shutil
     >>> shutil.copyfile('bag.py', 'bag_copy.py')
     >>> shutil.move('bag_copy.py', '../bag_copy.py')
@@ -3754,7 +3759,7 @@ interface that is easier to use:
 
 \subsection{File Wildcards}
 The \texttt{glob} module provides a function for making file lists from directory wildcard searches:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import glob
     >>> glob.glob('*.py')
     ['bag.py', 'dog.py', 'employee.py', 'exception_classes.py', 'mapping.py', 'my_class.py',
@@ -3765,7 +3770,7 @@ The \texttt{glob} module provides a function for making file lists from director
 Common utility scripts often need to process command line arguments. These arguments are stored in
 \texttt{sys} module's \emph{argv} attribute as a list. For instance the following output results
 from running \mintinline{bash}{python demo.py one two three} at the command line:
-\begin{minted}{bash}
+\begin{minted}{python}
     duangdeiMac:9 duang$ python -i bag.py one two three
     >>> import sys
     >>> print sys.argv
@@ -3780,7 +3785,7 @@ The \texttt{getopt} module processes \emph{sys.argv} using the conventions of th
 The \texttt{sys} module also has attributes for \emph{stdin}, \emph{stdout}, \emph{stderr}. The
 latter is useful for emitting warnings and error messages to make them visible even when
 \emph{stdout} has been redirected:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> sys.stderr.write('Warning, log file not found starting a new one\n')
     Warning, log file not found starting a new one
 \end{minted}
@@ -3790,7 +3795,7 @@ The most direct way to terminate a script is to use \texttt{sys.exit()}.
 \subsection{String Pattern Matching}
 The \texttt{re} module provides regular expression tools for advanced string processing. For
 complex matching and manipulation, regular expression offer succinct, optimized solutions:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import re
     >>> re.findall(r'\bf[a-z]*', 'which foot or hand fell fastest')
     ['foot', 'fell', 'fastest']
@@ -3800,14 +3805,14 @@ complex matching and manipulation, regular expression offer succinct, optimized 
 
 When only simple capabilities are needed, string methods are perferred because they are easier to
 read and debug:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> 'tea for too'.replace('too', 'two')
     'tea for two'
 \end{minted}
 
 \subsection{Mathmatics}
 The \texttt{math} module gives access to the underlying C library functions for floating point math:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import math
     >>> math.cos(math.pi / 4.0)
     0.7071067811865476
@@ -3816,7 +3821,7 @@ The \texttt{math} module gives access to the underlying C library functions for 
 \end{minted}
 
 The \texttt{random} module provides tools for making random selections:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import random
     >>> random.choice(['apple', 'pear', 'banana'])
     'apple'
@@ -3832,7 +3837,7 @@ The \texttt{random} module provides tools for making random selections:
 There are a number of modules for accessing the internet and processing internet protocols. Two of
 the simplest are \texttt{urllib2} for retrieving data from URLs and \texttt{smtplib} for sending
 mail:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import urllib2
     >>> for line in urllib2.urlopen('http://tycho.usno.navy.mil/cgi-bin/timer.pl'):
     ...     if 'EST' in line or 'EDT' in line:  # look for Eastern Time
@@ -3881,7 +3886,7 @@ The \texttt{datetime} module supplies classes for manipulating dates and times i
 complex ways. While date and time arithmetic is supported, the focus of the implementation is on
 efficient member extraction member extraction for output formatting and manipulation. The module
 also supports objects that are timezone aware.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> # dates are easily constructed and formatted
     >>> from datetime import date
     >>> now = date.today()
@@ -3900,7 +3905,7 @@ also supports objects that are timezone aware.
 \subsection{Data Compression}
 Common data archiving and compression formats are directly supported by modules including:
 \texttt{zlib}, \texttt{gzip}, \texttt{bz2}, \texttt{zipfile} and \texttt{tarfile}.
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> import zlib
     >>> s = 'witch which has which witches wrist watch'
     >>> len(s)
@@ -3922,7 +3927,7 @@ immediately.
 For example, it may be tempting to use the tuple packing and unpacking feature instead of the
 traditional approach to swapping arguments. The \texttt{timeit} module quickly demonstrates a
 modest performance advantage:
-\begin{minted}{bash}
+\begin{minted}{python}
     >>> Timer('t = a; a = b; b = t', 'a = 1; b = 2').timeit()
     0.027740955352783203
     >>> Timer('a, b = b, a', 'a = 1; b = 2').timeit()
@@ -3958,7 +3963,7 @@ Use \texttt{python average.py} in terminal to run script \texttt{average.py}. If
 change the clause \mintinline{python}{return sum(values, 0.0) / len(values)} to
 \mintinline{python}{return sum(values, 1.0) / len(values)}, then \texttt{python average.py} again
 in terminal, we will get the following message:
-\begin{minted}{bash}
+\begin{minted}{python}
     duangdeiMac:10 duang$ python average.py
     **********************************************************************
     File "average.py", line 4, in __main__.average
@@ -4014,6 +4019,374 @@ robust capabilities of its larger package. For example:
     \item Internationalization is supported by a number of modules including \texttt{gettext},
     \texttt{locale}, and the \texttt{codecs} package.
 \end{itemize}
+
+\section{Brief Tour of the Standard Library --- Part \RN{2}}
+This second tour covers more advanced modules that support professional programming needs. These
+modules rarely occur in small scripts.
+
+\subsection{Output Formatting}
+The \texttt{repr} module provides a version of \texttt{repr()} customized for abbreviated displays
+of large or deeply nested containers:
+\begin{minted}{python}
+    >>> import repr
+    >>> repr.repr(set('supercalifragilisticexpialidocious'))
+    "set(['a', 'c', 'd', 'e', 'f', 'g', ...])"
+\end{minted}
+
+The \texttt{pprint} module offers more sophisticated control over printing both built-in and user
+defined objects in a way that is readable by the interpreter. When the result is longer that one
+line, the ``pretty printer'' adds line breaks and indentation to more clearly reveal data
+structure:
+\begin{minted}{python}
+    >>> t = [[[['black', 'cyan'], 'white', ['green', 'red']], [['magenta', 'yellow'], 'blue']]]
+    >>> t
+    [[[['black', 'cyan'], 'white', ['green', 'red']], [['magenta', 'yellow'], 'blue']]]
+    >>> pprint.pprint(t, width = 30)
+    [[[['black', 'cyan'],
+       'white',
+       ['green', 'red']],
+      [['magenta', 'yellow'],
+       'blue']]]
+\end{minted}
+
+The \texttt{textwrap} module formats paragraphs of text to fit a given screen width:
+\begin{minted}{python}
+    >>> import textwrap
+    >>> doc = """The wrap() method is just like fill() except that it returns a list of
+    ... strings instead of one big string with newlines to separate the wrapped lines."""
+    >>> print textwrap.fill(doc, width = 40)
+    The wrap() method is just like fill()
+    except that it returns a list of strings
+    instead of one big string with newlines
+    to separate the wrapped lines.
+    >>> print textwrap.fill(doc, width = 60)
+    The wrap() method is just like fill() except that it returns
+    a list of strings instead of one big string with newlines to
+    separate the wrapped lines.
+\end{minted}
+
+The \texttt{locale} module accesses a database of culture specific data formats. The grouping
+attribute of locale's format function provides a direct way of formatting numbers with group
+separators:
+\begin{minted}{python}
+    >>> import locale
+    >>> locale.setlocale(locale.LC_ALL, 'English_United States.1252')
+    'English_United States.1252'
+    >>> conv = locale.localeconv()          # get a mapping of conventions
+    >>> x = 1234567.8
+    >>> locale.format("%d", x, grouping=True)
+    '1,234,567'
+    >>> locale.format_string("%s%.*f", (conv['currency_symbol'],
+    ...                      conv['frac_digits'], x), grouping=True)
+    '$1,234,567.80'
+\end{minted}
+(Note: I didn't get this output on my computer.)
+
+\subsection{Templating}
+The \texttt{string} module includes a versatile \texttt{Template} class with a simplified syntax
+suitable for editing by end-users. This allows users to customize their applications without having
+to alter the application.
+
+The format uses placeholder names formed by \texttt{\$} with valid Python identifiers (alphanumeric
+characters and underscores). Surrounding the placeholder with braces allows it to be followed by
+more alphanumeric letters with no intervening spaces. Writing \texttt{\$\$} creates a single
+escaped \texttt{\$}:
+\begin{minted}{python}
+    >>> from string import Template
+    >>> t = Template('${village}folk send $$10 to $cause.')
+    >>> t.substitute(village = 'Nottingham', cause = 'the ditch fund')
+    'Nottinghamfolk send $10 to the ditch fund.'
+\end{minted}
+
+The \texttt{substitute()} method raises a \texttt{KeyError} when a placeholder is not supplied in a
+dictionary or a keyword argument. For mail-merge style applicatons, user supplied data may be
+incomplete and the \texttt{safe\_substitude()} method may be more appropriate --- it will leave
+placeholders unchanged if data is missing:
+\begin{minted}{python}
+    >>> t = Template('Return the $item to $owner.')
+    >>> d = dict(item = 'unladen swallow')
+    >>> t.substitute(d)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/string.py",
+      line 176, in substitute return self.pattern.sub(convert, self.template)
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/string.py",
+      line 166, in convert val = mapping[named]
+    KeyError: 'owner'
+\end{minted}
+
+Template subclasses can specify a custom delimiter. For example, a batch renaming utility for a
+photo browser may elect to use percent signs for placeholders such as the current date, image
+sequence number, or file format:
+\begin{minted}{python}
+    >>> import time, os.path
+    >>> photofiles = ['img_1074.jpg', 'img_1076.jpg', 'img_1077.jpg']
+    >>> class BatchRename(Template):
+    ...     delimiter = '%'
+    ...
+    >>> fmt = raw_input('Enter rename style (%d-date %n-seqnum %f-format): ')
+    Enter rename style (%d-date %n-seqnum %f-format): Ashley_%n%f
+    >>> t = BatchRename(fmt)
+    >>> date = time.strftime('%d%b%y')
+    >>> for i, filename in enumerate(photofiles):
+    ...     base, ext = os.path.splitext(filename)
+    ...     newname = t.substitute(d = date, n = i, f = ext)
+    ...     print '{0} --> {1}'.format(filename, newname)
+    ...
+    img_1074.jpg --> Ashley_0.jpg
+    img_1076.jpg --> Ashley_1.jpg
+    img_1077.jpg --> Ashley_2.jpg
+\end{minted}
+
+Another application for templating is separating program logic from the details of multiple output
+formats. This makes it possible to substitute custom templates for XML files, plain text reports,
+and HTML web reports.
+
+\subsection{Working with Binary Data Record Layouts}
+The \texttt{struct} module provides \texttt{pack()} and \texttt{unpack()} functions for working
+with variable length binary record formats. The following example shows how to loop through header
+information in a ZIP file without using the \texttt{zipfile} module. Pack codes \texttt{"H"} and
+\texttt{"I"} represent two and four byte unsigned numbers respectively. The \texttt{"<"} indicates
+that they are standard size and in little-endian byte order:
+\begin{minted}{python}
+    import struct
+
+    data = open('myfile.zip', 'rb').read()
+    start = 0
+    for i in range(3):                      # show the first 3 file headers
+        start += 14
+        fields = struct.unpack('<IIIHH', data[start : start+16])
+        crc32, comp_size, uncomp_size, filenamesize, extra_size = fields
+
+        start += 16
+        filename = data[start : start+filenamesize]
+        start += filenamesize
+        extra = data[start : start+extra_size]
+        print filename, hex(crc32), comp_size, uncomp_size
+
+        start += extra_size + comp_size     # skip to the next header
+\end{minted}
+(Note: I failed to test this example with a customized ZIP file.)
+
+\subsection{Multi-threading}
+Threading is a technique for decoupling tasks which are not sequentially dependent. Threads can be
+used to improve the responsiveness of applications that accept user input while other tasks run in
+the background. A related use case is running I/O in parallel with computations in another thread.
+
+The following code shows how the high level \texttt{threading} module can run tasks in background
+while the main program continues to run:
+\begin{minted}{python}
+    import threading, zipfile
+
+    class AsyncZip(threading.Thread):
+        def __init__(self, infile, outfile):
+            threading.Thread.__init__(self)
+            self.infile = infile
+            self.outfile = outfile
+
+        def run(self):
+            f = zipfile.ZipFile(self.outfile, 'w', zipfile.ZIP_DEFLATED)
+            f.write(self.infile)
+            f.close()
+            print 'Finished background zip of: ', self.infile
+
+    background = AsyncZip('mydata.txt', 'myarhive.zip')
+    background.start()
+    print 'The main program continues to run in foreground.'
+
+    background.join()   # Wait for the background task to finish
+    print 'Main program waited until background was done.'
+\end{minted}
+
+The principal challenge of multi-threaded applications is coordinating threads that share data or
+other resources. To that end, the threading module provides a number of synchronization primitives
+including locks, events, condition variables, and semaphores.
+
+While those tools are powerful, minor design errors can result in problems that are difficult to
+reproduce. So, the preferred approach to task coordination is to concentrate all access to a
+resource in a single thread and then use the \texttt{Queue} module to feed that thread with
+requests from other threads. Applications using \texttt{Queue.Queue} objects for interthread
+communication and coordination are easier to design, more readable, and more reliable.
+
+\subsection{Logging}
+The \texttt{logging} module offers a full featured and flexible logging system. At its simplest,
+log messages are sent to a file or to \texttt{sys.stderr}:
+\begin{minted}{python}
+    >>> import logging
+    >>> logging.debug('Debugging information')
+    >>> logging.info('Informational message')
+    >>> logging.warning('Warning: config file %s not found', 'server.conf')
+    WARNING:root:Warning: config file server.conf not found
+    >>> logging.error('Error occurred')
+    ERROR:root:Error occurred
+    >>> logging.critical('Critical error -- shutting down')
+    CRITICAL:root:Critical error -- shutting down
+\end{minted}
+
+By default, informational and debugging messages are suppressed and the output is sent to standard
+error. Other output options include routing messages through email, datagrams, sockets, or to an
+HTTP Server. New filters can select different routing based on message priority: \texttt{DEBUG},
+\texttt{INFO}, \texttt{WARNING}, \texttt{ERROR}, and \texttt{CRITICAL}.
+
+The logging system can be configured directly from Python or can be loaded from a user editable
+configuration file for customized logging without altering the application.
+
+\subsection{Weak References}
+Python does automatic memory management (reference counting for most objects and garbage collection
+to eliminate cycles). The memory is freed shortly after the last reference to it has been
+eliminated.
+
+This approach works fine for most applications but occasionally there is a need to track objects
+only as long as they are being used by something else. Unfortunately, just tracking them creates a
+reference that makes them permanent. The \texttt{weakref} module provides tools for tracking
+objects without creating a reference. When the object is no longer needed, it is automatically
+removed from a weakref table and a callback is triggered for weakref objects. Typical applications
+include caching objects that are expensive to create:
+\begin{minted}{python}
+    >>> import weakref, gc
+    >>> class A:
+    ...     def __init__(self, value):
+    ...         self.value = value
+    ...     def __repr__(self):
+    ...         return str(self.value)
+    ...
+    >>> a = A(10)           # create a reference
+    >>> d = weakref.WeakValueDictionary()
+    >>> d['primary'] = a    # does not create a reference
+    >>> d['primary']        # fetch the object if it is still alive
+    10
+    >>> del a               # remove the one reference
+    >>> gc.collect()        # run garbage collection right away
+    0
+    >>> d['primary']        # entry was automatically removed
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/weakref.py",
+      line 70, in __getitem__
+        o = self.data[key]()
+    KeyError: 'primary'
+\end{minted}
+
+\subsection{Tools for Working with Lists}
+Many data structure needs can be met with the built-in list type. However, sometimes there is a
+need for alternative implementations with different performance trade-offs.
+
+The \texttt{array} module provides an \texttt{array()} object that is like a list that stores only
+homogeneous data and stores it more compactly. The following example shows an array of numbers
+stored as two bytes unsigned binary numbers (typecode \texttt{"H"}) rather than the usual 16 bytes
+per entry for regular lists of Python int objects.
+\begin{minted}{python}
+    >>> from array import array
+    >>> a = array('H', [4000, 10, 700, 22222])
+    >>> sum(a)
+    26932
+    >>> a[1:3]
+    array('H', [10, 700])
+\end{minted}
+
+The \texttt{collection} module provides a \texttt{deque()} object that is like a list with faster
+appends and pops from the left side but slower lookups in the middle. These objects are well suited
+for implementing queues and breadth first see searches:
+\begin{minted}{python}
+    >>> from collections import deque
+    >>> d = deque(["task1", "task2", "task3"])
+    >>> d.append("task4")
+    >>> print "Handling", d.popleft()
+    Handling task1
+    >>> d
+    deque(['task2', 'task3', 'task4'])
+\end{minted}
+
+\begin{minted}{python}
+    unsearched = deque([starting_node])
+    def breadth_first_search(unsearched):
+        node = unsearched.popleft()
+        for m in gen_moves(node):
+            if is_goal(m):
+                return m
+            unsearched.append(m)
+\end{minted}
+
+In addition to alternative list implementations, the library also offers other tools such as the
+\texttt{bisect} module with functions for manipulating sorted lists:
+\begin{minted}{python}
+    >>> import bisect
+    >>> scores = [(100, 'perl'), (200, 'tcl'), (400, 'lua'), (500, 'python')]
+    >>> bisect.insort(scores, (300, 'ruby'))
+    >>> scores
+    [(100, 'perl'), (200, 'tcl'), (300, 'ruby'), (400, 'lua'), (500, 'python')]
+\end{minted}
+
+The \texttt{heapq} module provides functions for implementing heaps based on regular lists. The
+lowest valued entry is always kept at position zero. This is useful for applications which
+repeatedly access the smallest element but do not want to run a full list sort:
+\begin{minted}{python}
+    >>> from heapq import heapify, heappop, heappush
+    >>> data = [1, 3, 5, 7, 9, 2, 4, 6, 8, 0]
+    >>> heapify(data)                       # rearrange the list into heap order
+    >>> data
+    [0, 1, 2, 6, 3, 5, 4, 7, 8, 9]
+    >>> heappush(data, -5)                  # add a new entry
+    >>> data
+    [-5, 0, 2, 6, 1, 5, 4, 7, 8, 9, 3]
+    >>> [heappop(data) for i in range(3)]   # fetch a three smallest entries
+    [-5, 0, 1]
+\end{minted}
+
+\subsection{Decimal Floating Point Arithmetic}
+The \texttt{decimal} module offers a \texttt{Decimal} datatype for decimal floating point
+arithmetic. Compared to the built-in \texttt{float} implementation of binary floating point, the
+class is epspecially helpful for
+\begin{itemize}
+    \item financial applications and other uses which require exact decimal representation
+    \item control over precision
+    \item control over rounding to meet legal or regulatory requirements
+    \item tracking of significant decimal places
+    \item applications where the user expects the results to match calculations done by hand
+\end{itemize}
+
+For example, calculating a 5\% tax on a 70 cent phone charge gives different results in decimal
+floating point and binary floating point. The difference becomes significant if the results are
+rounded to the nearest cent:
+\begin{minted}{python}
+    >>> from decimal import *
+    >>> x = Decimal('0.70') * Decimal('1.05')
+    >>> x
+    Decimal('0.7350')
+    >>> x.quantize(Decimal('0.01'))
+    Decimal('0.74')
+    >>> round(.70 * 1.05, 2)
+    0.73
+\end{minted}
+
+The \texttt{Decimal} result keeps a trailing zero, automatically inferring four place significance
+from multiplicands with two place significance. Decimal reproduces mathematics as done by hand and
+avoids issues that can arise when binary floating point cannot exactly represent decimal
+quantities.
+
+Exact representations enables the \texttt{Decimal} class to perform modulo calculations and
+equality tests that are unsuitable for binary floating point:
+\begin{minted}{python}
+    >>> Decimal('1.00') % Decimal('.10')
+    Decimal('0.00')
+    >>> 1.00 % 0.10
+    0.09999999999999995
+
+    >>> sum([Decimal('0.1')]*10) == Decimal('1.0')
+    True
+    >>> sum([0.1]*10) == 1.0
+    False
+\end{minted}
+
+The \texttt{decimal} module provides arithmetic with as much precision as needed:
+\begin{minted}{python}
+    >>> getcontext().prec = 36
+    >>> Decimal(1) / Decimal(7)
+    Decimal('0.142857142857142857142857142857142857')
+\end{minted}
+
+
+
 
 
 
