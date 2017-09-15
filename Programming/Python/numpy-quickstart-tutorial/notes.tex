@@ -20,6 +20,506 @@
 \tableofcontents
 \newpage
 
+\section{Prerequisites}
+Before reading this tutorial you should know a bit of Python. If you would like to refresh your
+memory, take a look at the Python tutorial.
+\footnote{https://docs.python.org/3/tutorial/}
+
+If you wish to work the examples in this tutorial, you must also have some softwares installed on
+your computer. Please see \url{http://scipy.org/install.html} for instructions.
+
+\section{The Basics}
+NumPy's main object is the homogeneous multidimensional array. It is a table of elements (usually
+numbers), all of the same type, indexed by a tuple of positive integers. In NumPy dimensions are
+called \emph{axes}. The number of axes is \emph{rank}.
+
+For example, the coordinates of a point in 3D shape \texttt{[1, 2, 1]} is an array of rank 1,
+because it has one axis. That axis has a length of 3. In the example pictured below, the array has
+rank 2 (it is 2-dimensional). The first dimension (axis) has a length of 2, the second dimension
+has a length of 3.
+\begin{minted}{text}
+    [[1., 0., 0.],
+     [0., 1., 2.]]
+\end{minted}
+
+NumPy's array class is called \texttt{ndarray}. It is also known by the alias \texttt{array}. Note
+that \texttt{numpy.array} is not the same as the Standard Python Library class \texttt{array.array},
+which only handles one-dimensional arrays and offers less functionality. The more important
+attributes of an \texttt{ndarray} object are:
+\begin{itemize}
+    \item \texttt{ndarray.ndim} \\
+    the number of axes (dimensions) of the array. In the Python world, the number of dimensions is
+    referred to as \emph{rank}.
+    \item \texttt{ndarray.shape} \\
+    the dimensions of the array. This is a tuple of integers indicating the size of the array in
+    each dimension. For a matrix with \emph{n} rows and \emph{m} columns, \texttt{shape} will be
+    \texttt{(n, m)}. The length of the \texttt{shape} tuple is therefore the rank, or number of
+    dimensions, \texttt{ndim}.
+    \item \texttt{ndarray.size} \\
+    the total number of elements of the array. This is equal to the product of the elements of
+    \texttt{shape}.
+    \item \texttt{ndarray.dtype} \\
+    an object describing the type of the elements in the array. One can create or specify dtype's
+    using standard Python types. Additionally NumPy provides types of its own. \texttt{numpy.int32},
+    \texttt{numpy.int16}, and \texttt{numpy.float64} are some examples.
+    \item \texttt{ndarray.itemsize} \\
+    the size in bytes of each element of the array. For example, an array of elements of type
+    \texttt{float64} has \texttt{itemsize} 8 (=64/8), while one of type \texttt{complex32} has
+    \texttt{itemsize} 4 (=32/8). It is equivalent to \texttt{ndarray.dtype.itemsize}.
+    \item \texttt{ndarray.data} \\
+    the buffer containing the actuall elements of the array. Normally, we won't need to use this
+    attribute because we will access the elements in an array using indexing facilities.
+\end{itemize}
+
+\subsection{An example}
+\begin{minted}{numpy}
+    >>> import numpy as np
+    >>> a = np.arange(15).reshape(3, 5)
+    >>> a
+    array([[ 0,  1,  2,  3,  4],
+           [ 5,  6,  7,  8,  9],
+           [10, 11, 12, 13, 14]])
+    >>> a.shape
+    (3, 5)
+    >>> a.ndim
+    2
+    >>> a.dtype.name
+    'int64'
+    >>> a.itemsize
+    8
+    >>> a.size
+    15
+    >>> type(a)
+    <class 'numpy.ndarray'>
+    >>> b = np.array([6, 7, 8])
+    >>> b
+    array([6, 7, 8])
+    >>> type(b)
+    <class 'numpy.ndarray'>
+\end{minted}
+
+\subsection{Array Creation}
+There are several ways to create arrays.
+
+For example, you can create an array from a regular Python list or tuple using the \texttt{array}
+function. The type of the resulting array is deduced from the type of the elements in the sequence.
+\begin{minted}{numpy}
+    >>> import numpy as np
+    >>> a = np.array([2, 3, 4])
+    >>> a
+    array([2, 3, 4])
+    >>> a.dtype
+    dtype('int64')
+    >>> b = np.array([1.2, 3.5, 5.1])
+    >>> b.dtype
+    dtype('float64')
+\end{minted}
+
+A frequent error consists in calling \texttt{array} with multiple numeric arguments, rather than
+providing a single list of numbers as an argument.
+\begin{minted}{numpy}
+    >>> a = np.array(1, 2, 3, 4)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    ValueError: only 2 non-keyword arguments accepted
+    >>> a = np.array([1, 2, 3, 4])
+\end{minted}
+
+\texttt{array} transforms sequences of sequences into two-dimensional arrays, sequences of
+sequences of sequences into three-dimensional arrays, and so on.
+\begin{minted}{numpy}
+    >>> b = np.array([(1.5, 2, 3), (4, 5, 6)])
+    >>> b
+    array([[ 1.5,  2. ,  3. ],
+       [ 4. ,  5. ,  6. ]])
+\end{minted}
+
+The types of the array can also be explicitly specified at creation time:
+\begin{minted}{numpy}
+    >>> c = np.array([[1, 2], [3, 4]], dtype=complex)
+    >>> c
+    array([[ 1.+0.j,  2.+0.j],
+           [ 3.+0.j,  4.+0.j]])
+\end{minted}
+
+Often, the elements of an array are originally unknown, but its size is known. Hence, NumPy offers
+several functions to create arrays with innitial placeholder content. These minimize the necessity
+of growing arrays, an expensive operation.
+
+The function \texttt{zeros} creates an array full of zeros, the funtion \texttt{ones} creates an
+array full of ones, and the funtion \texttt{empty} creates an array whoss initial content is random
+and depends on the state of the memory. By default, the dtype of the created array is
+\texttt{float64}.
+\begin{minted}{numpy}
+    >>> np.zeros((3, 4))
+    array([[ 0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.]])
+    >>> np.ones((2, 3, 4), dtype = np.int16)    # dtype can also be specified
+    array([[[1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1]],
+
+           [[1, 1, 1, 1],
+            [1, 1, 1, 1],
+            [1, 1, 1, 1]]], dtype=int16)
+    >>> np.empty((2, 3))    # uninitialized, output may vary
+    array([[ 0.,  0.,  0.],
+           [ 0.,  0.,  0.]])
+\end{minted}
+
+To create sequence of numbers, NumPy provides a function analogous to \texttt{range} that returns
+arrays instead of lists.
+\begin{minted}{numpy}
+    >>> np.arange(10, 30, 5)
+    array([10, 15, 20, 25])
+    >>> np.arange(0, 2, 0.3)    # it accepts float arguments
+    array([ 0. ,  0.3,  0.6,  0.9,  1.2,  1.5,  1.8])
+\end{minted}
+
+When \texttt{arange} is used with floating point arguments, it is generally not possible to predict
+the number of elements obtained, due to the finite floating point of precision. For this reason, it
+is usually better to use the function \texttt{linspace} that receives as an arguemnt the nubmer of
+elements that we want, instead of the step:
+\begin{minted}{numpy}
+    >>> from numpy import pi
+    >>> # linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
+    >>> np.linspace(0, 2, 9)
+    array([ 0.  ,  0.25,  0.5 ,  0.75,  1.  ,  1.25,  1.5 ,  1.75,  2.  ])
+    >>> x = np.linspace(0, 2*pi, 100)
+    >>> f = np.sin(x)
+\end{minted}
+
+\subsection{Printing Arrays}
+When you print an array, NumPy displays it in a similar way to nested lists, but with the following
+layout:
+\begin{itemize}
+    \item the last axis is printed from left to right
+    \item the second-to-last is printed from top to bottom
+    \item the rest are also printed from top to bottom, with each slice separated from the next by
+    an empty line
+\end{itemize}
+
+One-dimensional arrays are then printed as rows, bidimensional as matirces and tridimensional as
+lists of matrices.
+\begin{minted}{numpy}
+    >>> a = np.arange(6)                    # 1d array
+    >>> print(a)
+    [0 1 2 3 4 5]
+    >>>
+    >>> b = np.arange(12).reshape(4, 3)     # 2d array
+    >>> print(b)
+    [[ 0  1  2]
+     [ 3  4  5]
+     [ 6  7  8]
+     [ 9 10 11]]
+    >>>
+    >>> c = np.arange(24).reshape(2, 3, 4)  # 3d array
+    >>> print(c)
+    [[[ 0  1  2  3]
+      [ 4  5  6  7]
+      [ 8  9 10 11]]
+
+     [[12 13 14 15]
+      [16 17 18 19]
+      [20 21 22 23]]]
+\end{minted}
+
+See below to get more details on \texttt{reshape}.
+
+If an array is too large to be printed, NumPy automatically skips the central part of the array and
+only prints the corners:
+\begin{minted}{numpy}
+    >>> print(np.arange(10000))
+    [   0    1    2 ..., 9997 9998 9999]
+    >>>
+    >>> print(np.arange(10000).reshape(100, 100))
+    [[   0    1    2 ...,   97   98   99]
+     [ 100  101  102 ...,  197  198  199]
+     [ 200  201  202 ...,  297  298  299]
+     ...,
+     [9700 9701 9702 ..., 9797 9798 9799]
+     [9800 9801 9802 ..., 9897 9898 9899]
+     [9900 9901 9902 ..., 9997 9998 9999]]
+\end{minted}
+
+To disable this behaviour and force NumPy to print the entire array, you can change the printing
+options using \texttt{set\_printoptions}.
+\begin{minted}{numpy}
+    >>> np.set_printoptions(threshold='nan')
+\end{minted}
+
+\subsection{Basic Operations}
+Arithmetic operators on arrays apply \emph{elementwise}. A new array is created and filled with the
+result.
+\begin{minted}{numpy}
+    >>> a = np.array([20, 30, 40, 50])
+    >>> b = np.arange(4)
+    >>> b
+    array([0, 1, 2, 3])
+    >>> c = a - b
+    >>> c
+    array([20, 29, 38, 47])
+    >>> b**2
+    array([0, 1, 4, 9])
+    >>> 10 * np.sin(a)
+    array([ 9.12945251, -9.88031624,  7.4511316 , -2.62374854])
+    >>> a < 35
+    array([ True,  True, False, False], dtype=bool)
+\end{minted}
+
+Unlike in many matrix languages, the product operator \texttt{\*} operates elementwise in NumPy
+arrays. The matrix product can be performed using the \texttt{dot} function or method:
+\begin{minted}{numpy}
+    >>> A = np.array([[1, 1],
+    ...             [0, 1]])
+    >>> B = np.array([[2, 0],
+    ...             [3, 4]])
+    >>> A * B           # elementwise product
+    array([[2, 0],
+           [0, 4]])
+    >>> A.dot(B)        # matrix product
+    array([[5, 4],
+           [3, 4]])
+    >>> np.dot(A, B)    # another matrix product
+    array([[5, 4],
+           [3, 4]])
+\end{minted}
+
+Some operations, such as \texttt{+=} and \texttt{*=}, act in place to modify an existing array
+rather than create a new one.
+\begin{minted}{numpy}
+    >>> a = np.ones((2, 3), dtype=int)
+    >>> b = np.random.random((2, 3))
+    >>> a *= 3
+    >>> a
+    array([[3, 3, 3],
+           [3, 3, 3]])
+    >>> b += a
+    >>> b
+    array([[ 3.68582548,  3.15959264,  3.68984824],
+           [ 3.67301667,  3.64224267,  3.78424707]])
+    >>> a += b      # b is not automatically converted to integer type
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: Cannot cast ufunc add output from dtype('float64') to dtype('int64') with
+    casting rule 'same_kind'
+\end{minted}
+
+When operating with arrays of different types, the type of resulting array corresponds to the more
+general or precise one (a behavior known as upcasting).
+\begin{minted}{numpy}
+    >>> a = np.ones(3, dtype=np.int32)
+    >>> b = np.linspace(0, pi, 3)
+    >>> b.dtype.name
+    'float64'
+    >>> c = a + b
+    >>> c
+    array([ 1.        ,  2.57079633,  4.14159265])
+    >>> c.dtype.name
+    'float64'
+    >>> d = np.exp(c*1j)
+    >>> d
+    array([ 0.54030231+0.84147098j, -0.84147098+0.54030231j,
+           -0.54030231-0.84147098j])
+    >>> d.dtype.name
+    'complex128'
+\end{minted}
+
+Many unary operations, such as computing the sum of all the elements in the array, are implemented
+as methods of the \texttt{ndarray} class.
+\begin{minted}{numpy}
+    >>> a = np.random.random((2, 3))
+    >>> a
+    array([[ 0.33772353,  0.43252608,  0.36205143],
+           [ 0.63473759,  0.01005969,  0.50547396]])
+    >>> a.sum()
+    2.2825722818751424
+    >>> a.min()
+    0.010059688136148881
+    >>> a.max()
+    0.63473759159170229
+\end{minted}
+
+By default, these operations apply to the array as though it were a list of numbers, regardless of
+its shape. However, by specifying the the \texttt{axis} parameters you can apply an operation along
+the specified axis of an array:
+\begin{minted}{numpy}
+    >>> b = np.arange(12).reshape(3, 4)
+    >>> b
+    array([[ 0,  1,  2,  3],
+           [ 4,  5,  6,  7],
+           [ 8,  9, 10, 11]])
+    >>> b.sum(axis=0)           # sum of each column
+    array([12, 15, 18, 21])
+    >>> b.min(axis=1)           # min of each row
+    array([0, 4, 8])
+    >>>
+    >>> b.cumsum(axis=1)        # cumulative sum along each row
+    array([[ 0,  1,  3,  6],
+          [ 4,  9, 15, 22],
+          [ 8, 17, 27, 38]])
+\end{minted}
+
+\subsection{Universal Functions}
+NumPy provides familiar mathematical functions such as sin, cos, and exp. In NumPy, these are
+called ``universal functions'' (\texttt{ufunc}). Within NumPy, these functions operate elementwise
+on an array, producting an array as output.
+\begin{minted}{numpy}
+    >>> B = np.arange(3)
+    >>> B
+    array([0, 1, 2])
+    >>> np.exp(B)
+    array([ 1.        ,  2.71828183,  7.3890561 ])
+    >>> np.sqrt(B)
+    array([ 0.        ,  1.        ,  1.41421356])
+    >>> C = np.array([2., -1, 4.])
+    >>> np.add(B, C)
+    array([ 2.,  0.,  6.])
+\end{minted}
+
+\subsection{Indexing, Slicing and Iterating}
+\textbf{One-dimensional} arrays can be indexed, sliced and iterated over, much like lists and other
+Python sequences.
+\begin{minted}{numpy}
+    >>> a = np.arange(10)**3
+    >>> a
+    array([  0,   1,   8,  27,  64, 125, 216, 343, 512, 729])
+    >>> a[2]
+    8
+    >>> a[2:5]
+    array([ 8, 27, 64])
+    >>> # equivalent to a[0:6:2] = -1000; from start to position 6, exclusive, set
+    ... # every 2nd element to -1000
+    >>> a[:6:2] = -1000
+    >>> a   # reversed a
+    array([-1000,     1, -1000,    27, -1000,   125,   216,   343,   512,   729])
+    >>> a[ : :-1]
+    array([  729,   512,   343,   216,   125, -1000,    27, -1000,     1, -1000])
+    >>> for i in a:
+    ...     print(i**(1/3.))
+    ...
+    __main__:2: RuntimeWarning: invalid value encountered in power
+    nan
+    1.0
+    nan
+    3.0
+    nan
+    5.0
+    6.0
+    7.0
+    8.0
+    9.0
+\end{minted}
+
+\textbf{Multidimensional} arrays can have one index per axis. These indices are given in a tuple
+separated by commas:
+\begin{minted}{numpy}
+    >>> def f(x, y):
+    ...     return 10*x+y
+    ...
+    >>> b = np.fromfunction(f, (5, 4), dtype=int)
+    >>> b
+    array([[ 0,  1,  2,  3],
+           [10, 11, 12, 13],
+           [20, 21, 22, 23],
+           [30, 31, 32, 33],
+           [40, 41, 42, 43]])
+    >>> b[2, 3]
+    23
+    >>> b[0:5, 1]   # each row in the second column
+    array([ 1, 11, 21, 31, 41])
+    >>> b[ : , 1]   # equivalent to the previous example
+    array([ 1, 11, 21, 31, 41])
+    >>> b[1:3, : ]  # each column in the second and third row of b
+    array([[10, 11, 12, 13],
+           [20, 21, 22, 23]])
+\end{minted}
+
+When fewer indices are provided than the number of axes, the missing indices are considered
+complete slices \texttt{:}
+\begin{minted}{numpy}
+    >>> b[-1]   # the last row. Equivalent to b[-1, :]
+    array([40, 41, 42, 43])
+    >>> b[-1, :]
+    array([40, 41, 42, 43])
+\end{minted}
+
+The expression within brackets in \texttt{b[i]} is treated as an \texttt{i} followed by as many
+instances of \texttt{:} as needed to represent the remaining axes. NumPy also allows you to write
+this using dots as \texttt{b[i, ...]}.
+
+The \textbf{dots}(\texttt{...}) represent as many colons as needed to produce a complete indexing
+tuple. For example, if \texttt{x} is a rank 5 array (i.e., it has 5 axes), then
+\begin{itemize}
+    \item \texttt{x[1, 2, ...]} is equivalent to \texttt{x[1, 2, :, :, :]}
+    \item \texttt{x[..., 3]} to \texttt{x[:, :, :, :, 3]}
+    \item \texttt{x[4, ..., 5, :]} to \texttt{x[4, :, :, 5, :]}
+\end{itemize}
+\begin{minted}{numpy}
+    >>> c = np.array([[[0, 1, 2],       # a 3D array (two stacked 2D arrays)
+    ...             [10, 12, 13]],
+    ...             [[100, 101, 102],
+    ...             [110, 112, 113]]])
+    >>> c.shape
+    (2, 2, 3)
+    >>> c[1, ...]                       # same as c[1, :, :] or c[1]
+    array([[100, 101, 102],
+           [110, 112, 113]])
+    >>> c[..., 2]                       # same as c[:, :, 2]
+    array([[  2,  13],
+           [102, 113]])
+\end{minted}
+
+\textbf{Iterating} over multidimensional arrays is done with respect to the first axis:
+\begin{minted}{numpy}
+    >>> for row in b:
+    ...     print(row)
+    ...
+    [0 1 2 3]
+    [10 11 12 13]
+    [20 21 22 23]
+    [30 31 32 33]
+    [40 41 42 43]
+\end{minted}
+
+However, if one wants to perform an operation on each element in the array, one can use the
+\texttt{flat} attribute which is an iterator over all the elements of the array:
+\begin{minted}{numpy}
+    >>> for element in b.flat:
+    ...     print(element)
+    ...
+    0
+    1
+    2
+    3
+    10
+    11
+    12
+    13
+    20
+    21
+    22
+    23
+    30
+    31
+    32
+    33
+    40
+    41
+    42
+    43
+\end{minted}
+
+
+
+
+
+
+
+
+
+
 
 
 
