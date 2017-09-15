@@ -511,9 +511,153 @@ However, if one wants to perform an operation on each element in the array, one 
     43
 \end{minted}
 
+\section{Shape Manipulation}
+\subsection{Changing the shape of an array}
+An array has a shape given by the number of elements along each axis:
+\begin{minted}{numpy}
+    >>> a = np.floor(10*np.random.random((3, 4)))
+    >>> a
+    array([[ 3.,  4.,  8.,  9.],
+           [ 1.,  4.,  1.,  0.],
+           [ 1.,  0.,  0.,  1.]])
+    >>> a.shape
+    (3, 4)
+\end{minted}
 
+The shape of an array can  be changed with various commands. Note that the following three commands
+all return a modified array, but do not change the original array:
+\begin{minted}{numpy}
+    >>> a.ravel()       # returns the array, flattened
+    array([ 3.,  4.,  8.,  9.,  1.,  4.,  1.,  0.,  1.,  0.,  0.,  1.])
+    >>> a.reshape(6, 2) # returns the array with a modified shape
+    array([[ 3.,  4.],
+           [ 8.,  9.],
+           [ 1.,  4.],
+           [ 1.,  0.],
+           [ 1.,  0.],
+           [ 0.,  1.]])
+    >>> a.T             # returns the array, transposed
+    array([[ 3.,  1.,  1.],
+          [ 4.,  4.,  0.],
+          [ 8.,  1.,  0.],
+          [ 9.,  0.,  1.]])
+    >>> a.T.shape
+    (4, 3)
+    >>> a.shape
+    (3, 4)
+\end{minted}
 
+The order of the elements in the array resulting from ravel() is normally ``C-style'', that is, the
+rightmost index ``changes the fast'', so the element after a[0, 0] is a a[0, 1]. If the array is
+reshaped to some other shape, again the array is treated as ``C-style''. NumPy normally creates
+arrays stored in this order, so ravel() will usually not need to copy its argument, but if the
+array was made by taking slices of another array or created with unusal options, it may need to be
+copied. The functions ravel() and reshape() can also be instructed, using an optional argument, to
+use FORTRAN-style arrays, in which the leftmost index changes the fastest.
 
+The \texttt{reshape} function returns its argument with a modified shape, whereas the
+\texttt{ndarray.resize} method modifies the array itself:
+\begin{minted}{numpy}
+    >>> a
+    array([[ 3.,  4.,  8.,  9.],
+           [ 1.,  4.,  1.,  0.],
+           [ 1.,  0.,  0.,  1.]])
+    >>> a.resize((2, 6))
+    >>> a
+    array([[ 3.,  4.,  8.,  9.,  1.,  4.],
+           [ 1.,  0.,  1.,  0.,  0.,  1.]])
+\end{minted}
+
+If a dimension is given as -1 in a reshaping operation, the other dimensions are automatically
+calculated:
+\begin{minted}{numpy}
+    >>> a.reshape(3, -1)
+    array([[ 3.,  4.,  8.,  9.],
+           [ 1.,  4.,  1.,  0.],
+           [ 1.,  0.,  0.,  1.]])
+\end{minted}
+
+\subsection{Stacking together different arrays}
+Several arrays can be stacked together along different axes:
+\begin{minted}{numpy}
+    >>> a = np.floor(10*np.random.random((2, 2)))
+    >>> a
+    array([[ 8.,  3.],
+           [ 2.,  4.]])
+    >>> b = np.floor(10*np.random.random((2, 2)))
+    >>> b
+    array([[ 5.,  7.],
+           [ 4.,  9.]])
+    >>> np.vstack((a, b))
+    array([[ 8.,  3.],
+           [ 2.,  4.],
+           [ 5.,  7.],
+           [ 4.,  9.]])
+    >>> np.hstack((a, b))
+    array([[ 8.,  3.,  5.,  7.],
+           [ 2.,  4.,  4.,  9.]])
+\end{minted}
+
+The function \texttt{column\_stack} stacks 1D arrays as columns into a 2D array. It is equivalent
+to \texttt{vstack} only for 1D arrays:
+\begin{minted}{numpy}
+    >>> from numpy import newaxis
+    >>> np.column_stack((a, b))     # with 2D arrays
+    array([[ 8.,  3.,  5.,  7.],
+           [ 2.,  4.,  4.,  9.]])
+    >>> a = np.array([4., 2.])
+    >>> b = np.array([2., 8.])
+    >>> a[:, newaxis]               # this allows to have a 2D columns vector
+    array([[ 4.],
+           [ 2.]])
+    >>> np.column_stack((a[:, newaxis], b[:, newaxis]))
+    array([[ 4.,  2.],
+           [ 2.,  8.]])
+    >>> np.vstack((a[:, newaxis], b[:, newaxis]))   # the behavior of vstack is defferent
+    array([[ 4.],
+          [ 2.],
+          [ 2.],
+          [ 8.]])
+\end{minted}
+
+For arrays of with more than two dimensions, \texttt{hstack} stacks along their second axes,
+\texttt{vstack} stacks along their first axes, and concatenate allows for an optional arguments
+giving the number of the axis along which the concatenation should happen.
+
+\textbf{Note:} In complex cases, \texttt{r\_} and \texttt{c\_} are useful for creating arrays by
+stacking numbers along one axis. They allow the use of range literals (``:'')
+\begin{minted}{numpy}
+    >>> np.r_[1:4, 0, 4]
+    array([1, 2, 3, 0, 4])
+\end{minted}
+
+When used with arrays as arguments, \texttt{r\_} and \texttt{c\_} are similar to \texttt{vstack}
+and \texttt{hstack} in their default behavior, but allow for an optional argument giving the number
+of the axis along which to concatenate.
+
+\subsection{Splitting one array into several smaller ones}
+Using \texttt{hsplit}, you can split an array along its horizontal axis, either by specifying the
+number of equally shaped arrays to return, or by specifying the columns after which the division
+should occur:
+\begin{minted}{numpy}
+    >>> a = np.floor(10*np.random.random((2, 12)))
+    >>> a
+    array([[ 1.,  1.,  8.,  0.,  2.,  5.,  6.,  6.,  2.,  3.,  5.,  5.],
+           [ 0.,  4.,  8.,  8.,  8.,  5.,  2.,  0.,  8.,  4.,  8.,  7.]])
+    >>> np.hsplit(a, 3)         # split a into 3
+    [array([[ 1.,  1.,  8.,  0.],
+           [ 0.,  4.,  8.,  8.]]), array([[ 2.,  5.,  6.,  6.],
+           [ 8.,  5.,  2.,  0.]]), array([[ 2.,  3.,  5.,  5.],
+           [ 8.,  4.,  8.,  7.]])]
+    >>> np.hsplit(a, (3, 4))    # split a after the third and the fourth column
+    [array([[ 1.,  1.,  8.],
+           [ 0.,  4.,  8.]]), array([[ 0.],
+           [ 8.]]), array([[ 2.,  5.,  6.,  6.,  2.,  3.,  5.,  5.],
+           [ 8.,  5.,  2.,  0.,  8.,  4.,  8.,  7.]])]
+\end{minted}
+
+\texttt{vsplit} splits along the vertical axis, and \texttt{array\_split} allows one to specify
+along which axis to split.
 
 
 
