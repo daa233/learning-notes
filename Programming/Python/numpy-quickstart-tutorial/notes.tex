@@ -659,6 +659,172 @@ should occur:
 \texttt{vsplit} splits along the vertical axis, and \texttt{array\_split} allows one to specify
 along which axis to split.
 
+\section{Copies and Views}
+When operating and manipulating arrays, their data is sometimes copied into a new array and
+sometimes not. This is often a source of confusion for beginers. There are three cases:
+
+\subsection{No Copy at All}
+Simple assignments make no copy of array objects or of their data.
+\begin{minted}{numpy}
+    >>> a = np.arange(12)
+    >>> b = a               # no new object is created
+    >>> b is a              # a and b are two names for the same ndarray object
+    True
+    >>> b.shape = 3, 4      # changes the shape of a
+    >>> a.shape
+    (3, 4)
+\end{minted}
+
+Python passes mutable objects as references, so function calls make no copy.
+\begin{minted}{numpy}
+    >>> def f(x):
+    ...     print(id(x))
+    ...
+    >>> id(a)               # id is a unique identifier of an object
+    4369396080
+    >>> f(a)
+    4369396080
+\end{minted}
+
+\subsection{View or Shallow Copy}
+Different array objects can share the same data. The \texttt{view} method creates a new array
+object that looks at the same data.
+\begin{minted}{numpy}
+    >>> c = a.view()
+    >>> c is a
+    False
+    >>> c.base is a         # c is a view of the data owned by a
+    True
+    >>> c.flags.owndata
+    False
+    >>> c.shape = 2, 6      # a.shape doesn't change
+    >>> a.shape
+    (3, 4)
+    >>> c[0, 4] = 1234      # a's data changes
+    >>> a
+    array([[   0,    1,    2,    3],
+           [1234,    5,    6,    7],
+           [   8,    9,   10,   11]])
+\end{minted}
+
+Slicing an array returns a view of it:
+\begin{minted}{numpy}
+    >>> s = a[ : , 1:3]     # spaces added for clarity; could also be written "s = a[:, 1:3]"
+    >>> s[:] = 10           # s[:] is a view of s. Note the difference between s=10 and s[:]=10
+    >>> a
+    array([[   0,   10,   10,    3],
+           [1234,   10,   10,    7],
+           [   8,   10,   10,   11]])
+\end{minted}
+
+\subsection{Deep Copy}
+The \texttt{copy} method makes a complete copy of the array and its data.
+\begin{minted}{numpy}
+    >>> d = a.copy()        # a new ndarray object with new data is created
+    >>> d is a
+    False
+    >>> d.base is a         # d doesn't share anything
+    False
+    >>> d[0, 0] = 9999
+    >>> a
+    array([[   0,   10,   10,    3],
+           [1234,   10,   10,    7],
+           [   8,   10,   10,   11]])
+\end{minted}
+
+\subsection{Functions and Methods Overview}
+Here is a list of some useful NumPy functions and methods names ordered in categories. See
+\emph{Routines} \footnote{https://docs.scipy.org/doc/numpy-dev/reference/routines.html\#routines}
+for the full list.
+\begin{itemize}
+    \item \textbf{Array Creation} \\
+    \texttt{arange, array, copy, empty, empty\_like, eye, fromfile, fromfunction, identity,
+    linspace, logspace, mgrid, ogrid, ones, ones\_like, r, zeros, zeros\_like}
+    \item \textbf{Conversions} \\
+    \texttt{ndarray.astype, atleast\_1d, atleast\_2d, atleast\_3d, mat}
+    \item \textbf{Manipulations} \\
+    \texttt{array\_split, column\_stack, concatenate, diagonal, dsplit, dstack, hsplit, hstack,
+    ndarray.item, newaxis, ravel, repeat, reshape, resize, squeeze, swapaxes, take, transpose,
+    vsplit, vstack}
+    \item \textbf{Questions} \\
+    \texttt{all, any, nonzero, where}
+    \item \textbf{Ordering} \\
+    \texttt{argmax, argmin, argsort, max, min, ptp, searchsorted, sort}
+    \item \textbf{Operations} \\
+    \texttt{choose, compress, cumprod, cumsum, inner, ndarray.fill, imag, prod, put, putmask, real,
+    sum}
+    \item \textbf{Basic Statistics} \\
+    \texttt{cov, mean, std, var}
+    \item \textbf{Basic Linear Algebra} \\
+    \texttt{cross, dot, outer, linalg.svd, vdot}
+\end{itemize}
+
+\section{Less Basic}
+\subsection{Broadcasting rules}
+Broadcasting allows universal functions to deal in meaningful way with inputs that do not have
+exactly the same shape.
+
+The first rule of broadcasting is that if all input arrays do not have the same number of
+dimensions, a ``1'' will be repeatedly prepended to the shapes of the smaller arrays until all the
+arrays have the same number of dimensions.
+
+The second rule of broadcasting ensure that arrays with a size of 1 along a particular dimension
+act as if they had the size of the array with the largest shape along that dimension. The value of
+the array element is assumed to be the same along that dimension for the ``broadcast'' array.
+
+\begin{minted}{numpy}
+    >>> a = np.array([[1], [2], [3], [4]])
+    >>> a
+    array([[1],
+           [2],
+           [3],
+           [4]])
+    >>> b = 100
+    >>> a + b
+    array([[101],
+           [102],
+           [103],
+           [104]])
+    >>>
+    >>> a = np.array([[1, 2, 3], [4, 5, 6]])
+    >>> a
+    array([[1, 2, 3],
+           [4, 5, 6]])
+    >>> b = np.array([100, 200, 300])   # the result is same if b = np.array([[100, 200, 300]])
+    >>> b
+    array([[100, 200, 300]])
+    >>> a + b
+    array([[101, 202, 303],
+           [104, 205, 306]])
+    >>>
+    >>> a = np.arange(5).reshape(1, 5)
+    >>> a
+    array([[0, 1, 2, 3, 4]])
+    >>> b = a.T
+    >>> b
+    array([[0],
+           [1],
+           [2],
+           [3],
+           [4]])
+   >>> a + b
+   array([[0, 1, 2, 3, 4],
+          [1, 2, 3, 4, 5],
+          [2, 3, 4, 5, 6],
+          [3, 4, 5, 6, 7],
+          [4, 5, 6, 7, 8]])
+\end{minted}
+
+After application of the broadcasting rules, the sizes of all arrays must match. More details can
+be found in \emph{Boradcasting}.
+\footnote{https://docs.scipy.org/doc/numpy-dev/user/basics.broadcasting.html}
+
+
+
+
+
+
+
 
 
 
