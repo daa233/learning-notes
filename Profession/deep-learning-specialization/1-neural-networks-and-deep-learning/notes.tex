@@ -6,7 +6,8 @@
 \geometry{a4paper, centering, scale=0.8}
 \usepackage{minted}
 \usepackage{hyperref}
-\usepackage{indentfirst} % to indent the first paragraph of a section
+\usepackage{indentfirst}    % to indent the first paragraph of a section
+\usepackage{graphicx}       % to insert figures
 
 \title{Deep Learning Specialization \\
         Neural Networks and Deep Learning \\
@@ -19,6 +20,114 @@
 
 \tableofcontents
 \newpage
+
+\section{Welcome}
+\begin{quote}
+    \emph{AI is the new Electricity. --- Andrew Ng}
+\end{quote}
+
+Electricity had once transformed countless industries: transportation, manufacturing, healthcare,
+communications, and more.
+
+AI will now bring about an equally big transformation.
+
+\paragraph{Courses in this sequence (Specialization):}
+\begin{enumerate}
+    \item \emph{Neural Networks and Deep Learning}
+    \item \emph{Improving Deep Neural Networks: Hyperparameter tuning, Regularization and
+    Optimization}
+    \item \emph{Structuring Machine Learning Projects}
+    \item \emph{Convolutional Neural Networks}
+    \item \emph{Sequence Models}
+\end{enumerate}
+
+\section{Introduction to Deep Learning}
+\subsection{What is a neural network?}
+It is powerful learning algorithm inspired by how the brain works.
+\subsubsection{Single neural network}
+Given data about the size of houses on the real estate market and you want to fit a function that
+will predict their price. It is a linear regression problem because the price as a function of size
+is a continuous output.
+
+We know the prices can never be negative so we are creating a function called Rectified Linear Unit
+(ReLU) which starts at zero.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=40em]{figures/1-single-nn}
+    \caption{The ``Housing Price Prediction'' problem. The input is the size of the house (x);
+    The output is the price (y); The ``neuron'' implements the function ReLU.}
+\end{figure}
+
+\subsubsection{Multiple neural network}
+The price of a house can be affected by other features such as size, number of bedrooms, zip code
+and wealth. The role of the neural network is to predicted the price and it will automatically
+generate the hidden units. We only need to give the inputs x and the output y.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=40em]{figures/1-multiple-nn}
+    \caption{Multiple neural network}
+\end{figure}
+
+\subsection{Supervised Learning}
+In supervised learning, we are given a data set and already know about what our correct output
+should look like, having the idea that there is a relationship between the input and the output.
+
+Supervised learning problems are categorized into ``regression'' and ``classification'' problems.
+In a regression problem, we are trying to predict results with a continuous output, meaning that we
+are trying to map input variables to some continuous function. In a classification problem, we are
+instead trying to predict results in a discrete output. In other words, we are trying to map input
+variables into discrete categories.
+
+Here are some example of supervised learning:
+\begin{table}[ht]
+\centering
+\caption{Supervised Learning Applications}
+\begin{tabular}{lllc}
+\textbf{Input($x$)} & \textbf{Output($y$)} & \textbf{Application} & \textbf{NN Types} \\ \hline
+Home features & Price & Real Estate & Standard NN \\
+Ad, user info & Click on ad? (0/1) & Online Advertising & Standard NN \\
+Image & Object (1, ..., 1000) & Photo tagging & CNN \\
+Audio & Text transcript & Speech Recognition & RNN \\
+English & Chinese & Machine translation & RNN \\
+Image, Radar info & Position of other cars & Autonomous driving & Custom/Hybrid \\
+\end{tabular}
+\end{table}
+
+There are different types of neural network, for example, Convolutional Neural Network (CNN) used
+often for image application and Recurrent Neural Network (RNN) used for one-dimensional sequence
+data such as translating English to Chinese or a temporal component such as text transcript. As for
+the autonomous driving, it is a hybrid neural network architecture.
+
+\subsubsection{Structured vs unstructed data}
+Structed data refers to things that has a defined meaning such as price, age whereas unstructed
+data refers to thing like pixel, raw audio, text.
+
+\subsection{Why is Deep Learning taking off?}
+Deep learning is taking off due to a large amount of data available through the digitization of the
+society, faster computation and innovation in the development of neural network algorithm.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=40em]{figures/1-deep-nn-scale}
+    \caption{Scale drives deep learning progress}
+\end{figure}
+
+Two things have to be considered to get to the high level of performance:
+\begin{enumerate}
+    \item Being able to train a big enough neural network
+    \item Huge amount of labelled data
+\end{enumerate}
+
+The process of training a neural network is iterative:
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=25em]{figures/1-train-nn-process}
+\end{figure}
+
+It could take a good amount of time to train a neural network, which affects your productivity.
+Faster computation helps to iterate and improve new algorithm.
+
+
+
 
 
 
