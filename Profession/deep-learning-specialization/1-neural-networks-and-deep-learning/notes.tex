@@ -142,6 +142,135 @@ The process of training a neural network is iterative:
 It could take a good amount of time to train a neural network, which affects your productivity.
 Faster computation helps to iterate and improve new algorithm.
 
+\section{Neural Network Basics}
+\subsection{Binary Classification}
+In a binary classification problem, the result is a discrete value output. For example:
+\begin{itemize}
+    \item account hacked (1) or compromised (0)
+    \item a tumor malign (1) or benign (0)
+\end{itemize}
+
+\paragraph{Example: Cat vs Non-Cat}
+The goal is to train a classifier that the input is an image represented by a feature vector,
+$x$, and predicts whether the corresponding label $y$ is 1 or 0. In this case,
+whether this is a cat image (1) or a non-cat image (0).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=35em]{figures/1-cat}
+\end{figure}
+An image is store in the computer in three separate matrices corresponding to the Red, Green, and
+Blue color channels of the image. The three matrices have the same size as the image, for example,
+the resolution of the cat image is 64 pixels $\times$ 64 pixels, the three matrices (RGB) are 64
+$\times$ 64 each.
+
+The value in a cell represents the pixel intensity which will be used to create a feature vector of
+n-dimension. In pattern recognition and machine learning, a feature vector represents an object, in
+this case, a cat or no cat.
+
+To create a feature vector, $\Vector{x}$, the pixel intensity values will be ``unroll'' or
+``reshape'' for each color. The dimension of the input feature vector $\Vector{x}$, is
+$n_x = 64 \times 64 \times 3 = 12288$.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=10em]{figures/1-unrolled-image}
+\end{figure}
+
+\subsubsection{Notation}
+single example: $(x, y)$, $x \in \Set{R}^{n_x}$, $y \in \{0, 1\}$
+
+$m$ training examples: $\{(x^{(1)}, y^{(2)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})\}$
+
+$m = m_{train}$ \qquad $m_{test}$ = the number of test examples
+
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{X} = \left[
+        \begin{array}{cccc}
+            \big| & \big| & & \big| \\
+            \big| & \big| & & \big| \\
+            \Vector{x}^{(1)} & \Vector{x}^{(2)} & \ldots & \Vector{x}^{(m)} \\
+            \big| & \big| & & \big| \\
+            \big| & \big| & & \big|
+        \end{array}
+    \right]
+    \qquad
+    \Matrix{X} \in \Set{R}^{{n_x} \times m}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{Y} = \left[
+        \begin{array}{cccc}
+            y^{(1)} & y^{(2)} & \ldots & y^{(m)}
+        \end{array}
+    \right]
+    \qquad
+    \Matrix{Y} \in \Set{R}^{1 \times m}
+\end{IEEEeqnarray*}
+
+In Python/NumPy, \mintinline{numpy}{X.shape = (n_x, m), Y.shape = (1, m)}.
+
+\subsection{Logistic Regression}
+Logistic regression is a learning algorithm used in a supervised learning problem when the output
+$y$ are all either zero or one. The goal of logistic regression is to minimize the error between
+its predictions and training data.
+
+\paragraph{Example: Cat vs Non-Cat}
+Given an image represented by a feature vector $x$, the algorithm will evaluate the probabilty of a
+cat being in that image.
+
+Given $x$, want $\hat{y} = P(y=1|x)$, $x \in \Set{R}^{n_x}$, $0 \leq \hat{y} \leq 1$
+
+Parameters: $w \in \Set{R}^{n_x}$, $b \in \Set{R}$
+
+Output: \sout{$\hat{y} = w^T x + b$} \quad $\hat{y} = \sigma (w^T + b)$, where
+$\sigma(z) = \frac{1}{1+e^{-z}}$.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=25em]{figures/1-sigmoid}
+    \caption{Sigmoid}
+\end{figure}
+
+$(w^T + b)$ is a linear function $(ax + b)$, but since we are looking for a probability constraint
+between [0, 1], the sigmoid function is used. The function is bounded between [0, 1] as shown in
+the graph above.
+
+Some observations from the sigmoid function graph:
+\begin{itemize}
+    \item If $z$ is a large positive number, then $\sigma(z) = 1$
+    \item If $z$ is small or large negative number, then $\sigma(z) = 0$
+    \item If $z = 0$, then $\sigma(z) = 0.5$
+\end{itemize}
+
+
+\subsubsection{Logistic Regression cost function}
+$\hat{y}^{(i)} = \sigma (w^T x^{(i)} + b)$, where $\sigma(z^{(i)}) = \frac{1}{1+e^{-z^{(i)}}}$
+
+Given $\{(x^{(1)}, y^{(2)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})\}$, want
+$\hat{y}^{(i)} \approx y^{(i)}$.
+
+\paragraph{Loss (error) function:}
+$\Cal{L}(\hat{y}, y) = -(y\log{\hat{y}} + (1-y)\log(1-\hat{y}))$
+
+If $y = 1$: $\Cal{L}(\hat{y}, y) = -\log \hat{y}$ $\leftarrow$ want $\log \hat{y}$ large, want
+$\hat{y}$ large.
+
+If $y = 0$: $\Cal{L}(\hat{y}, y) = -\log(1-\hat{y})$ $\leftarrow$ want $\log(1-\hat{y})$ large,
+want $\hat{y}$ small.
+
+The loss function measures the discrepancy between the prediction ($\hat{y^{(i)}}$) and the desired
+output ($y^{(i)}$). In other words, the loss function computes the error for a single training
+example.
+
+Note: Why can't use $\Cal{L}(\hat{y}, y) = \frac{1}{2}(\hat{y}-y)^2$? Because
+$\Cal{L}(\hat{y}, y) = -(y\log{\hat{y}} + (1-y)\log(1-\hat{y}))$ is convex, however,
+$\Cal{L}(\hat{y}, y) = \frac{1}{2}(\hat{y}-y)^2$ is non-convex.
+
+\paragraph{Cost function:}
+\begin{equation*}
+    J(w, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)}) = - \frac{1}{m}
+    \sum_{i=1}^m[(y^{(i)}\log(\hat{y}^{(i)})) + (1-y^{(i)})\log(1-\hat{y}^{(i)})]
+\end{equation*}
+
 
 
 
