@@ -8,6 +8,20 @@
 \usepackage{hyperref}
 \usepackage{indentfirst}    % to indent the first paragraph of a section
 \usepackage{graphicx}       % to insert figures
+\usepackage{amsmath}        % to type some math equations
+\usepackage{amssymb}        % to use some special math font
+\usepackage{IEEEtrantools}  % to use IEEEeqnarray
+\usepackage{ulem}           % to use stikeout command \sout{}
+
+% Math notation
+% refered to https://github.com/exacity/deeplearningbook-chinese/blob/master/math_symbol.tex
+\newcommand{\Scalar}[1]{\mathit{#1}}                % Scalar, the default math font
+\newcommand{\Vector}[1]{\boldsymbol{\mathit{#1}}}   % Vector
+\newcommand{\Matrix}[1]{\boldsymbol{\mathit{#1}}}   % Matrix
+\newcommand{\Tensor}[1]{\textsf{\textbf{#1}}}       % Tensor
+\newcommand{\Set}[1]{\mathbb{#1}}                   % Set
+\newcommand{\Cal}[1]{\mathcal{#1}}                  % Math Cal
+
 
 \title{Deep Learning Specialization \\
         Neural Networks and Deep Learning \\
@@ -54,8 +68,9 @@ We know the prices can never be negative so we are creating a function called Re
 \begin{figure}[ht]
     \centering
     \includegraphics[width=40em]{figures/1-single-nn}
-    \caption{The ``Housing Price Prediction'' problem. The input is the size of the house (x);
-    The output is the price (y); The ``neuron'' implements the function ReLU.}
+    \caption{The ``Housing Price Prediction'' problem. The input is the size of the house
+    ($x$); The output is the price ($y$); The ``neuron'' implements the function
+    ReLU.}
 \end{figure}
 
 \subsubsection{Multiple neural network}
@@ -83,7 +98,8 @@ Here are some example of supervised learning:
 \centering
 \caption{Supervised Learning Applications}
 \begin{tabular}{lllc}
-\textbf{Input($x$)} & \textbf{Output($y$)} & \textbf{Application} & \textbf{NN Types} \\ \hline
+\textbf{Input($x$)} & \textbf{Output($y$)} & \textbf{Application}
+& \textbf{NN Types} \\ \hline
 Home features & Price & Real Estate & Standard NN \\
 Ad, user info & Click on ad? (0/1) & Online Advertising & Standard NN \\
 Image & Object (1, ..., 1000) & Photo tagging & CNN \\
@@ -125,7 +141,6 @@ The process of training a neural network is iterative:
 
 It could take a good amount of time to train a neural network, which affects your productivity.
 Faster computation helps to iterate and improve new algorithm.
-
 
 
 
