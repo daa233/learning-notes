@@ -12,6 +12,7 @@
 \usepackage{amssymb}        % to use some special math font
 \usepackage{IEEEtrantools}  % to use IEEEeqnarray
 \usepackage{ulem}           % to use stikeout command \sout{}
+\usepackage{algorithm2e}    % to use algorithm environment
 
 % Math notation
 % refered to https://github.com/exacity/deeplearningbook-chinese/blob/master/math_symbol.tex
@@ -143,7 +144,8 @@ It could take a good amount of time to train a neural network, which affects you
 Faster computation helps to iterate and improve new algorithm.
 
 \section{Neural Network Basics}
-\subsection{Binary Classification}
+\subsection{Logistic Regression as a Neural Network}
+\subsubsection{Binary Classification}
 In a binary classification problem, the result is a discrete value output. For example:
 \begin{itemize}
     \item account hacked (1) or compromised (0)
@@ -209,7 +211,7 @@ $m = m_{train}$ \qquad $m_{test}$ = the number of test examples
 
 In Python/NumPy, \mintinline{numpy}{X.shape = (n_x, m), Y.shape = (1, m)}.
 
-\subsection{Logistic Regression}
+\subsubsection{Logistic Regression}
 Logistic regression is a learning algorithm used in a supervised learning problem when the output
 $y$ are all either zero or one. The goal of logistic regression is to minimize the error between
 its predictions and training data.
@@ -241,15 +243,16 @@ Some observations from the sigmoid function graph:
     \item If $z = 0$, then $\sigma(z) = 0.5$
 \end{itemize}
 
-
-\subsubsection{Logistic Regression cost function}
+\paragraph{Logistic Regression cost function}
 $\hat{y}^{(i)} = \sigma (w^T x^{(i)} + b)$, where $\sigma(z^{(i)}) = \frac{1}{1+e^{-z^{(i)}}}$
 
 Given $\{(x^{(1)}, y^{(2)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})\}$, want
 $\hat{y}^{(i)} \approx y^{(i)}$.
 
-\paragraph{Loss (error) function:}
-$\Cal{L}(\hat{y}, y) = -(y\log{\hat{y}} + (1-y)\log(1-\hat{y}))$
+\paragraph{Loss (error) function:} (for single example)
+\begin{IEEEeqnarray*}{rCl}
+    \Cal{L}(\hat{y}, y) = -(y\log{\hat{y}} + (1-y)\log(1-\hat{y}))
+\end{IEEEeqnarray*}
 
 If $y = 1$: $\Cal{L}(\hat{y}, y) = -\log \hat{y}$ $\leftarrow$ want $\log \hat{y}$ large, want
 $\hat{y}$ large.
@@ -265,11 +268,127 @@ Note: Why can't use $\Cal{L}(\hat{y}, y) = \frac{1}{2}(\hat{y}-y)^2$? Because
 $\Cal{L}(\hat{y}, y) = -(y\log{\hat{y}} + (1-y)\log(1-\hat{y}))$ is convex, however,
 $\Cal{L}(\hat{y}, y) = \frac{1}{2}(\hat{y}-y)^2$ is non-convex.
 
-\paragraph{Cost function:}
-\begin{equation*}
+\paragraph{Cost function:} (for entire training set)
+\begin{IEEEeqnarray*}{rCl}
     J(w, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)}) = - \frac{1}{m}
     \sum_{i=1}^m[(y^{(i)}\log(\hat{y}^{(i)})) + (1-y^{(i)})\log(1-\hat{y}^{(i)})]
-\end{equation*}
+\end{IEEEeqnarray*}
+
+The cost function is the average of the loss function of the entire training set. We are going to
+find the parameters $w$ and $b$ that minimize the overall cost function.
+
+\paragraph{Gradient Descent}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=25em]{figures/1-gradient-descent}
+    \caption{Gradient descent. (Ignore $b$ here)}
+\end{figure}
+
+\begin{algorithm}[ht]
+\Repeat{iteration = MaxIteration}{
+        $\displaystyle{w := w - \alpha \frac{\partial J(w)}{\partial w}}$ \\
+        $\displaystyle{b := b - \alpha \frac{\partial J(w)}{\partial b}}$
+}
+\end{algorithm}
+
+Note: We often use ``d$w$'' to denote $\displaystyle{\frac{\partial J(w)}{\partial w}}$, use
+``d$b$'' to denote $\displaystyle{\frac{\partial J(w)}{\partial b}}$. In other words, we use
+``d$var$'' to denote $\displaystyle\frac{\text{d}FinalOutputVar}{\text{d}var}$ or
+$\displaystyle\frac{\partial FinalOutputVar}{\partial var}$.
+
+\paragraph{Gradient on single example:}
+\begin{IEEEeqnarray*}{rCl}
+    z = w^T x + b
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \hat{y} = a = \sigma(z) = \frac{1}{1 + e^{-z}}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \Cal{L}(a, y) = -(y\log(a) + (1-y)\log(1-a))
+\end{IEEEeqnarray*}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=35em]{figures/1-lr-gradient-descent}
+    \caption{The computation graph of logistic regression gradient descent}
+    \label{fig:1-lr-gradient-descent}
+\end{figure}
+
+According to the computation graph~\ref{fig:1-lr-gradient-descent}, go backwards to compute the
+derivatives:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}a = \frac{\text{d}\Cal{L}(a, y)}{\text{d}a} = -\frac{y}{a} + \frac{1-y}{1-a}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}z = \frac{\text{d}\Cal{L}(a, y)}{\text{d}z} = \frac{\text{d}\Cal{L}}{\text{d}a} \cdot
+    \frac{\text{d}a}{\text{d}z} = (-\frac{y}{a} + \frac{1-y}{1-a}) \cdot a(1-a) = a - y
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}w_1 = \frac{\partial \Cal{L}}{\partial w_1} = x_1 \text{d}z = x_1 (a-y)
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}w_2 = \frac{\partial \Cal{L}}{\partial w_2} = x_2 \text{d}z = x_2 (a-y)
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}b = \frac{\partial \Cal{L}}{\partial b} = \text{d}z = a - y
+\end{IEEEeqnarray*}
+
+\paragraph{Gradient on m examples:}
+\begin{IEEEeqnarray*}{rCl}
+    J(w, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(a^{(i)}, y^{(i)})
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    a^{(i)} = \hat{y^{(i)}} = \sigma(z^{(i)}) = \sigma(w^T x^{(i)} + b)
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \frac{\partial J(w, b)}{\partial w_1} = \frac{1}{m} \sum_{i=1}^m
+    \frac{\partial \Cal{L}(a^{(i)}, y^{(i)})}{\partial w_1} = \frac{1}{m} \sum_{i=1}^m \text{d}w_1^{(i)}
+\end{IEEEeqnarray*}
+
+The following is the algorithm of Logistic Regression Gradient Descent on m examples. It uses two
+for-loops, so it's less efficient than use vertorization.
+\begin{algorithm}[ht]
+    \tcc{Initialization}
+    $J = 0;$ \\
+    \For{$j = 1$ \KwTo $n$}{
+        $\text{d}w_j = 0$ \\
+    }
+    $\text{d}b = 0;$
+
+    \tcc{Compute cost and derivatives}
+    \For{$i = 0$ \KwTo $m$}{
+        $z^{(i)} = w^T x^{(i)} + b;$ \\
+        $a^{(i)} = \sigma(z^{(i)});$ \\
+        $J = J - [y^{(i)} \log a^{(i)} + (1-y^{(i)})\log (1-a^{(i)})];$ \\
+        $\text{d}z^{(i)} = a^{(i)} - y^{(i)};$ \\
+        \For{$j = 1$ \KwTo $n$}{
+            $\text{d}w_j = \text{d}w_j + x_j^{(i)} \text{d}z^{(i)};$ \\
+        }
+        $\text{d}b = \text{d}b + \text{d}z^{(i)}$
+    }
+
+    \tcc{Get the average}
+    $J = J / m;$ \\
+    \For{$j = 1$ \KwTo $n$}{
+        $\text{d}w_j = \text{d}w_j / m$
+    }
+    $\text{d}b = \text{d}b / m;$
+
+    \tcc{Gradient descent}
+    \For{$j = 1$ \KwTo $n$}{
+        $\text{d}w_j = \text{d}w_j - \alpha \text{d}w_j$
+    }
+    $b = b - \alpha \text{d}b$
+\end{algorithm}
+
 
 
 
