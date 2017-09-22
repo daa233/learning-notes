@@ -13,6 +13,9 @@
 \usepackage{IEEEtrantools}  % to use IEEEeqnarray
 \usepackage{ulem}           % to use stikeout command \sout{}
 \usepackage{algorithm2e}    % to use algorithm environment
+\usepackage{multicol}       % to display some content in multi-columns
+\setlength{\columnseprule}{0.4pt}   % set the rule's width of multicols
+\setlength{\columnsep}{5em}         % set the sep of multicols
 
 % Math notation
 % refered to https://github.com/exacity/deeplearningbook-chinese/blob/master/math_symbol.tex
@@ -68,7 +71,7 @@ We know the prices can never be negative so we are creating a function called Re
 (ReLU) which starts at zero.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=40em]{figures/1-single-nn}
+    \includegraphics[width=40em]{figures/single-nn}
     \caption{The ``Housing Price Prediction'' problem. The input is the size of the house
     ($x$); The output is the price ($y$); The ``neuron'' implements the function
     ReLU.}
@@ -80,7 +83,7 @@ and wealth. The role of the neural network is to predicted the price and it will
 generate the hidden units. We only need to give the inputs x and the output y.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=40em]{figures/1-multiple-nn}
+    \includegraphics[width=30em]{figures/multiple-nn}
     \caption{Multiple neural network}
 \end{figure}
 
@@ -124,7 +127,7 @@ Deep learning is taking off due to a large amount of data available through the 
 society, faster computation and innovation in the development of neural network algorithm.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=40em]{figures/1-deep-nn-scale}
+    \includegraphics[width=40em]{figures/deep-nn-scale}
     \caption{Scale drives deep learning progress}
 \end{figure}
 
@@ -137,7 +140,7 @@ Two things have to be considered to get to the high level of performance:
 The process of training a neural network is iterative:
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=25em]{figures/1-train-nn-process}
+    \includegraphics[width=25em]{figures/train-nn-process}
 \end{figure}
 
 It could take a good amount of time to train a neural network, which affects your productivity.
@@ -159,7 +162,7 @@ whether this is a cat image (1) or a non-cat image (0).
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=35em]{figures/1-cat}
+    \includegraphics[width=35em]{figures/cat}
 \end{figure}
 An image is store in the computer in three separate matrices corresponding to the Red, Green, and
 Blue color channels of the image. The three matrices have the same size as the image, for example,
@@ -175,13 +178,14 @@ To create a feature vector, $\Vector{x}$, the pixel intensity values will be ``u
 $n_x = 64 \times 64 \times 3 = 12288$.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=10em]{figures/1-unrolled-image}
+    \includegraphics[width=10em]{figures/unrolled-image}
 \end{figure}
 
 \subsubsection{Notation}
-single example: $(x, y)$, $x \in \Set{R}^{n_x}$, $y \in \{0, 1\}$
+single example: $(\Vector{x}, y)$, $\Vector{x} \in \Set{R}^{n_x}$, $y \in \{0, 1\}$
 
-$m$ training examples: $\{(x^{(1)}, y^{(2)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})\}$
+$m$ training examples: $\{(\Vector{x}^{(1)}, y^{(2)}), (\Vector{x}^{(2)}, y^{(2)}), \ldots,
+(\Vector{x}^{(m)}, y^{(m)})\}$
 
 $m = m_{train}$ \qquad $m_{test}$ = the number of test examples
 
@@ -190,7 +194,7 @@ $m = m_{train}$ \qquad $m_{test}$ = the number of test examples
         \begin{array}{cccc}
             \big| & \big| & & \big| \\
             \big| & \big| & & \big| \\
-            \Vector{x}^{(1)} & \Vector{x}^{(2)} & \ldots & \Vector{x}^{(m)} \\
+            \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
             \big| & \big| & & \big| \\
             \big| & \big| & & \big|
         \end{array}
@@ -200,13 +204,13 @@ $m = m_{train}$ \qquad $m_{test}$ = the number of test examples
 \end{IEEEeqnarray*}
 
 \begin{IEEEeqnarray*}{rCl}
-    \Matrix{Y} = \left[
+    \Vector{Y} = \left[
         \begin{array}{cccc}
-            y^{(1)} & y^{(2)} & \ldots & y^{(m)}
+            y^{(1)} & y^{(2)} & \cdots & y^{(m)}
         \end{array}
     \right]
     \qquad
-    \Matrix{Y} \in \Set{R}^{1 \times m}
+    \Vector{Y} \in \Set{R}^{1 \times m}
 \end{IEEEeqnarray*}
 
 In Python/NumPy, \mintinline{numpy}{X.shape = (n_x, m), Y.shape = (1, m)}.
@@ -217,24 +221,26 @@ $y$ are all either zero or one. The goal of logistic regression is to minimize t
 its predictions and training data.
 
 \paragraph{Example: Cat vs Non-Cat}
-Given an image represented by a feature vector $x$, the algorithm will evaluate the probabilty of a
-cat being in that image.
+Given an image represented by a feature vector $\Vector{x}$, the algorithm will evaluate the
+probabilty of a cat being in that image.
 
-Given $x$, want $\hat{y} = P(y=1|x)$, $x \in \Set{R}^{n_x}$, $0 \leq \hat{y} \leq 1$
+Given $\Vector{x}$, want $\hat{y} = P(y=1|\Vector{x})$, $\Vector{x} \in \Set{R}^{n_x}$, $0 \leq
+\hat{y} \leq 1$
 
-Parameters: $w \in \Set{R}^{n_x}$, $b \in \Set{R}$
+Parameters: $\Vector{w} \in \Set{R}^{n_x}$, $b \in \Set{R}$
 
-Output: \sout{$\hat{y} = w^T x + b$} \quad $\hat{y} = \sigma (w^T + b)$, where
-$\sigma(z) = \frac{1}{1+e^{-z}}$.
+Output: \sout{$\hat{y} = \Vector{w}^T \Vector{x} + b$} \quad
+$\hat{y} = \sigma (\Vector{w}^T\Vector{x} + b)$, where $\sigma(z) = \frac{1}{1+e^{-z}}$.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=25em]{figures/1-sigmoid}
+    \includegraphics[width=25em]{figures/sigmoid}
     \caption{Sigmoid}
+    \label{fig:sigmoid}
 \end{figure}
 
-$(w^T + b)$ is a linear function $(ax + b)$, but since we are looking for a probability constraint
-between [0, 1], the sigmoid function is used. The function is bounded between [0, 1] as shown in
-the graph above.
+$(\Vector{w}^T\Vector{x} + b)$ is a linear function $(a\Vector{x} + b)$, but since we are looking
+for a probability constraint between [0, 1], the sigmoid function is used. The function is bounded
+between [0, 1] as shown in the graph~\ref{fig:sigmoid}.
 
 Some observations from the sigmoid function graph:
 \begin{itemize}
@@ -244,10 +250,11 @@ Some observations from the sigmoid function graph:
 \end{itemize}
 
 \paragraph{Logistic Regression cost function}
-$\hat{y}^{(i)} = \sigma (w^T x^{(i)} + b)$, where $\sigma(z^{(i)}) = \frac{1}{1+e^{-z^{(i)}}}$
+$\hat{y}^{(i)} = \sigma (\Vector{w}^T \Vector{x}^{(i)} + b)$, where
+$\sigma(z^{(i)}) = \frac{1}{1+e^{-z^{(i)}}}$
 
-Given $\{(x^{(1)}, y^{(2)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})\}$, want
-$\hat{y}^{(i)} \approx y^{(i)}$.
+Given $\{(\Vector{x}^{(1)}, y^{(2)}), (\Vector{x}^{(2)}, y^{(2)}), \ldots,
+(\Vector{x}^{(m)}, y^{(m)})\}$, want $\hat{y}^{(i)} \approx y^{(i)}$.
 
 \paragraph{Loss (error) function:} (for single example)
 \begin{IEEEeqnarray*}{rCl}
@@ -270,35 +277,37 @@ $\Cal{L}(\hat{y}, y) = \frac{1}{2}(\hat{y}-y)^2$ is non-convex.
 
 \paragraph{Cost function:} (for entire training set)
 \begin{IEEEeqnarray*}{rCl}
-    J(w, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)}) = - \frac{1}{m}
+    J(\Vector{w}, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)}) = - \frac{1}{m}
     \sum_{i=1}^m[(y^{(i)}\log(\hat{y}^{(i)})) + (1-y^{(i)})\log(1-\hat{y}^{(i)})]
 \end{IEEEeqnarray*}
 
 The cost function is the average of the loss function of the entire training set. We are going to
-find the parameters $w$ and $b$ that minimize the overall cost function.
+find the parameters $\Vector{w}$ and $b$ that minimize the overall cost function.
 
 \paragraph{Gradient Descent}
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=25em]{figures/1-gradient-descent}
+    \includegraphics[width=25em]{figures/gradient-descent}
     \caption{Gradient descent. (Ignore $b$ here)}
 \end{figure}
 
 \begin{algorithm}[ht]
 \Repeat{iteration = MaxIteration}{
-        $\displaystyle{w := w - \alpha \frac{\partial J(w)}{\partial w}}$ \\
-        $\displaystyle{b := b - \alpha \frac{\partial J(w)}{\partial b}}$
+        $\displaystyle{\Vector{w} := \Vector{w}
+        - \alpha \frac{\partial J(\Vector{w}, b)}{\partial \Vector{w}}}$ \\
+        $\displaystyle{b := b - \alpha \frac{\partial J(\Vector{w}, b)}{\partial b}}$
 }
 \end{algorithm}
 
-Note: We often use ``d$w$'' to denote $\displaystyle{\frac{\partial J(w)}{\partial w}}$, use
-``d$b$'' to denote $\displaystyle{\frac{\partial J(w)}{\partial b}}$. In other words, we use
-``d$var$'' to denote $\displaystyle\frac{\text{d}FinalOutputVar}{\text{d}var}$ or
+Note: We often use ``d$\Vector{w}$'' to denote
+$\displaystyle{\frac{\partial J(\Vector{w}, b)}{\partial \Vector{w}}}$, use
+``d$b$'' to denote $\displaystyle{\frac{\partial J(\Vector{w}, b)}{\partial b}}$. In other words,
+we use ``d$var$'' to denote $\displaystyle\frac{\text{d}FinalOutputVar}{\text{d}var}$ or
 $\displaystyle\frac{\partial FinalOutputVar}{\partial var}$.
 
 \paragraph{Gradient on single example:}
 \begin{IEEEeqnarray*}{rCl}
-    z = w^T x + b
+    z = \Vector{w}^T \Vector{x} + b
 \end{IEEEeqnarray*}
 
 \begin{IEEEeqnarray*}{rCl}
@@ -311,12 +320,12 @@ $\displaystyle\frac{\partial FinalOutputVar}{\partial var}$.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=35em]{figures/1-lr-gradient-descent}
+    \includegraphics[width=35em]{figures/lr-gradient-descent}
     \caption{The computation graph of logistic regression gradient descent}
-    \label{fig:1-lr-gradient-descent}
+    \label{fig:lr-gradient-descent}
 \end{figure}
 
-According to the computation graph~\ref{fig:1-lr-gradient-descent}, go backwards to compute the
+According to the computation graph~\ref{fig:lr-gradient-descent}, go backwards to compute the
 derivatives:
 \begin{IEEEeqnarray*}{rCl}
     \text{d}a = \frac{\text{d}\Cal{L}(a, y)}{\text{d}a} = -\frac{y}{a} + \frac{1-y}{1-a}
@@ -341,20 +350,22 @@ derivatives:
 
 \paragraph{Gradient on m examples:}
 \begin{IEEEeqnarray*}{rCl}
-    J(w, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(a^{(i)}, y^{(i)})
+    J(\Vector{w}, b) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(a^{(i)}, y^{(i)})
 \end{IEEEeqnarray*}
 
 \begin{IEEEeqnarray*}{rCl}
-    a^{(i)} = \hat{y^{(i)}} = \sigma(z^{(i)}) = \sigma(w^T x^{(i)} + b)
+    a^{(i)} = \hat{y^{(i)}} = \sigma(z^{(i)}) = \sigma(\Vector{w}^T \Vector{x}^{(i)} + b)
 \end{IEEEeqnarray*}
 
 \begin{IEEEeqnarray*}{rCl}
-    \frac{\partial J(w, b)}{\partial w_1} = \frac{1}{m} \sum_{i=1}^m
-    \frac{\partial \Cal{L}(a^{(i)}, y^{(i)})}{\partial w_1} = \frac{1}{m} \sum_{i=1}^m \text{d}w_1^{(i)}
+    \frac{\partial J(\Vector{w}, b)}{\partial w_1} = \frac{1}{m} \sum_{i=1}^m
+    \frac{\partial \Cal{L}(a^{(i)}, y^{(i)})}{\partial w_1} = \frac{1}{m} \sum_{i=1}^m
+    \text{d}w_1^{(i)}
 \end{IEEEeqnarray*}
 
-The following is the algorithm of Logistic Regression Gradient Descent on m examples. It uses two
-for-loops, so it's less efficient than use vertorization.
+The Algorithm~\ref{alg:lr_gradient_descent} is the algorithm of logistic regression gradient
+descent on m examples. It uses two for-loops, so it's less efficient than use vertorization.
+
 \begin{algorithm}[ht]
     \tcc{Initialization}
     $J = 0;$ \\
@@ -365,7 +376,7 @@ for-loops, so it's less efficient than use vertorization.
 
     \tcc{Compute cost and derivatives}
     \For{$i = 0$ \KwTo $m$}{
-        $z^{(i)} = w^T x^{(i)} + b;$ \\
+        $z^{(i)} = \Vector{w}^T \Vector{x^{(i)}} + b;$ \\
         $a^{(i)} = \sigma(z^{(i)});$ \\
         $J = J - [y^{(i)} \log a^{(i)} + (1-y^{(i)})\log (1-a^{(i)})];$ \\
         $\text{d}z^{(i)} = a^{(i)} - y^{(i)};$ \\
@@ -387,7 +398,398 @@ for-loops, so it's less efficient than use vertorization.
         $\text{d}w_j = \text{d}w_j - \alpha \text{d}w_j$
     }
     $b = b - \alpha \text{d}b$
+    \caption{Logistic regression gradient descent on m examples}
+    \label{alg:lr_gradient_descent}
 \end{algorithm}
+
+\subsection{Python and Vectorization}
+\subsubsection{Vectorization}
+\paragraph{What is vectorization?}
+\begin{IEEEeqnarray*}{rCl}
+    z = \Vector{w}^T \Vector{x} + b \qquad\qquad
+    \Vector{w} = \left[\begin{array}{c}
+        \vdots \\
+        \vdots \\
+    \end{array} \right], \qquad
+    \Vector{x} = \left[\begin{array}{c}
+        \vdots \\
+        \vdots \\
+    \end{array} \right], \qquad
+    \Vector{w} \in \Set{R}^{n_x}, \quad
+    \Vector{x} \in \Set{R}^{n_x}
+\end{IEEEeqnarray*}
+
+\begin{multicols}{2}
+Non vectorized:
+\begin{minted}{numpy}
+    z = 0
+    for i in range(n_x):
+        z += w[i] * x[i]
+    z += b
+\end{minted}
+\columnbreak
+Vectorized:
+\begin{minted}{numpy}
+    z = np.dot(w, x) + b
+\end{minted}
+\end{multicols}
+
+\begin{IEEEeqnarray*}{rCl}
+    \left\{
+        \begin{array}{r}
+            \text{CPU} \\
+            \text{GPU}
+        \end{array}
+    \right.
+    \qquad \text{SIMD - Single Instruction Multiple Data}
+\end{IEEEeqnarray*}
+
+\subsubsection{More Vectorization Examples}
+\paragraph{Neural network programming guideline}
+Whenever possible, avoid explicit for-loops.
+
+For example, compute $\Vector{u} = \Vector{A} \Vector{v}$. $\Vector{A} \in \Set{R}^{m \times n}$,
+$\Vector{v} \in \Set{R}^{n}$.
+
+\begin{multicols}{2}
+Non-vectorized: $\displaystyle u_i = \sum_j \Vector{A}_{ij} v_j$
+\begin{minted}{numpy}
+    u = np.zeros((n, 1))
+    for i in range(A.shape[0]):
+        for j in range(A.shape[1]):
+            u[i] += A[i][j] * v[j]
+\end{minted}
+\columnbreak
+Vectorized:
+\begin{minted}{numpy}
+    u = np.dot(A, v)
+\end{minted}
+\end{multicols}
+
+\paragraph{Vectors and matrix valued functions}
+Say you need to apply the exponential operation on every element of a matrix/vector.
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{v} = \left[
+        \begin{array}{c}
+            v_1 \\
+            \vdots \\
+            v_n
+        \end{array}
+    \right]
+    \longrightarrow
+    \Vector{u} = \left[
+        \begin{array}{c}
+            e^{v_1} \\
+            \vdots \\
+            e^{v_n}
+        \end{array}
+    \right]
+\end{IEEEeqnarray*}
+
+\begin{multicols}{2}
+Non-vectorized:
+\begin{minted}{numpy}
+    u = np.zeors((n, 1))
+    for i in range(n):
+        u[i] = math.exp(v[i])
+\end{minted}
+\columnbreak
+Vectorized:
+\begin{minted}{numpy}
+    u = np.exp(v)
+\end{minted}
+\end{multicols}
+
+\paragraph{Logistic regression derivatives}
+\begin{algorithm}[ht]
+    J = 0 \\
+    \tcc{$\text{d}w_1 = 0, \text{d}w_2 = 0, \ldots, \text{d}w_{n_x}$}
+    $\text{d}\Vector{w}$ = np.zeros(($n_x$, 1)) \\
+    $\text{d}b$ = 0 \\
+    \For{$i = 1$ \KwTo $m$}{
+        $z^{(i)} = \Vector{w}^T x^{(i)} + b$ \\
+        $a^{(i)} = \sigma(z^{(i)})$ \\
+        $J = J - [y^{(i)}\log \hat{y}^{(i)} + (1-y^{(i)})\log (1-\hat{y}^{(i)})]$ \\
+        $\text{d}z^{(i)} = a^{(i)} - y^{(i)}$ \\
+        \tcc{
+            $\text{d}w_1 = \text{d}w_1 + x_1^{(i)} \text{d}z^{(i)}$ \\
+            $\text{d}w_2 = \text{d}w_2 + x_2^{(i)} \text{d}z^{(i)}$ \\
+            \ldots \\
+            $\text{d}w_{n_x} = \text{d}w_{n_x} + x_{n_x}^{(i)} \text{d}z^{(i)}$
+        }
+        $\text{d}\Vector{w} = \text{d}\Vector{w} + x^{(i)}\text{d}z^{(i)}$ \\
+        $\text{d}b = \text{d}b + \text{d}z^{(i)}$ \\
+    }
+    $J = J / m$ \\
+    \tcc{
+        $\text{d}w_1 = \text{d}w_1 / m$ \\
+        $\text{d}w_2 = \text{d}w_2 / m$ \\
+        \ldots \\
+        $\text{d}w_{n_x} = \text{d}w_{n_x} / m$
+    }
+    $\text{d}\Vector{w} = \text{d}\Vector{w} / m$ \\
+    $\text{d}b = \text{d}b / m$
+    \caption{Replace the inner for-loop by vectorization in logistic regression}
+\end{algorithm}
+
+\subsubsection{Vectorizing Logistic Regression}
+Inference process:
+\begin{IEEEeqnarray*}{rCl}
+    z^{(1)} = \Vector{w}^T \Vector{x^{(1)}} + b \qquad z^{(2)} = \Vector{w}^T \Vector{x^{(2)}} + b
+    \qquad \cdots \qquad z^{(m)} = \Vector{w}^T \Vector{x^{(m)}} + b
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    a^{(1)} = \sigma (z^{(1)}) \qquad a^{(2)} = \sigma (z^{(2)}) \qquad \cdots \qquad
+    a^{(m)} = \sigma (z^{(m)})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{X} = \left[
+        \begin{array}{cccc}
+            \big| & \big| & & \big| \\
+            \big| & \big| & & \big| \\
+            \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
+            \big| & \big| & & \big| \\
+            \big| & \big| & & \big|
+        \end{array}
+    \right]
+    \qquad
+    \Matrix{X} \in \Set{R}^{{n_x} \times m}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{Z} = \left[
+        \begin{array}{cccc}
+            z^{(1)} & z^{(2)} & \cdots & z^{(m)}
+        \end{array}
+    \right]
+    = \Vector{w}^T \Matrix{X}
+    + \underbrace{\left[\begin{array}{cccc}
+        b & b & \cdots & b
+    \end{array}\right]}_{1 \times m}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{A} = \left[
+        \begin{array}{cccc}
+            a^{(1)} & a^{(2)} & \cdots & a^{(m)}
+        \end{array}
+    \right]
+    = \sigma(\Vector{Z})
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}z^{(1)} = a^{(1)} - y^{(1)} \qquad \text{d}z^{(2)} = a^{(2)} - y^{(2)} \qquad \cdots
+    \qquad \text{d}z^{(m)} = a^{(m)} - y^{(m)}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{Z} = \left[
+        \begin{array}{cccc}
+            \text{d}z^{(1)} & \text{d}z^{(2)} & \cdots & \text{d}z^{(m)}
+        \end{array}
+    \right]
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{Y} = \left[
+        \begin{array}{cccc}
+            y^{(1)} & y^{(2)} & \cdots & y^{(m)}
+        \end{array}
+    \right]
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{Z} = \Vector{A} - \Vector{Y} = \left[
+        \begin{array}{cccc}
+            a^{(1)}-y^{(1)} & a^{(2)}-y^{(2)} & \cdots & a^{(m)}-y^{(m)}
+        \end{array}
+    \right]
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}b = \frac{1}{m} \sum_{i=1}^m \text{d}z^{(i)}
+    \longrightarrow
+    \text{d}b = \frac{1}{m} \text{np.sum(}\text{d}\Vector{Z}\text{)}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{w} = \frac{1}{m} \left[
+        \begin{array}{cccc}
+            \big| & \big| & & \big| \\
+            \big| & \big| & & \big| \\
+            \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
+            \big| & \big| & & \big| \\
+            \big| & \big| & & \big|
+        \end{array}
+    \right]
+    \left[
+        \begin{array}{c}
+            \text{d}z^{(1)} \\
+            \text{d}z^{(2)} \\
+            \vdots \\
+            \text{d}z^{(m)}
+        \end{array}
+    \right]
+    = \frac{1}{m} \underbrace{\left[
+        \Vector{x}^{(1)}\text{d}z^{(1)} + \Vector{x}^{(2)}\text{d}z^{(2)} + \cdots
+        + \Vector{x}^{(m)}\text{d}z^{(m)}
+    \right]}_{n \times 1}
+    \longrightarrow
+    \text{d}\Vector{w} = \frac{1}{m} \Matrix{X} \text{d}\Vector{Z}^T
+\end{IEEEeqnarray*}
+
+Vectorized (in a single iteration):
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{Z} = \Vector{w}^T\Matrix{X} + b \longrightarrow \text{np.dot(w.T, X) + b}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{A} = \sigma(\Vector{Z})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{Z} = \Vector{A} - \Vector{Y}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{w} = \frac{1}{m} \Matrix{X}(\text{d}\Vector{Z}^T)
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}b = \frac{1}{m} \text{np.sum(d}\Vector{Z}\text{)}
+\end{IEEEeqnarray*}
+
+Then update $\Vector{w}$ and $b$ for each iteration:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{w} = \Vector{w} - \alpha \text{d}\Vector{w}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    b = b - \alpha \text{d}b
+\end{IEEEeqnarray*}
+
+\subsubsection{Broadcasting in Python}
+According to Figure~\ref{fig:foods-calories}, denote the matrix in the figure as $\Matrix{A}$,
+calculate the percentages of calories from Carbs, Proteins, Fats for each of four foods. Try do that
+without explicit for-loop.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=25em]{figures/foods-calories}
+    \caption{Calories from Carbs, Proteins, Fats in 100g of different foods}
+    \label{fig:foods-calories}
+\end{figure}
+
+\begin{minted}{numpy}
+    cal = A.sum(axis=0) # sum vertically, pass axis=1 to sum horizontally
+    # broadcasting, A.shape = (3, 4), cal.shape = (1, 4)
+    percentage = 100 * A / (cal.reshape(1, 4))
+\end{minted}
+
+\paragraph{Broadcasting examples}
+\begin{IEEEeqnarray*}{rCl}
+    \left[\begin{array}{c} 1 \\ 2 \\ 3 \\ 4 \end{array}\right] + 100
+    = \left[\begin{array}{c} 1 \\ 2 \\ 3 \\ 4 \end{array}\right]
+    + \left[\begin{array}{c} 100 \\ 100 \\ 100 \\ 100 \end{array} \right]
+    = \left[\begin{array}{c} 101 \\ 102 \\ 103 \\ 104 \end{array} \right]
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \left[\begin{array}{ccc} 1 & 2 & 3 \\ 4 & 5 & 6 \end{array}\right]
+    + \left[\begin{array}{ccc} 100 & 200 & 300 \end{array}\right]
+    = \left[\begin{array}{ccc} 1 & 2 & 3 \\ 4 & 5 & 6 \end{array}\right]
+    + \left[\begin{array}{ccc} 100 & 200 & 300 \\ 100 & 200 & 300 \end{array}\right]
+    = \left[\begin{array}{ccc} 101 & 202 & 303 \\ 104 & 205 & 306 \end{array}\right]
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \left[\begin{array}{ccc} 1 & 2 & 3 \\ 4 & 5 & 6 \end{array}\right]
+    + \left[\begin{array}{c} 100 \\ 200 \end{array}\right]
+    = \left[\begin{array}{ccc} 1 & 2 & 3 \\ 4 & 5 & 6 \end{array}\right]
+    + \left[\begin{array}{ccc} 100 & 100 & 100 \\ 200 & 200 & 200 \end{array}\right]
+\end{IEEEeqnarray*}
+
+(Note: In MATLAB/Octave, the \mintinline{matlab}{bsxfun} seems to have the same feature, it can
+apply element-wise operation to two arrays with implicit expansion enabled.)
+
+\paragraph{General principle of broadcasting}
+\begin{IEEEeqnarray*}{rCl}
+    \underbrace{\Matrix{Matrix}}_{(m, n)} \qquad
+    \begin{array}{c} + \\ - \\ * \\ / \end{array} \qquad
+    \underbrace{\Vector{Vector}}_{(1, n) or (m, 1)} \qquad
+    \longrightarrow  \qquad \underbrace{\Matrix{Matrix}}_{(m, n)}
+\end{IEEEeqnarray*}
+
+\subsubsection{A Note on Python/NumPy Vectors}
+For broadcasting:
+\begin{IEEEeqnarray*}{rCl}
+    \left\{\begin{array}{rl}
+        \text{Strenght:} & \text{expressivity, flexibility} \\
+        \text{Weakness:} & \text{may introduce subtle bugs}
+    \end{array}\right.
+\end{IEEEeqnarray*}
+
+\begin{minted}{numpy}
+    >>> import numpy as np
+    >>> a = np.random.randn(5)
+    >>> a   # rank 1 array, do not use in this course
+    array([-0.40700705, -1.27728182,  0.10255894,  0.06871343, -1.01614418])
+    >>> a.shape
+    (5,)
+    >>> a = a.reshape((5, 1))       # column vector
+    >>> a
+    array([[-0.40700705],
+           [-1.27728182],
+           [ 0.10255894],
+           [ 0.06871343],
+           [-1.01614418]])
+    >>> a = np.random.randn(5, 1)   # column vector
+    >>> a
+    array([[ 1.32238445],
+           [-2.09932992],
+           [ 0.29040232],
+           [-1.31295795],
+           [-1.05893313]])
+    >>> a.shape
+    (5, 1)
+    >>> a = np.random.randn(1, 5)   # row vector
+    >>> a
+    array([[-0.7020727 , -0.54867968,  1.38088584,  0.69785511, -0.2510519 ]])
+    >>> a.shape
+    (1, 5)
+    >>> assert(a.shape == (1, 5))
+    >>> assert(a.shape == (5, 1))
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    AssertionError
+\end{minted}
+
+\subsubsection{Explanation of Logistic Regression Cost Function (Optional)}
+Logistic regression cost function:
+\begin{IEEEeqnarray*}{rCl}
+    \hat{y} = \sigma(\Vector{w}^T \Vector{x} + b), \qquad
+    \text{where } \sigma(z) = \frac{1}{1+e^{-z}}.
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \left.\begin{array}{rl}
+        \text{If }y=1\text{: } & P(y|x) = \hat{y} \\
+        \text{If }y=0\text{: } & P(y|x) = 1 - \hat{y}
+    \end{array}\right\}
+    P(y|x) = \hat{y}^y (1-\hat{y})^{(1-y)}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \log P(y|x) = y \log\hat{y} + (1-y)\log(1-\hat{y}) = -\Cal{L}(\hat{y}, y)
+\end{IEEEeqnarray*}
+
+Cost on m examples: (Maximum Likelihood Estimation)
+\begin{IEEEeqnarray*}{rCl}
+    \log P(\text{labels in training set}) = \log \prod_{i=1}^m P(y^{(i)}|x^{(i)})
+    = \underbrace{\sum_{i=1}^m \log P(y^{(i)}|x^{(i)})}_{-\Cal{L}(\hat{y}^{(i)}, y^{(i)})}
+    = -\sum_{(i=1)}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)})
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \underset{\text{minimize}}{J(\Vector{w}, b)}
+    = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)})
+\end{IEEEeqnarray*}
+
+
+
 
 
 
