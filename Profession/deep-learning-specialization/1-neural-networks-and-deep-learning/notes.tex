@@ -11,7 +11,7 @@
 \usepackage{amsmath}        % to type some math equations
 \usepackage{amssymb}        % to use some special math font
 \usepackage{IEEEtrantools}  % to use IEEEeqnarray
-\usepackage{ulem}           % to use stikeout command \sout{}
+\usepackage{ulem}           % to use stikeout command \sout{} (don't work in math mode)
 \usepackage{algorithm2e}    % to use algorithm environment
 \usepackage{multicol}       % to display some content in multi-columns
 \setlength{\columnseprule}{0.4pt}   % set the rule's width of multicols
@@ -26,6 +26,9 @@
 \newcommand{\Set}[1]{\mathbb{#1}}                   % Set
 \newcommand{\Cal}[1]{\mathcal{#1}}                  % Math Cal
 
+% Draw the lines in a matrix, which is composed by a series of vectors
+\newcommand{\vRule}{\rule{0.3pt}{10mm}}             % vertical rule
+\newcommand{\hRule}{\,\rule[1mm]{10mm}{0.3pt}\,}    % horizontal rule
 
 \title{Deep Learning Specialization \\
         Neural Networks and Deep Learning \\
@@ -69,7 +72,7 @@ is a continuous output.
 
 We know the prices can never be negative so we are creating a function called Rectified Linear Unit
 (ReLU) which starts at zero.
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=40em]{figures/single-nn}
     \caption{The ``Housing Price Prediction'' problem. The input is the size of the house
@@ -81,7 +84,7 @@ We know the prices can never be negative so we are creating a function called Re
 The price of a house can be affected by other features such as size, number of bedrooms, zip code
 and wealth. The role of the neural network is to predicted the price and it will automatically
 generate the hidden units. We only need to give the inputs x and the output y.
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=30em]{figures/multiple-nn}
     \caption{Multiple neural network}
@@ -98,7 +101,7 @@ instead trying to predict results in a discrete output. In other words, we are t
 variables into discrete categories.
 
 Here are some example of supervised learning:
-\begin{table}[ht]
+\begin{table}[htb]
 \centering
 \caption{Supervised Learning Applications}
 \begin{tabular}{lllc}
@@ -125,7 +128,7 @@ data refers to thing like pixel, raw audio, text.
 \subsection{Why is Deep Learning taking off?}
 Deep learning is taking off due to a large amount of data available through the digitization of the
 society, faster computation and innovation in the development of neural network algorithm.
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=40em]{figures/deep-nn-scale}
     \caption{Scale drives deep learning progress}
@@ -138,7 +141,7 @@ Two things have to be considered to get to the high level of performance:
 \end{enumerate}
 
 The process of training a neural network is iterative:
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=25em]{figures/train-nn-process}
 \end{figure}
@@ -160,7 +163,7 @@ The goal is to train a classifier that the input is an image represented by a fe
 $x$, and predicts whether the corresponding label $y$ is 1 or 0. In this case,
 whether this is a cat image (1) or a non-cat image (0).
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=35em]{figures/cat}
 \end{figure}
@@ -176,7 +179,7 @@ this case, a cat or no cat.
 To create a feature vector, $\Vector{x}$, the pixel intensity values will be ``unroll'' or
 ``reshape'' for each color. The dimension of the input feature vector $\Vector{x}$, is
 $n_x = 64 \times 64 \times 3 = 12288$.
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=10em]{figures/unrolled-image}
 \end{figure}
@@ -192,11 +195,9 @@ $m = m_{train}$ \qquad $m_{test}$ = the number of test examples
 \begin{IEEEeqnarray*}{rCl}
     \Matrix{X} = \left[
         \begin{array}{cccc}
-            \big| & \big| & & \big| \\
-            \big| & \big| & & \big| \\
+            \vRule & \vRule & & \vRule \\
             \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
-            \big| & \big| & & \big| \\
-            \big| & \big| & & \big|
+            \vRule & \vRule & & \vRule
         \end{array}
     \right]
     \qquad
@@ -231,7 +232,7 @@ Parameters: $\Vector{w} \in \Set{R}^{n_x}$, $b \in \Set{R}$
 
 Output: \sout{$\hat{y} = \Vector{w}^T \Vector{x} + b$} \quad
 $\hat{y} = \sigma (\Vector{w}^T\Vector{x} + b)$, where $\sigma(z) = \frac{1}{1+e^{-z}}$.
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=25em]{figures/sigmoid}
     \caption{Sigmoid}
@@ -285,13 +286,13 @@ The cost function is the average of the loss function of the entire training set
 find the parameters $\Vector{w}$ and $b$ that minimize the overall cost function.
 
 \paragraph{Gradient Descent}
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=25em]{figures/gradient-descent}
     \caption{Gradient descent. (Ignore $b$ here)}
 \end{figure}
 
-\begin{algorithm}[ht]
+\begin{algorithm}[htb]
 \Repeat{iteration = MaxIteration}{
         $\displaystyle{\Vector{w} := \Vector{w}
         - \alpha \frac{\partial J(\Vector{w}, b)}{\partial \Vector{w}}}$ \\
@@ -318,7 +319,7 @@ $\displaystyle\frac{\partial FinalOutputVar}{\partial var}$.
     \Cal{L}(a, y) = -(y\log(a) + (1-y)\log(1-a))
 \end{IEEEeqnarray*}
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=35em]{figures/lr-gradient-descent}
     \caption{The computation graph of logistic regression gradient descent}
@@ -366,7 +367,7 @@ derivatives:
 The Algorithm~\ref{alg:lr_gradient_descent} is the algorithm of logistic regression gradient
 descent on m examples. It uses two for-loops, so it's less efficient than use vertorization.
 
-\begin{algorithm}[ht]
+\begin{algorithm}[htb]
     \tcc{Initialization}
     $J = 0;$ \\
     \For{$j = 1$ \KwTo $n$}{
@@ -501,7 +502,7 @@ Vectorized:
 \end{multicols}
 
 \paragraph{Logistic regression derivatives}
-\begin{algorithm}[ht]
+\begin{algorithm}[htb]
     J = 0 \\
     \tcc{$\text{d}w_1 = 0, \text{d}w_2 = 0, \ldots, \text{d}w_{n_x}$}
     $\text{d}\Vector{w}$ = np.zeros(($n_x$, 1)) \\
@@ -545,11 +546,9 @@ Inference process:
 \begin{IEEEeqnarray*}{rCl}
     \Matrix{X} = \left[
         \begin{array}{cccc}
-            \big| & \big| & & \big| \\
-            \big| & \big| & & \big| \\
+            \vRule & \vRule & & \vRule \\
             \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
-            \big| & \big| & & \big| \\
-            \big| & \big| & & \big|
+            \vRule & \vRule & & \vRule
         \end{array}
     \right]
     \qquad
@@ -613,11 +612,9 @@ Inference process:
 \begin{IEEEeqnarray*}{rCl}
     \text{d}\Vector{w} = \frac{1}{m} \left[
         \begin{array}{cccc}
-            \big| & \big| & & \big| \\
-            \big| & \big| & & \big| \\
+            \vRule & \vRule & & \vRule \\
             \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
-            \big| & \big| & & \big| \\
-            \big| & \big| & & \big|
+            \vRule & \vRule & & \vRule
         \end{array}
     \right]
     \left[
@@ -666,7 +663,7 @@ According to Figure~\ref{fig:foods-calories}, denote the matrix in the figure as
 calculate the percentages of calories from Carbs, Proteins, Fats for each of four foods. Try do that
 without explicit for-loop.
 
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=25em]{figures/foods-calories}
     \caption{Calories from Carbs, Proteins, Fats in 100g of different foods}
@@ -788,12 +785,210 @@ Cost on m examples: (Maximum Likelihood Estimation)
     = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)})
 \end{IEEEeqnarray*}
 
+\section{Shallow Neural Network}
+\subsection{What is a Neural Netork?}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=15em]{figures/shallow-nn}
+    \includegraphics[width=50em]{figures/shallow-nn-compute}
+    \caption{The example of a shallow neural network}
+    \label{fig:shallow-nn}
+\end{figure}
 
+Figure~\ref{fig:shallow-nn} shows an example of a shallow neural network.
 
+Notation: Use superscript $[i]$ to denote the i-th layer; use the superscript $(i)$ to denote the
+i-th example in dataset.
 
+\subsection{Neural Network Representation}
+As is shown in Figure~\ref{fig:nn-representation}, $\Vector{a^{[i]}}$ denotes the activation of the
+i-th layer.
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/nn-representation}
+    \caption{The representation of a neural network}
+    \label{fig:nn-representation}
+\end{figure}
 
+\subsection{Computing a Neural Network's Output}
+As the Figure~\ref{fig:neuron-compuation} shows, the compuation of a single neuron includes two
+parts: the first part, $\Vector{z} = \Vector{w}^T\Vector{x} + b$; the second part,
+$\Vector{a} = \sigma(\Vector{z})$.
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/neuron-computation}
+    \caption{The computation of a single neuron}
+    \label{fig:neuron-compuation}
+\end{figure}
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/nn-first-layer-computation}
+    \caption{The computation of the first layer of a neural network}
+    \label{fig:nn-first-layer-computation}
+\end{figure}
 
+The Figure~\ref{fig:nn-first-layer-computation} shows the compuation of the neural network's first
+layer. Cause it uses a for-loop, it is less efficient. According to it, we can generize a
+vectorized version:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[1]}} = \left[\begin{array}{c}
+        z_1^{[1]} \\ z_2^{[1]} \\ z_3^{[1]} \\ z_4^{[1]}
+    \end{array}\right] \qquad
+    \Matrix{W^{[1]}} = \left[\begin{array}{c}
+        \hRule \Vector{w_1^{[1]}}^T \hRule \\
+        \hRule \Vector{w_2^{[1]}}^T \hRule \\
+        \hRule \Vector{w_3^{[1]}}^T \hRule \\
+        \hRule \Vector{w_4^{[1]}}^T \hRule
+    \end{array}\right] \qquad
+    \Vector{x} = \Vector{a^{[0]}} = \left[\begin{array}{c}
+        x_1 \\ x_2 \\ x_3
+    \end{array}\right] \qquad
+    \Vector{b} = \left[\begin{array}{c}
+        b_1^{[1]} \\ b_2^{[1]} \\ b_3^{[1]} \\ b_4^{[1]}
+    \end{array}\right]
+\end{IEEEeqnarray*}
+
+Given input $\Vector{x} (\Vector{a^{[0]}})$:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[1]}} = \Matrix{W^{[1]}} \Vector{a^{[0]}} + \Vector{b^{[1]}} \qquad
+    \Vector{a^{[1]}} = \sigma(\Vector{z^{[1]}}) \qquad
+    \Vector{z^{[2]}} = \Matrix{W^{[2]}} \Vector{a^{[1]}} + \Vector{b^{[2]}} \qquad
+    \Vector{a^{[2]}} = \sigma(\Vector{z^{[2]}})
+\end{IEEEeqnarray*}
+
+\section{Vectorizing across Multiple Examples}
+For single example:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{x} \longrightarrow \Vector{a^{[2]}} = \Vector{\hat{y}}
+\end{IEEEeqnarray*}
+
+For m examples:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{x^{(1)}} \longrightarrow \Vector{a^{[2](1)}} = \Vector{\hat{y}^{(1)}} \qquad
+    \Vector{x^{(2)}} \longrightarrow \Vector{a^{[2](2)}} = \Vector{\hat{y}^{(2)}} \qquad
+    \ldots \qquad
+    \Vector{x^{(m)}} \longrightarrow \Vector{a^{[2](m)}} = \Vector{\hat{y}^{(m)}} \qquad
+\end{IEEEeqnarray*}
+
+Non-vectorized:
+\begin{algorithm}[htb]
+    \For{$i = 1$ \KwTo $m$}{
+        $\Vector{z^{[1](i)}} = \Matrix{W^{[1]}}\Vector{x^{(i)}} + \Vector{b^{[1]}}$ \\
+        $\Vector{a^{[1](i)}} = \sigma(\Vector{z^{[1](1)}})$ \\
+        $\Vector{z^{[2](1)}} = \Matrix{W^{[2]}}\Vector{a^{[1](i)}} + \Vector{b^{[2]}}$ \\
+        $\Vector{a^{[2](i)}} = \sigma(\Vector{z^{[2](i)}})$
+    }
+\end{algorithm}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{Let} \quad \Matrix{X} = \underbrace{\left[\begin{array}{cccc}
+        \vRule & \vRule & & \vRule \\
+        \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
+        \vRule & \vRule & & \vRule
+    \end{array}\right]}_{(n_x, m)}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \text{then} \quad \Matrix{Z^{[1]}} = \underbrace{\left[\begin{array}{cccc}
+        \vRule & \vRule & & \vRule \\
+        \Vector{z^{[1](1)}} & \Vector{z^{[1](2)}} & \cdots & \Vector{z^{[1](m)}} \\
+        \vRule & \vRule & & \vRule
+    \end{array}\right]}_{(\text{hidden units}, \text{training examples})} \qquad
+    \Matrix{A^{[1]}} = \underbrace{\left[\begin{array}{cccc}
+        \vRule & \vRule & & \vRule \\
+        \Vector{a^{[1](1)}} & \Vector{a^{[1](2)}} & \cdots & \Vector{a^{[1](m)}} \\
+        \vRule & \vRule & & \vRule
+    \end{array}\right]}_{(\text{hidden units}, \text{training examples})}
+\end{IEEEeqnarray*}
+
+Vectorized:
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{Z^{[1]}} = \Matrix{W^{[1]}} \Matrix{A^{[0]}} + \Vector{b^{[1]}}
+    = \Matrix{W^{[1]}} \Matrix{X} + \Vector{b^{[1]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{A^{[1]}} = \sigma(\Matrix{Z^{[1]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{Z^{[2]}} = \Matrix{W^{[2]}} \Matrix{A^{[1]}} + \Vector{b^{[2]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{A^{[2]}} = \sigma(\Matrix{Z^{[2]}})
+\end{IEEEeqnarray*}
+
+\subsection{Explanation for Vectorized Implementation}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[1](1)}} = \Matrix{W^{[1]}}\Vector{x^{(1)}} + \Vector{b^{[1]}}, \quad
+    \Vector{z^{[1](2)}} = \Matrix{W^{[1]}}\Vector{x^{(2)}} + \Vector{b^{[1]}}, \quad
+    \ldots, \quad
+    \Vector{z^{[1](m)}} = \Matrix{W^{[1]}}\Vector{x^{(m)}} + \Vector{b^{[1]}}
+\end{IEEEeqnarray*}
+
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[1]}} = \left[\begin{array}{c}
+        \hRule \Vector{w_1^{[1]}}^T \hRule \\
+        \hRule \Vector{w_2^{[1]}}^T \hRule \\
+        \hRule \Vector{w_3^{[1]}}^T \hRule \\
+        \hRule \Vector{w_4^{[1]}}^T \hRule
+    \end{array}\right]
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[1]}}{\color{purple} \Vector{x^{(1)}}} = {\color{purple} \left[\begin{array}{c}
+        \cdot \\ \cdot \\ \cdot \\ \cdot
+    \end{array}\right]} \qquad
+    \Matrix{W^{[1]}}{\color{green} \Vector{x^{(2)}}} = {\color{green} \left[\begin{array}{c}
+        \cdot \\ \cdot \\ \cdot \\ \cdot
+    \end{array}\right]} \qquad
+    \cdots \qquad
+    \Matrix{W^{[1]}}{\color{yellow} \Vector{x^{(m)}}} = {\color{yellow} \left[\begin{array}{c}
+        \cdot \\ \cdot \\ \cdot \\ \cdot
+    \end{array}\right]}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[1]}}
+    \left[
+    {\color{purple}\begin{array}{c} \vRule \\ \Vector{x^{(1)}} \\ \vRule \end{array}}
+    {\color{green}\begin{array}{c} \vRule \\ \Vector{x^{(2)}} \\ \vRule \end{array}}
+    \cdots
+    {\color{yellow}\begin{array}{c} \vRule \\ \Vector{x^{(m)}} \\ \vRule \end{array}}
+    \right] + \Vector{b^{[1]}}
+    = \left[{\color{purple} \begin{array}{c} \cdot \\ \cdot \\ \cdot \\ \cdot \end{array}}
+    {\color{green} \begin{array}{c} \cdot \\ \cdot \\ \cdot \\ \cdot \end{array}} \cdots
+    {\color{yellow} \begin{array}{c} \cdot \\ \cdot \\ \cdot \\ \cdot \end{array}}\right]
+    + \Vector{b^{[1]}}
+    = \left[
+    {\color{purple}\begin{array}{c} \vRule \\ \Vector{z^{[1](1)}} \\ \vRule \end{array}}
+    {\color{green}\begin{array}{c} \vRule \\ \Vector{z^{[1](2)}} \\ \vRule \end{array}}
+    \cdots
+    {\color{yellow}\begin{array}{c} \vRule \\ \Vector{z^{[1](m)}} \\ \vRule \end{array}}
+    \right] = \Matrix{Z^{[1]}}
+\end{IEEEeqnarray*}
+
+So, $\Matrix{W^{[1]}\Vector{x^{(i)}}} + \Vector{b^{[1]}} = \Vector{z^{[1](i)}}$,
+$\Matrix{Z^{[1]}} = \Matrix{W^{[1]}}\Matrix{X} + \Vector{b^{[1]}}$.
+
+\subsection{Activation Functions}
+Given $\Vector{x}$:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[1]}} = \Matrix{W^{[1]}}\Vector{x} + \Vector{b^{[1]}}
+\end{IEEEeqnarray*}
+{\centering \sout{$\Vector{a^{[1]}} = \sigma(\Vector{z^{[1]}})$} \par}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[1]}} = g^{[1]}(\Vector{z^{[1]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[2]}} = \Matrix{W^{[2]}}\Vector{a^{[1]}} + b^{[2]}
+\end{IEEEeqnarray*}
+{\centering \sout{$\Vector{a^{[2]}} = \sigma(\Vector{z^{[2]}})$} \par}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[2]}} = g^{[2]}(\Vector{z^{[2]}})
+\end{IEEEeqnarray*}
+
+We use $g(z)$ to denote activation function. Sometimes we can use other activation function instead
+of $\sigma(z)$ function. Different layers of the neural network may have different activation
+function, so we can use $g^{[i]}(z)$ to denote the i-th layer's activation function of a neural
+network.
 
 
 
