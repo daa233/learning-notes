@@ -368,14 +368,14 @@ The Algorithm~\ref{alg:lr_gradient_descent} is the algorithm of logistic regress
 descent on m examples. It uses two for-loops, so it's less efficient than use vertorization.
 
 \begin{algorithm}[htb]
-    \tcc{Initialization}
+    \tcp{Initialization}
     $J = 0;$ \\
     \For{$j = 1$ \KwTo $n$}{
         $\text{d}w_j = 0$ \\
     }
     $\text{d}b = 0;$
 
-    \tcc{Compute cost and derivatives}
+    \tcp{Compute cost and derivatives}
     \For{$i = 0$ \KwTo $m$}{
         $z^{(i)} = \Vector{w}^T \Vector{x^{(i)}} + b;$ \\
         $a^{(i)} = \sigma(z^{(i)});$ \\
@@ -387,14 +387,14 @@ descent on m examples. It uses two for-loops, so it's less efficient than use ve
         $\text{d}b = \text{d}b + \text{d}z^{(i)}$
     }
 
-    \tcc{Get the average}
+    \tcp{Get the average}
     $J = J / m;$ \\
     \For{$j = 1$ \KwTo $n$}{
         $\text{d}w_j = \text{d}w_j / m$
     }
     $\text{d}b = \text{d}b / m;$
 
-    \tcc{Gradient descent}
+    \tcp{Gradient descent}
     \For{$j = 1$ \KwTo $n$}{
         $\text{d}w_j = \text{d}w_j - \alpha \text{d}w_j$
     }
@@ -504,7 +504,7 @@ Vectorized:
 \paragraph{Logistic regression derivatives}
 \begin{algorithm}[htb]
     J = 0 \\
-    \tcc{$\text{d}w_1 = 0, \text{d}w_2 = 0, \ldots, \text{d}w_{n_x}$}
+    \tcp{$\text{d}w_1 = 0, \text{d}w_2 = 0, \ldots, \text{d}w_{n_x}$}
     $\text{d}\Vector{w}$ = np.zeros(($n_x$, 1)) \\
     $\text{d}b$ = 0 \\
     \For{$i = 1$ \KwTo $m$}{
@@ -512,7 +512,7 @@ Vectorized:
         $a^{(i)} = \sigma(z^{(i)})$ \\
         $J = J - [y^{(i)}\log \hat{y}^{(i)} + (1-y^{(i)})\log (1-\hat{y}^{(i)})]$ \\
         $\text{d}z^{(i)} = a^{(i)} - y^{(i)}$ \\
-        \tcc{
+        \tcp{
             $\text{d}w_1 = \text{d}w_1 + x_1^{(i)} \text{d}z^{(i)}$ \\
             $\text{d}w_2 = \text{d}w_2 + x_2^{(i)} \text{d}z^{(i)}$ \\
             \ldots \\
@@ -522,7 +522,7 @@ Vectorized:
         $\text{d}b = \text{d}b + \text{d}z^{(i)}$ \\
     }
     $J = J / m$ \\
-    \tcc{
+    \tcp{
         $\text{d}w_1 = \text{d}w_1 / m$ \\
         $\text{d}w_2 = \text{d}w_2 / m$ \\
         \ldots \\
@@ -786,7 +786,7 @@ Cost on m examples: (Maximum Likelihood Estimation)
 \end{IEEEeqnarray*}
 
 \section{Shallow Neural Network}
-\subsection{What is a Neural Netork?}
+\subsection{Neural Network Overview}
 \begin{figure}[htb]
     \centering
     \includegraphics[width=15em]{figures/shallow-nn}
@@ -857,7 +857,7 @@ Given input $\Vector{x} (\Vector{a^{[0]}})$:
     \Vector{a^{[2]}} = \sigma(\Vector{z^{[2]}})
 \end{IEEEeqnarray*}
 
-\section{Vectorizing across Multiple Examples}
+\subsection{Vectorizing across Multiple Examples}
 For single example:
 \begin{IEEEeqnarray*}{rCl}
     \Vector{x} \longrightarrow \Vector{a^{[2]}} = \Vector{\hat{y}}
@@ -985,10 +985,196 @@ Given $\Vector{x}$:
     \Vector{a^{[2]}} = g^{[2]}(\Vector{z^{[2]}})
 \end{IEEEeqnarray*}
 
-We use $g(z)$ to denote activation function. Sometimes we can use other activation function instead
-of $\sigma(z)$ function. Different layers of the neural network may have different activation
-function, so we can use $g^{[i]}(z)$ to denote the i-th layer's activation function of a neural
-network.
+We use $g(z)$ to denote activation function. Sometimes we can use other activation function like
+$tanh(z)$, ReLU ($max(0, z)$), etc., instead of $\sigma(z)$ function. Different layers of the
+neural network may have different activation function, so we can use $g^{[i]}(z)$ to denote the
+i-th layer's activation function of a neural network.
+
+\subsubsection{Pros and cons of activation functions}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/sigmoid-black} \qquad
+    \includegraphics[width=19em]{figures/tanh} \\
+    \includegraphics[width=20em]{figures/relu} \quad
+    \includegraphics[width=24em]{figures/leaky-relu}
+    \caption{Activation functions}
+\end{figure}
+
+\begin{itemize}
+    \item One of downside of both the sigmoid and tanh activation function is that if $z$ is either
+    very large or very small, then the gradient (derivative, slope) of the function becomes very
+    small, this slows down the gradient descent.
+    \item Never use sigmoid activation function, except for the output layer if you are doing
+    binary classification. Tanh is prety superior than sigmoid.
+    \item If you don't have an idea to choose which activation function, choose ReLU as the default
+    activation function, or you can try Leaky ReLU.
+\end{itemize}
+
+\subsection{Why do you need non-linear activation functions?}
+If $g(z) = z$, sometimes we will call it ``linear activation function'' or ``identity activation
+function''.
+
+Given $\Vector{x}$:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[1]}} = \Matrix{W^{[1]}}\Vector{x} + \Vector{b^{[1]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[1]}} = g^{[1]}(\Vector{z^{[1]}}) = \Vector{z^{[1]}}
+    = \Matrix{W^{[1]}}\Vector{x} + \Vector{b^{[1]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[2]}} = \Matrix{W^{[2]}}\Vector{a^{[1]}} + b^{[2]}
+    = \Matrix{W^{[2]}}(\Matrix{W^{[1]}}\Vector{x} + \Vector{b^{[1]}}) + \Vector{b^{[2]}}
+    = \underbrace{(\Matrix{W^{[2]}}\Matrix{W^{[1]}})}_{\Matrix{W'}}\Vector{x}
+    + \underbrace{(\Matrix{W^{[2]}}\Vector{b^{[1]}} + \Vector{b^{[2]}})}_{\Vector{b'}}
+    = \Matrix{W'}\Vector{x} + \Vector{b'}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[2]}} = g^{[2]}(\Vector{z^{[2]}}) = \Vector{z^{[2]}}
+    = \Matrix{W'}\Vector{x} + \Vector{b'}
+\end{IEEEeqnarray*}
+
+If you use linear activation function as the activation function of your neural network, then the
+neural network is just outputting a linear function of the input. It turns out that if you use a
+linear function or alternatively if you don't have an activation function, then no matter how many
+layers your neural network has always doing is just computing a linear activation function, so you
+might as well not have any hidden layers.
+
+\subsection{Derivatives of activation functions}
+\subsubsection{Sigmoid activation function}
+\begin{IEEEeqnarray*}{rCl}
+    g(z) = \frac{1}{1+e^{-z}} = a
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    g'(z) = \frac{\text{d}}{\text{d}z}g(z) = \frac{1}{1+e^{-z}}(1-\frac{1}{1+e^{-z}})
+    = g(z)(1-g(z)) = a(1-a)
+\end{IEEEeqnarray*}
+\subsubsection{Tanh activation function}
+\begin{IEEEeqnarray*}{rCl}
+    g(z) = \tanh(z) = \frac{e^z-e^{-z}}{e^z+e^{-z}} = a
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    g'(z) = \frac{\text{d}}{\text{d}z}g(z) = 1 - (\tanh(z))^2 = 1 - a^2
+\end{IEEEeqnarray*}
+
+\subsection{ReLU}
+\begin{IEEEeqnarray*}{rCl}
+    g(z) = \max(0, z)
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    g'(z) = \left\{\begin{array}{cl}
+        0, & \text{if } z < 0; \\
+        1, & \text{if } z > 0; \\
+        \text{undefined}, & \text{if } z = 0.
+    \end{array}\right.
+    \qquad \xrightarrow{\text{implemented in sofware}} \qquad
+    g'(z) = \left\{\begin{array}{cl}
+        0, & \text{if } z < 0; \\
+        1, & \text{if } z \geq 0.
+    \end{array}\right.
+\end{IEEEeqnarray*}
+
+\subsection{Leaky ReLU}
+\begin{IEEEeqnarray*}{rCl}
+    g(z) = \max(0.01z, z)
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    g'(z) = \left\{\begin{array}{cl}
+        0.01, & \text{if } z < 0; \\
+        1, & \text{if } z > 0; \\
+        \text{undefined}, & \text{if } z = 0.
+    \end{array}\right.
+    \qquad \xrightarrow{\text{implemented in sofware}} \qquad
+    g'(z) = \left\{\begin{array}{cl}
+        0.01, & \text{if } z < 0; \\
+        1, & \text{if } z \geq 0.
+    \end{array}\right.
+\end{IEEEeqnarray*}
+
+\subsection{Gradient descent for Neural Networks}
+Parameters: $n_x = n^{[0]}$, $n^{[1]}$, $n^{[2]} = 1$,
+$\underbrace{\Matrix{W^{[1]}}}_{(n^{[1]}, n^{[0]})}$,
+$\underbrace{\Vector{b^{[1]}}}_{(n^{[2]}, n^{[1]})}$,
+$\underbrace{\Matrix{W^{[2]}}}_{(n^{[2]}, n^{[1]})}$,
+$\underbrace{\Vector{b^{[2]}}}_{(n^{[2]}, 1)}$
+
+Data:
+$\Matrix{X} = \underbrace{\left[
+    \begin{array}{cccc}
+        \vRule & \vRule & & \vRule \\
+        \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots & \Vector{x^{(m)}} \\
+        \vRule & \vRule & & \vRule
+    \end{array}
+\right]}_{(n^{[0]}, m)}$,
+$\Vector{Y} = \underbrace{\left[
+    \begin{array}{cccc}
+        y^{(1)} & y^{(2)} & \cdots & y^{(m)}
+    \end{array}
+\right]}_{(1, m)}$
+
+Cost Function:
+\begin{IEEEeqnarray*}{rCl}
+    J(\Matrix{W^{[1]}}, \Vector{b^{[1]}}, \Matrix{W^{[2]}}, \Vector{b^{[2]}})
+    = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}, y)
+\end{IEEEeqnarray*}
+\begin{algorithm}[htb]
+    \Repeat{iteration = MaxIteration}{
+        \tcp{Forward propagation}
+        $\Matrix{Z^{[1]}} = \Matrix{W^{[1]}}\Matrix{X}$ \\
+        $\Matrix{A^{[1]}} = g^{[1]}(\Matrix{Z^{[1]}})$ \\
+        $\Matrix{Z^{[2]}} = \Matrix{W^{[2]}}\Matrix{A^{[1]}} + \Vector{b^{[2]}}$ \\
+        $\Matrix{A^{[2]}} = g^{[2]}(\Matrix{Z^{[2]}}) = \sigma(\Matrix{Z^{[2]}})$ \\
+        \tcp{Backpropagation}
+        $\text{d}\Matrix{Z^{[2]}} = \Matrix{A^{[2]}} - \Vector{Y}$ \\
+        $\text{d}\Matrix{W^{[2]}} = \frac{1}{m} \text{d}\Matrix{Z^{[2]}}\Matrix{A^{[1]}}^T$ \\
+        \tcp{keepdims=True ensures that the shape of result is $(n^{[2]}, 1)$)}
+        $\text{d}\Vector{b^{[2]}}
+        = \frac{1}{m}\text{np.sum(d}\Matrix{Z^{[2]}}\text{, axis=1, keepdims=True)}$ \\
+        \tcp{here $*$ means element-wise multiplication}
+        $\text{d}\Matrix{Z^{[1]}}
+        = \Matrix{W^{[2]}}^T \text{d}\Matrix{Z^{[2]}} * g^{[1]'}(\Matrix{Z^{[1]}})$ \\
+        $\text{d}\Matrix{W^{[1]}} = \frac{1}{m} \text{d}\Matrix{Z^{[1]}}\Matrix{X}^T$ \\
+        $\text{d}\Vector{b}^{[1]}
+        = \frac{1}{m} \text{np.sum(d}\Matrix{Z^{[1]}}\text{, axis=1, keepdims=True)}$
+    }
+    \caption{The gradient descent algorithm for neural networks}
+\end{algorithm}
+
+\subsection{Backpropagation intuition (Optional)}
+According to Figure~\ref{fig:lr-gradient-descent}, we have got how to compute the gradient of
+logistic regression. By the chain rule, we can get:
+\begin{IEEEeqnarray*}{rCl}
+    \text{If } a = g(z), \text{then d}z = \text{d}a \cdot g'(z)
+\end{IEEEeqnarray*}
+
+Logistic regression can be seen as a neural network with only one layers (exclude input layer),
+while the neural network in Figure~\ref{fig:shallow-nn} and Figure~\ref{fig:nn-representation}
+contains two layers. To compute the derivatives for each single example, we can also use
+backpropagation and the chain rule.
+
+At first, because $\Cal{L}(\hat{y}, y) = -(y\log\hat{y}+(1-y)\log(1-\hat{y}))$, we can compute
+$\text{d}a^{[2]}$:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}a^{[2]} = \frac{\text{d}\Cal{L}(a^{[2]}, y)}{\text{d}a^{[2]}} = -\frac{y}{a^{[2]}}
+    + \frac{1-y}{1-a^{[2]}}
+\end{IEEEeqnarray*}
+
+Then, according to the chain rule, we can compute $\text{d}{z^{[2]}}$:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}z^{[2]} = \frac{\text{d}\Cal{L}}{\text{d}a^{[2]}}\frac{\text{d}a^{[2]}}{\text{d}z^{[2]}}
+    = (-\frac{y}{a^{[2]}} + \frac{1-y}{1-a^{[2]}}) [z^{[2]} (1-z^{[2]})] = a^{[2]} - y
+\end{IEEEeqnarray*}
+
+Because $z^{[2]} = \Matrix{W^{[2]}}\Vector{a^{[1]}} + \Vector{b^{[2]}}$, once we get
+$\text{d}{z^{[2]}}$, we can continue to compute $\text{d}\Matrix{W^{[2]}}$ and $\text{d}{b^{[2]}}$:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{W^{[2]}} = \text{d}z^{[2]} \Vector{a^{[1]}}^T
+\end{IEEEeqnarray*}
+
+
+
+
+
 
 
 
