@@ -1162,18 +1162,141 @@ $\text{d}a^{[2]}$:
 Then, according to the chain rule, we can compute $\text{d}{z^{[2]}}$:
 \begin{IEEEeqnarray*}{rCl}
     \text{d}z^{[2]} = \frac{\text{d}\Cal{L}}{\text{d}a^{[2]}}\frac{\text{d}a^{[2]}}{\text{d}z^{[2]}}
+    = \frac{\text{d}\Cal{L}}{\text{d}a^{[2]}} {g^{[2]}}'(z^{[2]})
     = (-\frac{y}{a^{[2]}} + \frac{1-y}{1-a^{[2]}}) [z^{[2]} (1-z^{[2]})] = a^{[2]} - y
 \end{IEEEeqnarray*}
 
-Because $z^{[2]} = \Matrix{W^{[2]}}\Vector{a^{[1]}} + \Vector{b^{[2]}}$, once we get
-$\text{d}{z^{[2]}}$, we can continue to compute $\text{d}\Matrix{W^{[2]}}$ and $\text{d}{b^{[2]}}$:
+Because $z^{[2]} = \Vector{W^{[2]}}\Vector{a^{[1]}} + b^{[2]}$, once we get
+$\text{d}{z^{[2]}}$, we can continue to compute $\text{d}\Vector{W^{[2]}}$ and $\text{d}{b^{[2]}}$:
 \begin{IEEEeqnarray*}{rCl}
     \text{d}\Vector{W^{[2]}} = \text{d}z^{[2]} \Vector{a^{[1]}}^T
 \end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}b^{[2]} = \text{d}z^{[2]}
+\end{IEEEeqnarray*}
 
+To continue it, we can get $\text{d}\Vector{a^{[1]}} = \Vector{W^{[2]}}^T \text{d}z^{[2]}$. In
+practice, the computation of $\text{d}\Vector{a^{[1]}}$ and $\text{d}\Vector{z^{[1]}}$ often
+collapses into one step. And we can check the dimensions,
+$\Vector{W^{[2]}} \in \Set{R}^{(n^{[2]}, n^{[1]})}$,
+$z^{[2]}, \text{d}z^{[2]} \in \Set{R}^{(n^{[2]}, 1)}$,
+$\Vector{z^{[1]}}, \text{d}\Vector{z^{[1]}} \in \Set{R}^{(n^{[1]}, 1)}$ (the $*$ here means
+element-wise multiplication):
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{z^{[1]}} = \text{d}\Vector{a^{[1]}} * {g^{[1]}}'(\Vector{z^{[1]}})
+    = \underbrace{\underbrace{\Vector{W^{[2]}}^T}_{(n^{[1]}, n^{[2]})} \underbrace{\text{d}z^{[2]}}_{(n^{[2]}, 1)}}_{(n^{[1]}, 1)}
+    * \underbrace{{g^{[1]}}'(\Vector{z^{[1]}})}_{(n^{[1]}, 1)}
+\end{IEEEeqnarray*}
 
+At last, we can get $\text{d}\Matrix{W^{[1]}}$ and $\text{d}\Vector{b^{[1]}}$:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{W^{[1]}} = \text{d}\Vector{z^{[1]}} \underbrace{\Vector{x}^T}_{\Vector{a^{[0]}}^T}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{b^{[1]}} = \text{d}\Vector{z^{[1]}}
+\end{IEEEeqnarray*}
 
+\subsubsection{Summary of gradient descent}
+\begin{multicols}{2}
+For single example:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{z^{[2]}} = \Vector{a^{[2]}} - \Vector{y}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{W^{[2]}} = \text{d}\Vector{z^{[2]}} \Vector{a^{[1]}}^T
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{b^{[2]}} = \text{d}\Vector{z^{[2]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{z^{[1]}} = \Matrix{W^{[2]}}^T \text{d}\Vector{z^{[2]}}
+    * {g^{[1]}}'(\Vector{z^{[1]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{W^{[1]}} = \text{d}\Vector{z^{[1]}} \Vector{x}^T
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{b^{[1]}} = \text{d}\Vector{z^{[1]}}
+\end{IEEEeqnarray*}
+\columnbreak
 
+Vectorized implementation for m examples:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{Z^{[2]}} = \Matrix{A^{[2]}} - \Matrix{Y}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{W^{[2]}} = \frac{1}{m} \text{d}\Matrix{Z^{[2]}}\Matrix{A^{[1]}}^T
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{b^{[2]}}
+    = \frac{1}{m} \text{np.sum(}\text{d}\Matrix{Z^{[2]}}\text{, axis=1, keepdims=True)}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{Z^{[1]}} = \Matrix{W^{[2]}}^T \text{d}\Matrix{Z^{[2]}}
+    * {g^{[1]}}'(\Matrix{Z^{[1]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{W^{[1]}} = \frac{1}{m} \text{d}\Matrix{Z^{[1]}}\Matrix{X}^T
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Vector{b^{[1]}}
+    = \frac{1}{m} \text{np.sum(}\Matrix{Z^{[1]}} \text{, axis=1, keepdims=True)}
+\end{IEEEeqnarray*}
+\end{multicols}
+
+\subsection{Random Initialization}
+When you are training a neural network, it's important to initialize your weights randomly. For
+logistic regression, it was okay to initialize the weights to 0, but for a neural network of
+intialized weights and parameters to all 0 and then apply gradient descent, it won't work.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/randomly-init}
+    \caption{A shallow neural network with all weights and parameters initialized to 0}
+    \label{fig:randomly-init}
+\end{figure}
+
+As the Figure~\ref{fig:randomly-init} shows, there is a shallow neural network with two input
+features, two hidden units and one output unit. Then we initialized all the weights and parameters
+to zero:
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[1]}} = \left[\begin{array}{cc} 0 & 0 \\ 0 & 0 \end{array}\right] \qquad
+    \Vector{b^{[1]}} = \left[\begin{array}{c} 0 \\ 0 \end{array}\right] \qquad
+    \Matrix{W^{[2]}} = \left[\begin{array}{cc} 0 & 0 \end{array}\right] \qquad
+    \Vector{b^{[2]}} = [0]
+\end{IEEEeqnarray*}
+
+It turns out that initializing the bias terms $\Vector{b}$ to all zero is exactly okay, but
+initializing $\Matrix{W}$ to all zero causes a problem. So the problem with this formalization is
+that for any example you give it, you'll have that $a_1^{[1]} = a_2^{[2]}$, and then when you
+compute backpropagation, it turns out that $\text{d}z_1^{[1]} = \text{d}z_2^{[2]}$.
+
+If we initialize the neural network this way, the hidden unit $a_1^{[1]}$ and $a_2^{[1]}$ will be
+completely identical (symmetric). It turns out that after every single iteration of training, the
+two hidden units are still computing exactly the same function, both units have the same
+influence on the output unit. The $\text{d}\Matrix{W^{[1]}}$ and $\Matrix{W^{[1]}}$ will looks like
+as the following:
+\begin{IEEEeqnarray*}{rCl}
+    \text{d}\Matrix{W} = \left[\begin{array}{cc} u & v \\ u & v \end{array}\right] \qquad
+    \Matrix{W^{[1]}} = \Matrix{W^{[1]}} - \alpha \text{d}\Matrix{W} \qquad
+    \Matrix{W^{[1]}} = \left[\begin{array}{cc} r & s \\ r & s \end{array}\right]
+\end{IEEEeqnarray*}
+
+So in this case there is really no point to have more than one hidden unit, because all units are
+computing the same thing. However, that's not helpful, because you want different units compute
+different functions. The solution is to initialize the weights randomly:
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[1]}} = \text{np.random.randn((2, 2)) * 0.01} \qquad
+    \Vector{b^{[1]}} = \text{np.zero((2, 1))}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[2]}} = \text{np.random.randn((1, 2)) * 0.01} \qquad
+    \Vector{b^{[2]}} = \text{np.zero((1, 1))}
+\end{IEEEeqnarray*}
+
+Why we multiply a factor 0.01? That's because when we use the sigmoid or tanh activation function,
+if the weight is large, then the value input to the activation function will be large, so in that
+case the slope of the gradient is small and the gradient descent will be very slow.
 
 
 
