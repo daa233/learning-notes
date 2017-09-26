@@ -1298,6 +1298,266 @@ Why we multiply a factor 0.01? That's because when we use the sigmoid or tanh ac
 if the weight is large, then the value input to the activation function will be large, so in that
 case the slope of the gradient is small and the gradient descent will be very slow.
 
+\section{Deep Neural Networks}
+\subsection{Deep L-layer neural network}
+\paragraph{What is a deep neural network?}
+As Figure~\ref{fig:nn-examples} shows, logistic regresssion can be
+seen as one layer neural network. When we count the layers of the neural network, we don't count
+the input layer. Technically logistic regression is a quite shallow neural network, but over the
+last several years, the AI and machine learning community has realized that there are functions
+that very deep neural networks can learn while shallower are unable to.
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=45em]{figures/nn-examples}
+    \caption{Examples of neural networks}
+    \label{fig:nn-examples}
+\end{figure}
+
+\paragraph{Deep neural network notation}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=30em]{figures/four-layer-nn}
+    \caption{A 4-layer neural network}
+    \label{fig:four-layer-nn}
+\end{figure}
+
+Figure~\ref{fig:four-layer-nn} shows a 4-layer neural network, with the input layer as ``layer 0'',
+three hidden layers ``layer 1'', ``layer 2'' and ``layer 3'', the output layer as ``layer 4''.
+Some notations should be remembered as the following:
+\begin{description}
+    \item[$L$:] \# layers. In Figure~\ref{fig:four-layer-nn}, $L = 4$.
+    \item[$n^{[l]}$:] \# units in layer $l$. In this case, $n^{[1]} = 5, n^{[2]} = 5, n^{[3]} = 3,
+    n^{[4]} = n^{[L]} = 1, n^{[0]} = n_x = 3$.
+    \item[$\Vector{a}^{[l]}$:] activations in layer $l$. In propagation, we will implement
+    $\Vector{a}^{[l]} = g^{[1]}(\Vector{z}^{[l]})$. For single example,
+    $\Vector{a^{[0]}} = \Vector{x}$, $\Vector{a}^{[L]} = \Vector{\hat{y}}$
+    \item[$\Matrix{W}^{[l]}$:] weights for $\Vector{z}^{[l]}$.
+\end{description}
+
+\subsection{Forward Propagation in a Deep Network}
+We still look at the Figure~\ref{fig:four-layer-nn}, see the forward propagation in this neural
+network.
+\pagebreak[6]
+
+For every single example,
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[1]}} = \Matrix{W^{[1]}} \Vector{a^{[0]}} + \Vector{b^{[1]}}
+    = \Matrix{W^{[1]}} \Vector{x} + \Vector{b^{[1]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[1]}} = g^{[1]}(\Vector{z^{[1]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[2]}} = \Matrix{W^{[2]}} \Vector{a^{[1]}} + \Vector{b^{[2]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[2]}} = g^{[2]}(\Vector{z^{[2]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[3]}} = \Matrix{W^{[3]}} \Vector{a^{[2]}} + \Vector{b^{[3]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[3]}} = g^{[3]}(\Vector{z^{[3]}})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[4]}} = \Matrix{W^{[4]}} \Vector{a^{[3]}} + \Vector{b^{[4]}}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a^{[4]}} = g^{[4]}(\Vector{z^{[4]}}) = \Vector{\hat{y}}
+\end{IEEEeqnarray*}
+
+Then we can get the general rule for forward propagation:
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z}^{[l]} = \Matrix{W}^{[l]} \Vector{a}^{[l-1]} + \Vector{b}^{[l]}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{a}^{[l]} = g^{[l]}(\Vector{z^{[l]}})
+\end{IEEEeqnarray*}
+
+For the whole training set, in a vectorized way:
+\begin{multicols}{2}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{Z^{[1]}} = \Matrix{W^{[1]}} \Matrix{A^{[0]}}  + \Vector{b^{[1]}}
+        = \Matrix{W^{[1]}} \Matrix{X}  + \Vector{b^{[1]}}
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{A^{[1]}} = g^{[1]}(\Matrix{Z^{[1]}})
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{Z^{[2]}} = \Matrix{W^{[2]}} \Matrix{A^{[1]}}  + \Vector{b^{[2]}}
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{A^{[2]}} = g^{[2]}(\Matrix{Z^{[2]}})
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{Z^{[3]}} = \Matrix{W^{[3]}} \Matrix{A^{[2]}}  + \Vector{b^{[3]}}
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{A^{[3]}} = g^{[3]}(\Matrix{Z^{[3]}})
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{Z^{[4]}} = \Matrix{W^{[4]}} \Matrix{A^{[3]}}  + \Vector{b^{[4]}}
+    \end{IEEEeqnarray*}
+    \begin{IEEEeqnarray*}{rCl}
+        \Matrix{A^{[4]}} = g^{[4]}(\Matrix{Z^{[4]}}) = \Matrix{\hat{Y}}
+    \end{IEEEeqnarray*}
+    \columnbreak
+
+    We can put the left into a explicit for-loop:
+    \begin{algorithm}[H]
+        \For{$l = 1$ \KwTo 4}{
+        \begin{IEEEeqnarray*}{rCl}
+            \Matrix{Z^{[l]}} = \Matrix{W^{[l]}} \Matrix{A^{[l-1]}}  + \Vector{b^{[l]}}
+        \end{IEEEeqnarray*}
+        \begin{IEEEeqnarray*}{rCl}
+            \Matrix{A^{[l]}} = g^{[l]}(\Matrix{Z^{[l]}})
+        \end{IEEEeqnarray*}
+        }
+    \end{algorithm}
+\end{multicols}
+
+\subsection{Getting your matrix dimensions right}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=35em]{figures/five-layer-nn}
+    \caption{A 5-layer neural network}
+    \label{fig:five-layer-nn}
+\end{figure}
+
+In Figure~\ref{fig:five-layer-nn}, there is a five-layer neural network, with $n^{[0]} = n_x = 2$,
+$n^{[1]} = 3$, $n^{[2]} = 5$, $n^{[3]} = 4$, $n^{[4]} = 2$ and $n^{[5]} = 1$. The checking of the
+matrix dimensions can be seen as following.
+\paragraph{For every single example}
+\begin{IEEEeqnarray*}{rCl}
+    \underbrace{\Vector{z^{[1]}}}_{(n^{[1]}, 1) = (3, 1)}
+    = \underbrace{\underbrace{\Matrix{W^{[1]}}}_{(n^{[1]}, n^{[0]}) = (3, 2)}
+    \underbrace{\Vector{x}}_{(n^{[0]}, 1) = (2, 1)}}_{(3, 1)}
+    + \underbrace{\Vector{b^{[1]}}}_{(n^{[1]}, 1) = (3, 1)}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \underbrace{\Matrix{Z^{[2]}}}_{(n^{[2]}, 1) = (5, 1)}
+    = \underbrace{\Matrix{W^{[2]}}}_{(n^{[2]}, n^{[1]}) = (5, 3)}
+    \underbrace{\Vector{a^{[1]}}}_{(3, 1)} + \underbrace{\Vector{b^{[2]}}}_{(n^{[2]}, 1) = (5, 1)}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \ldots\ldots
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W^{[3]}} : (n^{[3]}, n^{[2]}) = (4, 5) \qquad
+    \Matrix{W^{[4]}} : (n^{[4]}, n^{[3]}) = (2, 4) \qquad
+    \Matrix{W^{[5]}} : (n^{[5]}, n^{[4]}) = (1, 2)
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z^{[3]}}, \Vector{a^{[3]}}, \Vector{b^{[3]}} : (n^{[3]}, 1) = (4, 1) \qquad
+    \Vector{z^{[4]}}, \Vector{a^{[4]}}, \Vector{b^{[4]}} : (n^{[4]}, 1) = (3, 1) \qquad
+    \Vector{z^{[5]}}, \Vector{a^{[5]}}, \Vector{b^{[5]}} : (n^{[5]}, 1) = (1, 1)
+\end{IEEEeqnarray*}
+
+The general formula to check is that when you're implementing the matrix $\Matrix{W}$ for layer
+$l$, the dimension of that matrix will be $(n^{[l]}, n^{[l-1]})$. And if you're implementing the
+back-propagation, the matrix d$\Matrix{W}$ will have the same dimension with $\Matrix{W}$, the
+vector d$\Vector{b}$ will have the same dimension with $\Vector{b}$. So for each single example,
+the formula is:
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W}^{[l]} : (n^{[l]}, n^{[l-1]}) \qquad \text{d}\Matrix{W}^{[l]} : (n^{[l]}, n^{[l-1]})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{z}^{[l]}, \Vector{a}^{[l]}, \Vector{b}^{[l]} : (n^{[l]}, 1) \qquad
+    \text{d}\Vector{z}^{[l]}, \text{d}\Vector{a}^{[l]}, \text{d}\Vector{b}^{[l]} : (n^{[l]}, 1)
+\end{IEEEeqnarray*}
+
+\paragraph{Vectorized implementation}
+\begin{IEEEeqnarray*}{rCl}
+    \underbrace{\Matrix{Z^{[1]}}}_{(n^{[1]}, m)}
+    = \underbrace{\underbrace{\Matrix{W^{[1]}}}_{(n^{[1]}, n^{[0]})}
+    \underbrace{\Matrix{X}}_{(n^{[0]}, m)}}_{(n^{[1]}, m)}
+    + \underbrace{\Vector{b^{[1]}}}_{(n^{[1]}, 1) \rightarrow (n^{[1]}, m)}
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \ldots\ldots
+\end{IEEEeqnarray*}
+
+Stack all $m$ training examples together, then we can get the vectorized version of the formula:
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{W}^{[l]} : (n^{[l]}, n^{[l-1]}) \qquad \text{d}\Matrix{W}^{[l]} : (n^{[l]}, n^{[l-1]})
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Vector{b}^{[l]} : (n^{[l]}, 1) \qquad
+    \text{d}\Vector{b}^{[l]} : (n^{[l]}, 1)
+\end{IEEEeqnarray*}
+\begin{IEEEeqnarray*}{rCl}
+    \Matrix{Z}^{[l]}, \Matrix{A}^{[l]} : (n^{[l]}, m) \qquad
+    \text{d}\Matrix{Z}^{[l]}, \text{d}\Matrix{A}^{[l]} : (n^{[l]}, m)
+\end{IEEEeqnarray*}
+
+\subsection{Why deep representations?}
+\subsubsection{Intuition about deep representation}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/dnn-intuition}
+    \caption{Intuition about deep representation}
+    \label{fig:dnn-intuition}
+\end{figure}
+
+Like Figure~\ref{fig:dnn-intuition} shows, if you are building a system for face recognition or
+face detectioin, here's what a deep neural network could be doing. Perhaps you input a picture of
+a face then the first layer of the neural network you can think of as maybe being a feature
+detector or an edge detector.
+
+In this example, there are about 20 units in the hidden layer. So the 20 hidden units are
+visualized by these little square boxes. So for example, this little visualization in the first
+hidden layer represents the hidden unit is trying to figure out where the edges of that orientation
+in the image.
+
+Now, let's think about where the edges in this picture by grouping together pixels to form edges.
+It can then detect the edges and group edges together to form parts of the faces. So for example,
+you might have a neuron trying to see if it's finding an eye, or a different neuron trying to find
+that part of the nose. So by putting together lots of edges, it can start to detect different parts
+of faces.
+
+Finally, by putting together different parts of faces, like an eye or a nose or an ear or a chin,
+it can try to recognize or detect different types of faces.
+
+So intuitively, you can think of the earlier layers of the neural network as detecting simple
+functions, like edges. And then composing them together in the later layers of a neural network so
+that it can learn more and more complex functions. These visualizations will make more sense when
+we talk about convolutional nets.
+
+\subsubsection{Circuit theory and deep learning}
+Informally: There are functions you can compute with a ``small'' (hidden units) L-layer deep neural
+network that shallower networks require exponentially more hidden units to compute.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/circuit-theory-and-dl}
+    \caption{Use deep neural networks and shallower neural networks to implement the XOR of $n$
+    input. For deep neural network (the left one), to compute the XOR, the depth of the network
+    will be on the order of $O(\log n)$, so the number of nodes, or the number of circuit
+    components or the number of gates in this neural network is not that large. But if you are
+    forced to compute the function with just one hidden layer, then in order to get the parity
+    of XOR to compute this XOR function, the size of this hidden layer will need to be exponentially
+    large ($2^{n-1}$), because essentially you need to exhaustively enumerate all 2 to the $n$ possible
+    configurations.}
+    \label{circuit-theory-and-dl}
+\end{figure}
+
+\subsection{Building blocks of deep neural networks}
+For the layer $l$ in the deep neural network:
+\begin{description}
+    \item[Parameters:] $\Matrix{W}^{[1]}$, $\Vector{b}^{[l]}$.
+    \item[Forward:] input: $\Vector{a}^{[l-1]}$; output: $\Vector{a}^{[l]}$;
+    cache: $\Vector{z^{[l-1]}}$. \\
+    $\Vector{z}^{[l]} = \Matrix{W}^{[l]} \Vector{a}^{[l-1]} + \Vector{b}^{[l]}$ \\
+    $\Vector{a}^{[l]} = g^{[l]}(\Vector{z}^{[l]})$
+    \item[Backward:] input: d$\Vector{a}^{[l]}$ (get from cache ($\Vector{z^{[l-1]}}$));
+    output: d$\Vector{a}^{[l-1]}$, d$\Matrix{W}^{[l]}$, d$\Vector{b}^{[l]}$;
+\end{description}
+
+The process above can be 
+
+
+
+
 
 
 
