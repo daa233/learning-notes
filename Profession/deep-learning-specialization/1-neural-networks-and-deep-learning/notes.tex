@@ -403,6 +403,8 @@ descent on m examples. It uses two for-loops, so it's less efficient than use ve
     \label{alg:lr_gradient_descent}
 \end{algorithm}
 
+\pagebreak[6]
+
 \subsection{Python and Vectorization}
 \subsubsection{Vectorization}
 \paragraph{What is vectorization?}
@@ -429,6 +431,7 @@ Non vectorized:
     z += b
 \end{minted}
 \columnbreak
+
 Vectorized:
 \begin{minted}{numpy}
     z = np.dot(w, x) + b
@@ -1299,7 +1302,7 @@ if the weight is large, then the value input to the activation function will be 
 case the slope of the gradient is small and the gradient descent will be very slow.
 
 \section{Deep Neural Networks}
-\subsection{Deep L-layer neural network}
+\subsection{Deep $L$-layer neural network}
 \paragraph{What is a deep neural network?}
 As Figure~\ref{fig:nn-examples} shows, logistic regresssion can be
 seen as one layer neural network. When we count the layers of the neural network, we don't count
@@ -1524,7 +1527,7 @@ that it can learn more and more complex functions. These visualizations will mak
 we talk about convolutional nets.
 
 \subsubsection{Circuit theory and deep learning}
-Informally: There are functions you can compute with a ``small'' (hidden units) L-layer deep neural
+Informally: There are functions you can compute with a ``small'' (hidden units) $L$-layer deep neural
 network that shallower networks require exponentially more hidden units to compute.
 
 \begin{figure}[htb]
@@ -1546,23 +1549,71 @@ For the layer $l$ in the deep neural network:
 \begin{description}
     \item[Parameters:] $\Matrix{W}^{[1]}$, $\Vector{b}^{[l]}$.
     \item[Forward:] input: $\Vector{a}^{[l-1]}$; output: $\Vector{a}^{[l]}$;
-    cache: $\Vector{z^{[l-1]}}$. \\
+    cache ($\Vector{z^{[l-1]}}$). \\
     $\Vector{z}^{[l]} = \Matrix{W}^{[l]} \Vector{a}^{[l-1]} + \Vector{b}^{[l]}$ \\
-    $\Vector{a}^{[l]} = g^{[l]}(\Vector{z}^{[l]})$
+    $\Vector{a}^{[l]} = g^{[l]}(\Vector{z}^{[l]})$ \\
+    Vectorized version: \\
+    $\Matrix{Z}^{[l]} = \Matrix{W}^{[l]} \Matrix{A}^{[l-1]} + \Vector{b}^{[l]}$ \\
+    $\Matrix{A}^{[l]} = g^{[l]}(\Matrix{Z}^{[l]})$
     \item[Backward:] input: d$\Vector{a}^{[l]}$ (get from cache ($\Vector{z^{[l-1]}}$));
-    output: d$\Vector{a}^{[l-1]}$, d$\Matrix{W}^{[l]}$, d$\Vector{b}^{[l]}$;
+    output: d$\Vector{a}^{[l-1]}$, d$\Matrix{W}^{[l]}$, d$\Vector{b}^{[l]}$; \\
+    d$\Vector{z}^{[l]} = \text{d}\Vector{a}^{[l]} * {g^{[l]}}'(\Vector{z}^{[l]})$ \\
+    d$\Matrix{W}^{[l]} = \text{d}\Vector{z}^{[l]} \Vector{a}^{[l-1]}$ \\
+    d$\Vector{b}^{[l]} = \text{d}\Vector{z}^{[l]}$ \\
+    d$\Vector{a}^{[l-1]} = {\Matrix{W}^{[l]}}^T \text{d}\Vector{z}^{[l]}$ \\
+    Vectorized version: \\
+    d$\Matrix{Z}^{[l]} = \text{d}\Matrix{A}^{[l]} * {g^{[l]}}'(\Matrix{Z}^{[l]})$ \\
+    d$\Matrix{W}^{[l]} = \frac{1}{m} \text{d}\Matrix{Z}^{[l]} {\Matrix{A}^{[l-1]}}^T$ \\
+    d$\Vector{b}^{[l]}
+        = \frac{1}{m} \text{np.sum(d} \Matrix{Z}^{[l]} \text{, axis=1, keepdims=True)}$ \\
+    d$\Matrix{A}^{[l-1]} = {\Matrix{W}^{[l]}}^T \text{d}\Matrix{Z}^{[l]}$
 \end{description}
 
-The process above can be 
+The process above can be concluded as a block in Figure~\ref{fig:dnn-block}.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/dnn-block}
+    \caption{A block of forward and backward process in a deep Neural network}
+    \label{fig:dnn-block}
+\end{figure}
 
+\subsection{Parameters vs Hyperparameters}
+\subsubsection{What are hyperparameters?}
+\begin{description}
+    \item[Paramters:] $\Matrix{W^{[1]}}$, $\Vector{b^{[1]}}$, $\Matrix{W^{[2]}}$,
+    $\Vector{b^{[2]}}$, $\Matrix{W^{[3]}}$, $\Vector{b^{[3]}}$ \ldots
+    \item[Hyperparameters:] learning rate $\alpha$; \# iterations; \# hidden layer $L$;
+    \# hidden units $n^{[1]}$, $n^{[2]}$, \ldots; choice of activation function.
+\end{description}
 
+Hyperparamters are parameters that control parameters $\Matrix{W}$ and $\Vector{b}$. In later
+course, we will learn other hyperparameters such as momentum, mini-batch size and regularization
+parameters.
 
+\subsubsection{Applied deep learning is a very empirical process}
+Applied deep learning today is a very empirical process. For example, in
+Figure~\ref{fig:hyperparameters} you have an idea that set $\alpha = 0.01$, then you implement it,
+try out and see how that works, and then based on the outcome you might say you know that I have
+changed my mind, then you do the process again to try $\alpha = 0.05$. You might plot the cost $J$
+of the number of iterations to see which is the best learning rate.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/hyperparameters}
+    \caption{The process of try different hyperparamters in a deep Neural network}
+    \label{fig:hyperparameters}
+\end{figure}
 
+The `empirical process' in the title means that you have to try a lit if things and see what works.
+When starting on a new problem, just try out a range of values and see what works. In the next
+course, we'll see some systematic ways for trying out a range of values of hyperprameters.
 
-
-
+Secondly, if you're working on one application for a long time, maybe you're working on online
+advertising as you make progress on the problem is quite possible there the best value for the
+learning rate, a number of hidden units and so on might change, even if you tune your system to
+the best value of hyperparameters today, it's possible that you find taht the best value might
+change year from now.
 
 
 \end{document}
