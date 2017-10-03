@@ -293,7 +293,7 @@ find the parameters $\Vector{w}$ and $b$ that minimize the overall cost function
 \end{figure}
 
 \begin{algorithm}[htb]
-\Repeat{iteration = MaxIteration}{
+\Repeat{converge}{
         $\displaystyle{\Vector{w} := \Vector{w}
         - \alpha \frac{\partial J(\Vector{w}, b)}{\partial \Vector{w}}}$ \\
         $\displaystyle{b := b - \alpha \frac{\partial J(\Vector{w}, b)}{\partial b}}$
@@ -878,7 +878,7 @@ Non-vectorized:
 \begin{algorithm}[htb]
     \For{$i = 1$ \KwTo $m$}{
         $\Vector{z^{[1](i)}} = \Matrix{W^{[1]}}\Vector{x^{(i)}} + \Vector{b^{[1]}}$ \\
-        $\Vector{a^{[1](i)}} = \sigma(\Vector{z^{[1](1)}})$ \\
+        $\Vector{a^{[1](i)}} = \sigma(\Vector{z^{[1](i)}})$ \\
         $\Vector{z^{[2](1)}} = \Matrix{W^{[2]}}\Vector{a^{[1](i)}} + \Vector{b^{[2]}}$ \\
         $\Vector{a^{[2](i)}} = \sigma(\Vector{z^{[2](i)}})$
     }
@@ -1004,11 +1004,11 @@ i-th layer's activation function of a neural network.
 \end{figure}
 
 \begin{itemize}
-    \item One of downside of both the sigmoid and tanh activation function is that if $z$ is either
+    \item One of the downside of both the sigmoid and tanh activation function is that if $z$ is either
     very large or very small, then the gradient (derivative, slope) of the function becomes very
     small, this slows down the gradient descent.
     \item Never use sigmoid activation function, except for the output layer if you are doing
-    binary classification. Tanh is prety superior than sigmoid.
+    binary classification. Tanh is pretty superior than sigmoid.
     \item If you don't have an idea to choose which activation function, choose ReLU as the default
     activation function, or you can try Leaky ReLU.
 \end{itemize}
@@ -1039,9 +1039,9 @@ Given $\Vector{x}$:
 
 If you use linear activation function as the activation function of your neural network, then the
 neural network is just outputting a linear function of the input. It turns out that if you use a
-linear function or alternatively if you don't have an activation function, then no matter how many
-layers your neural network has always doing is just computing a linear activation function, so you
-might as well not have any hidden layers.
+linear activation function or alternatively if you don't have an activation function, then no
+matter how many layers your neural network has always doing is just computing a linear activation
+function, so you might as well not have any hidden layers.
 
 \subsection{Derivatives of activation functions}
 \subsubsection{Sigmoid activation function}
@@ -1095,9 +1095,9 @@ might as well not have any hidden layers.
 \end{IEEEeqnarray*}
 
 \subsection{Gradient descent for Neural Networks}
-Parameters: $n_x = n^{[0]}$, $n^{[1]}$, $n^{[2]} = 1$,
+Parameters: $n^{[0]} = n_x$, $n^{[1]}$, $n^{[2]} = 1$,
 $\underbrace{\Matrix{W^{[1]}}}_{(n^{[1]}, n^{[0]})}$,
-$\underbrace{\Vector{b^{[1]}}}_{(n^{[2]}, n^{[1]})}$,
+$\underbrace{\Vector{b^{[1]}}}_{(n^{[1]}, 1)}$,
 $\underbrace{\Matrix{W^{[2]}}}_{(n^{[2]}, n^{[1]})}$,
 $\underbrace{\Vector{b^{[2]}}}_{(n^{[2]}, 1)}$
 
@@ -1121,7 +1121,7 @@ Cost Function:
     = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}, y)
 \end{IEEEeqnarray*}
 \begin{algorithm}[htb]
-    \Repeat{iteration = MaxIteration}{
+    \Repeat{converge}{
         \tcp{Forward propagation}
         $\Matrix{Z^{[1]}} = \Matrix{W^{[1]}}\Matrix{X} + \Vector{b^{[1]}}$ \\
         $\Matrix{A^{[1]}} = g^{[1]}(\Matrix{Z^{[1]}})$ \\
@@ -1136,7 +1136,8 @@ Cost Function:
         \tcp{here $*$ means element-wise multiplication}
         $\text{d}\Matrix{Z^{[1]}}
         = \Matrix{W^{[2]}}^T \text{d}\Matrix{Z^{[2]}} * g^{[1]'}(\Matrix{Z^{[1]}})$ \\
-        $\text{d}\Matrix{W^{[1]}} = \frac{1}{m} \text{d}\Matrix{Z^{[1]}}\Matrix{X}^T$ \\
+        $\text{d}\Matrix{W^{[1]}} = \frac{1}{m} \text{d}\Matrix{Z^{[1]}}\Matrix{A^{[0]}}^T
+        = \frac{1}{m} \text{d}\Matrix{Z^{[1]}}\Matrix{X}^T$ \\
         $\text{d}\Vector{b}^{[1]}
         = \frac{1}{m} \text{np.sum(d}\Matrix{Z^{[1]}}\text{, axis=1, keepdims=True)}$
     }
@@ -1150,7 +1151,7 @@ logistic regression. By the chain rule, we can get:
     \text{If } a = g(z), \text{then d}z = \text{d}a \cdot g'(z)
 \end{IEEEeqnarray*}
 
-Logistic regression can be seen as a neural network with only one layers (exclude input layer),
+Logistic regression can be seen as a neural network with only one layer (exclude input layer),
 while the neural network in Figure~\ref{fig:shallow-nn} and Figure~\ref{fig:nn-representation}
 contains two layers. To compute the derivatives for each single example, we can also use
 backpropagation and the chain rule.
@@ -1162,11 +1163,12 @@ $\text{d}a^{[2]}$:
     + \frac{1-y}{1-a^{[2]}}
 \end{IEEEeqnarray*}
 
-Then, according to the chain rule, we can compute $\text{d}{z^{[2]}}$:
+Then, $a^{[2]} = g^{[2]}(z^{[2]}) = \sigma(z^{[2]})$, according to the chain rule, we can compute
+$\text{d}z^{[2]}$:
 \begin{IEEEeqnarray*}{rCl}
     \text{d}z^{[2]} = \frac{\text{d}\Cal{L}}{\text{d}a^{[2]}}\frac{\text{d}a^{[2]}}{\text{d}z^{[2]}}
     = \frac{\text{d}\Cal{L}}{\text{d}a^{[2]}} {g^{[2]}}'(z^{[2]})
-    = (-\frac{y}{a^{[2]}} + \frac{1-y}{1-a^{[2]}}) [z^{[2]} (1-z^{[2]})] = a^{[2]} - y
+    = (-\frac{y}{a^{[2]}} + \frac{1-y}{1-a^{[2]}}) [a^{[2]} (1-a^{[2]})] = a^{[2]} - y
 \end{IEEEeqnarray*}
 
 Because $z^{[2]} = \Vector{W^{[2]}}\Vector{a^{[1]}} + b^{[2]}$, once we get
@@ -1260,7 +1262,7 @@ intialized weights and parameters to all 0 and then apply gradient descent, it w
 \end{figure}
 
 As the Figure~\ref{fig:randomly-init} shows, there is a shallow neural network with two input
-features, two hidden units and one output unit. Then we initialized all the weights and parameters
+features, two hidden units and one output unit. Then we initialize all the weights and parameters
 to zero:
 \begin{IEEEeqnarray*}{rCl}
     \Matrix{W^{[1]}} = \left[\begin{array}{cc} 0 & 0 \\ 0 & 0 \end{array}\right] \qquad
@@ -1274,7 +1276,7 @@ initializing $\Matrix{W}$ to all zero causes a problem. So the problem with this
 that for any example you give it, you'll have that $a_1^{[1]} = a_2^{[2]}$, and then when you
 compute backpropagation, it turns out that $\text{d}z_1^{[1]} = \text{d}z_2^{[2]}$.
 
-If we initialize the neural network this way, the hidden unit $a_1^{[1]}$ and $a_2^{[1]}$ will be
+If we initialize the neural network this way, the hidden units $a_1^{[1]}$ and $a_2^{[1]}$ will be
 completely identical (symmetric). It turns out that after every single iteration of training, the
 two hidden units are still computing exactly the same function, both units have the same
 influence on the output unit. The $\text{d}\Matrix{W^{[1]}}$ and $\Matrix{W^{[1]}}$ will looks like
@@ -1289,12 +1291,12 @@ So in this case there is really no point to have more than one hidden unit, beca
 computing the same thing. However, that's not helpful, because you want different units compute
 different functions. The solution is to initialize the weights randomly:
 \begin{IEEEeqnarray*}{rCl}
-    \Matrix{W^{[1]}} = \text{np.random.randn((2, 2)) * 0.01} \qquad
-    \Vector{b^{[1]}} = \text{np.zero((2, 1))}
+    \Matrix{W^{[1]}} = \text{np.random.randn(2, 2) * 0.01} \qquad
+    \Vector{b^{[1]}} = \text{np.zeros((2, 1))}
 \end{IEEEeqnarray*}
 \begin{IEEEeqnarray*}{rCl}
-    \Matrix{W^{[2]}} = \text{np.random.randn((1, 2)) * 0.01} \qquad
-    \Vector{b^{[2]}} = \text{np.zero((1, 1))}
+    \Matrix{W^{[2]}} = \text{np.random.randn(1, 2) * 0.01} \qquad
+    \Vector{b^{[2]}} = \text{np.zeros((1, 1))}
 \end{IEEEeqnarray*}
 
 Why we multiply a factor 0.01? That's because when we use the sigmoid or tanh activation function,
@@ -1332,7 +1334,7 @@ Some notations should be remembered as the following:
     \item[$n^{[l]}$:] \# units in layer $l$. In this case, $n^{[1]} = 5, n^{[2]} = 5, n^{[3]} = 3,
     n^{[4]} = n^{[L]} = 1, n^{[0]} = n_x = 3$.
     \item[$\Vector{a}^{[l]}$:] activations in layer $l$. In propagation, we will implement
-    $\Vector{a}^{[l]} = g^{[1]}(\Vector{z}^{[l]})$. For single example,
+    $\Vector{a}^{[l]} = g^{[l]}(\Vector{z}^{[l]})$. For single example,
     $\Vector{a^{[0]}} = \Vector{x}$, $\Vector{a}^{[L]} = \Vector{\hat{y}}$
     \item[$\Matrix{W}^{[l]}$:] weights for $\Vector{z}^{[l]}$.
 \end{description}
@@ -1406,7 +1408,7 @@ For the whole training set, in a vectorized way:
     \end{IEEEeqnarray*}
     \columnbreak
 
-    We can put the left into a explicit for-loop:
+    We can put the left into an explicit for-loop:
     \begin{algorithm}[H]
         \For{$l = 1$ \KwTo 4}{
         \begin{IEEEeqnarray*}{rCl}
@@ -1547,15 +1549,15 @@ network that shallower networks require exponentially more hidden units to compu
 \subsection{Building blocks of deep neural networks}
 For the layer $l$ in the deep neural network:
 \begin{description}
-    \item[Parameters:] $\Matrix{W}^{[1]}$, $\Vector{b}^{[l]}$.
+    \item[Parameters:] $\Matrix{W}^{[l]}$, $\Vector{b}^{[l]}$.
     \item[Forward:] input: $\Vector{a}^{[l-1]}$; output: $\Vector{a}^{[l]}$;
-    cache ($\Vector{z^{[l-1]}}$). \\
+    cache ($\Vector{z^{[l]}}$). \\
     $\Vector{z}^{[l]} = \Matrix{W}^{[l]} \Vector{a}^{[l-1]} + \Vector{b}^{[l]}$ \\
     $\Vector{a}^{[l]} = g^{[l]}(\Vector{z}^{[l]})$ \\
     Vectorized version: \\
     $\Matrix{Z}^{[l]} = \Matrix{W}^{[l]} \Matrix{A}^{[l-1]} + \Vector{b}^{[l]}$ \\
     $\Matrix{A}^{[l]} = g^{[l]}(\Matrix{Z}^{[l]})$
-    \item[Backward:] input: d$\Vector{a}^{[l]}$ (get from cache ($\Vector{z^{[l-1]}}$));
+    \item[Backward:] input: d$\Vector{a}^{[l]}$ (get from cache ($\Vector{z^{[l]}}$));
     output: d$\Vector{a}^{[l-1]}$, d$\Matrix{W}^{[l]}$, d$\Vector{b}^{[l]}$; \\
     d$\Vector{z}^{[l]} = \text{d}\Vector{a}^{[l]} * {g^{[l]}}'(\Vector{z}^{[l]})$ \\
     d$\Matrix{W}^{[l]} = \text{d}\Vector{z}^{[l]} \Vector{a}^{[l-1]}$ \\
