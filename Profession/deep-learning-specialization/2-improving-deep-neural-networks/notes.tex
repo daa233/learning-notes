@@ -219,6 +219,81 @@ $L_2$ norm sometimes is called ``weight decay'', that's because
 - \frac{\alpha}{m} \text{d}\Matrix{Z}^{[l]}{\Matrix{A}^{[l-1]}}^T
 \end{IEEEeqnarray*}
 
+\subsubsection{Why regularization reduces overfitting?}
+\paragraph{Intuition 1}
+$$ J(\Matrix{W^{[1]}}, \Vector{b^{[1]}}, \ldots, \Matrix{W}^{[L]}, \Vector{b}^{[L]})
+= \frac{1}{m} \sum_{i=1}^{m} \Cal{L}(\hat{\Vector{y}}^{(i)}, \Vector{y}^{(i)})
++ \frac{\lambda}{2m} \sum_{l=1}^L ||\Matrix{W}^{[l]}||_F^2 $$
+
+What we did for regularization was adding extra term $\lambda$ to penalize the weight matricies
+$\Matrix{W}^{[l]}$ from being too large. So why is it that shrinking the $L_2$ norm or the
+Frobenius norm might cause less overfitting? One piece of intuition is that if you crank
+regularization lambda to be really, really big, they'll be really incentivized to set the weight
+matricies $\Matrix{W}^{[l]}$ to be reasonably close to zero. So one piece of intuition is maybe it
+set the weight to be so close to zero for a lot of hidden units that's basically zeroing out a lot
+of the impact of these hidden units. And if that's the case, then this much simplified neural
+network becomes a much smaller neural network. In fact, it is almost like logistic regression
+units, but stacked most probably as deep. And so that will take you from this overfitting case much
+closer to the left to other high bias case, just like Figure~\ref{fig:regularization-intuition-1}.
+But hopefully there'll be an intermediate value of lambda that results in a result closer to this
+just right case in the middle.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/regularization-intuition-1}
+    \caption{A intuition of regularization: big $\lambda$ penalizes weights to almost zeros, make
+    it a simpler network}
+    \label{fig:regularization-intuition-1}
+\end{figure}
+
+\paragraph{Intuition 2}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/regularization-intuition-2}
+    \caption{A intuition of regularization: big $\lambda$ penalizes weights $\Matrix{W}^{[l]}$
+    smaller, then $\Matrix{Z}^{[l]}$ will be smaller and will fall on the linear part of tanh
+    activation function}
+    \label{fig:regularization-intuition-2}
+\end{figure}
+
+In Figure~\ref{fig:regularization-intuition-2}, there is another attempt at additional intuition
+for why regularization helps prevent overfitting. And for this, We assume taht we're using the tanh
+activation function which looks like this. So if that's the case, if the regularization parameter
+$\lambda$ is large, then your parameters $\Matrix{W}^{[l]}$ will be relatively small, then
+$\Matrix{Z}^{[l]}$ will be relatively small. And in particular, if $\Matrix{Z}^{[l]}$ ends up
+taking relative small values, then $g(\Matrix{Z}^{[l]})$ will be roughly linear. So it's as if
+every layer will be roughly linear. We saw in course one that if every layer is linear then your
+whole network is just a linear network, as if it is just linear regression. So even a very deep
+network, in this case, it will compute something not far from a big linear function which is
+therefore pretty simple function rather than a very complex highly non-linear function. And so it
+is much less able to overfit.
+
+\subsubsection{Dropout Regularization}
+In addition to $L_2$ regularization, another very powerful regularization techniques is called
+``dropout''.
+
+Like Figrure~\ref{fig:dropout} shows, with dropout, what we're going to do is go through each of
+the layers of the network and set some probability of eliminating a node in neural network. So you
+end up with a much smaller, really much diminished network. On different examples, you would toss a
+set of coins again and keep a different set of nodes and then dropout or eliminate different set of
+nodes. So for each example, you would train it using one of these neural reduced networks.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/dropout-orig}
+    \includegraphics[width=20em]{figures/dropout-zero-out}
+    \caption{Dropout}
+    \label{fig:dropout}
+\end{figure}
+
+
+
+
+
+
+
+
+
 
 
 
