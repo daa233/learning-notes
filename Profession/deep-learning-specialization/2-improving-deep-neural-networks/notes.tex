@@ -286,10 +286,80 @@ nodes. So for each example, you would train it using one of these neural reduced
     \label{fig:dropout}
 \end{figure}
 
+\paragraph{Implementing dropout (``Inverted dropout'')}
+For the sake of completeness, let's say we want to illustrate this with layer $l=3$. What we are
+going to do is set a vector \texttt{d3}, which is going to be the dropout vector for the
+layer 3.
+\begin{minted}{numpy}
+    keep_prob = 0.8  # the probability of keeping each unit
 
+    d3 = np.randm.rand(a3.shape[0], a3.shape[1]) < keep_prob
+    a3 = np.multiply(a3, d3)  # a3 * d3, element-wise multiplication
+    a3 /= keep_prob  # inverted dropout
+\end{minted}
 
+\paragraph{Making predictions at test time}
+Don't use dropout at test time. That's because when you are making predictions at the test time,
+you don't really want your output to be random. If you are implementing dropout at test time, that
+just add noise to your predictions. In theory, one thing you could do is run a prediction process
+many times with different hidden units randomly dropped out and have it across them. But that's
+computationally inefficient and will give you roughly the same result.
 
+And just to mention, the inverted dropout thing, you remember the step on the previous line when we
+divided by the \texttt{keep\_prob}. The effect of that was to ensure that even when you don't
+implement dropout at test time to the scaling, the expected value of the activations don't change.
+So you don't need to add an extra funny scaling parameter at test time.
 
+\subsubsection{Understanding dropout}
+Intuition: Can't rely on any one feature, so have to spread out weights. And by spreading norm of
+the weights, this will tend to have an effect of shrinking the squared norm of the weights. And so,
+similar to what we saw with $L_2$ regularization, the effect of implementing dropout is that it
+shrinks the weights and does similar to $L_2$ regularization that helps prevent overfitting.
+But it turns out that dropout can formally be shown to be an adaptive form without a regularization,
+while $L_2$ penalty on different weights are different, depending on the size of the activations
+being multiplied that way.
+
+It is also feasible to vary \texttt{keep\_prob} by layer. The \texttt{keep\_prob} of $1.0$ means
+that you're keeping every unit and so you're really not using dropout for that layer. But for
+layers where you're more worried about overfitting, really the layers with a lot of parameters, you
+can set the \texttt{keep\_prob} to be smaller to apply a more powerful form of dropout.
+
+And technicall, you can also apply droput to the input layer, where you can have some chance of
+just maxing out one or more of the input features. Although in practice, usually don't do that that
+often. And so, a \texttt{keep\_prob} of $1.0$ was quite common for the input layer.
+
+One downside of dropout is, this gives you even more hyperparameters to search for using
+cross-validation. One other alternative might be to have some layers where you apply dropout and
+some layers where don't apply dropout, and then you just have one hyperparameter, which is a
+\texttt{keep\_prob} for the layers for which you do apply dropouts.
+
+Many of the first successful implementations of dropout were to computer vision, and it is
+frequently used by computer vision. But the really thing to remember is that dropout is a
+regularization technique, it helps prevent overfitting, don't use it unless your algorithm is
+overfitting.
+
+Another big downside of dropout is that the cost function $J$ is no longer well-defined. On every
+iteration, you are randomly killing off a bunch of nodes. And so, if you are double checking the
+performance of gradient descent, it will be harder to double check that because the cost function
+$J$ is less well-defined or is certainly hard to calculate. So we lose the debugging tool to plot
+the graph $J$ of the number of iterations. We can turn off dropout (set \texttt{keep\_prob} equals
+$1.0$) at first, and run the code to make sure that it is monotonically decresing $J$. Then turn on
+dropout and use other ways, but not plotting the figures, to make sure that our code is working,
+the gradient descent is working even with dropout.
+
+\subsubsection{Other regularization methods}
+\paragraph{Data augmentation}
+Let's say you are fitting a cat classifier. If you are overfitting, getting more data can help, but
+getting more training data can be expensive and sometimes you just can't get more data. Then like
+Figure~\ref{fig:data-augmentation} shows, we can use data augmentation by using flipping, random
+cropping, distortion, etc. to get more training data.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/data-augmentation}
+    \caption{Data augmentation}
+    \label{fig:data-augmentation}
+\end{figure}
 
 
 
