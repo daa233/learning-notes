@@ -122,7 +122,7 @@ select ways to improve your algorithm.
     \centering
     \includegraphics[width=40em]{figures/bias-and-variance-2}
     \caption{Bias or Variance showed by training set error and dev set error. It is related to the
-    optimal error (base error), which is determined by the common practices and our expectation.}
+    optimal error (Bayes error), which is determined by the common practices and our expectation.}
 \end{figure}
 
 \begin{figure}[htb]
@@ -361,11 +361,137 @@ cropping, distortion, etc. to get more training data.
     \label{fig:data-augmentation}
 \end{figure}
 
+\paragraph{Early stopping}
+Just like Figure~\ref{fig:early-stopping} shows, what you are going to do is as you run gradient
+descent you are going to plot the training error or $J$, and plot the dev set error. Now what you
+find isi that your dev set error will usually go down for a while, and then it wil increase from
+there. So what early stopping does is, stop training on your neural network halfway on that
+iteration.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/early-stopping}
+    \caption{Early stopping}
+    \label{fig:early-stopping}
+\end{figure}
 
+Why dose this work? When you haven't run many iterations for your neural networks yet, your
+parameters $\Matrix{W}$ will be close to zero, because with random initialization you
+probably initialize $\Matrix{W}$ to small random values. And as you iterate, as you train,
+$\Matrix{W}$ will get bigger and bigger until you end, then you have a larger $\Matrix{W}$ at last.
+So what early stopping does is, by stopping halfway, you have only a mid-size rate $\Matrix{W}$.
+And so similar to $L_2$ regularization by picking a neural network with smaller norm for your
+parameters $\Matrix{W}$, hopefully your neural network is overfitting less.
 
+We can think of machine learning process as comprising several different steps:
+\begin{enumerate}
+    \item Optimize cost function $J$. (Gradient descent, etc.)
+    \label{step:machine-learning-step-one}
+    \item Not overfitting. (Regularization, dropout, etc.)
+    \label{step:machine-learning-step-two}
+\end{enumerate}
 
+When we have a set of tools for optimizing the cost function $J$, and when you are focusing on
+optimizing the cost function $J$, all you care about is finding $\Matrix{W}$ and $\Vector{b}$, so
+that $J(\Matrix{W}, \Vector{b})$ is as small as possible. You just don't think about anything else
+than Step~\ref{step:machine-learning-step-one}. Then it's completely separate task to not
+overfit, in other words, to reduce variance. And when you're doing that, you have a separate set of
+tools for doing it. This principle is sometimes called orthogonalization.
 
+The main downside of early stopping is that it couples the above two tasks, so you no longer can
+work on these two problems independently. Becaues by stopping gradient descent early, you're sort
+of breaking whatever you're doing to optimize cost function $J$. That means when you are optimizing
+cost function $J$, you are trying to not overfit simultaneously. So instead of using different
+tools to solve the two problems, you are using one that kind of mixes the two, and this just makes
+the set of things you could try more complicated to think about.
+
+Rather than using early stopping, one alternative is just use $L_2$ regularization, then you can
+just train the neural network as long as possible. You can find this makes the search space of
+hyperparameters easier to decompose and easier to search over. But the downsid of this though is
+that you might have to try a lot of values of the regularization parameter $\lambda$, which is more
+computationally expensive.
+
+The advantage of early stopping is that running the gradient descent process just once, you get to
+try out values of small $\Matrix{W}$, mid-size $\Matrix{W}$ and large $\Matrix{W}$, without needing
+to try a lot of values of the $L_2$ regularization hyperparameter $\lambda$.
+
+\subsection{Setting up your optimization problem}
+\subsubsection{Normalizing inputs}
+\paragraph{Normalizing training sets}
+
+When training a neural network, one of the techniques that will speed up your training is if you
+normalize your inputs.
+
+Normalizing your inputs correspondes to two steps:
+\begin{enumerate}
+    \item Subtract out (zero out) the mean
+    $$ \mu = \frac{1}{m} \sum_{i=1}^m x^{(i)} $$
+    $$ x := x - \mu $$
+    \item Normalize the variances
+    $$ \sigma = \frac{1}{m} \sum_{i=1}^m {x^{(i)}}^2 \quad \text{(element-wise square)}$$
+    $$ x :=  x / \sigma^2 $$
+\end{enumerate}
+
+Use the same $\mu$ and $\sigma^2$ to normalize test sets.
+
+\paragraph{Why normalize inputs?}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/normalization}
+    \caption{Unnormalized features vs. Normalized features}
+    \label{fig:normalization}
+\end{figure}
+
+Recall the cost function $J$:
+$$ J(\Matrix{W}, \Vector{b}) = \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{y}^{(i)}, y^{(i)}) $$
+
+If you use unnormalized input features, it's more likely your cost function will look like the left
+one in Figure~\ref{fig:normalization}. And if you're running gradient descent on the cost function
+like the one on the left, then you might have to use a very small learning rate. Whereas if you
+have a more spherical contours, then wherever you start, gradient descent can pretty much go
+straight to the minimum. You can take much larger steps with gradient descent rather needing to
+oscillate around like the picture on the left.
+
+Of course in practice $W$ is a high-dimensional vector and so try to plot this in 2D doesn't convey
+all the intuitions correctly. But the rough intuition that your cost function will be more round
+and easier to optimize when your features are all on similar scales.
+
+\subsubsection{Vanishing/Exploding gradients}
+One of the problems of training a neural network, especially very deep neural networks, is that
+vanishing and exploding gradients. What that means is that when you're training a very deep network
+your derivatives or your slopes can sometimes get either very big or very small, maybe even
+exponentially small and this makes training difficult.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/vanishing-exploding-gradients}
+    \caption{Vanishing/explosing gradients}
+    \label{fig:vanishing-exploding-gradients}
+\end{figure}
+
+In Figure~\ref{fig:vanishing-exploding-gradients}, there is a deep neural network with only two
+units in each hidden layer. We have $\Matrix{W}^{[1]}, \Matrix{W}^{[2]}, \ldots, \Matrix{W}^{[L]}$
+parameters in this example, and we set $g^{[l]}(z) = z$, which means a linear activation function,
+and with $\Vector{b}^{[l]} = 0$. Then the output $\hat{y}$ can be calculated as following:
+\begin{IEEEeqnarray*}{rCl}
+    \hat{y} = \Matrix{W}^{[L]} \Matrix{W}^{[L-1]} \cdots \Matrix{W}^{[2]} \Matrix{W}^{[1]}
+    \Vector{x}
+\end{IEEEeqnarray*}
+
+Now, let's say that each of your weight matrices
+$\Matrix{W}^{[l]} = \left[\begin{array}{cc} 1.5 & 0 \\ 0 & 1.5 \end{array}\right]$
+(excluded $\Matrix{W}^{[L]}$), then
+$\hat{y} = \Matrix{W}^{[L]} \left[\begin{array}{cc} 1.5 & 0 \\ 0 & 1.5 \end{array}\right]^{L-1}
+\Vector{x}$, so $\hat{y}$ will be like $1.5^{L-1} \Vector{x}$. If $L$ is very large, $\hat{y}$ will
+be exploded.
+
+Conversely, If we replace 1.5 with 0.5, which is less than 1, then $\hat{y}$ becomes to
+$0.5^{L-1} \Vector{x}$. So if $L$ is large, the activation values will decrease exponentially.
+
+To conclude, with a very deep network, if $\Matrix{W}^{[l]} > I$, then the activations can explode;
+and if $\Matrix{W}^{[l]} < I$, then the activations may decrease exponentially. Similarly, the
+derivatives or the gradients will also increase exponentially or decrease exponentially.
 
 
 
