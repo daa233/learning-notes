@@ -1,7 +1,7 @@
 /**
  * C语言中的运算成分 逻辑运算应用练习 综合练习（2）#5：自整除数
  *
- * @file: DivisibleBySelfSum.cpp
+ * @file: DivisibleBySelf.cpp
  * @description: 对一个整数n,如果其各个位数的数字相加得到的数m能整除n,则称n为自整除数.例如21,21%(2+1)==0,所以21是自
                 整除数.现求出从10到n(n < 100)之间的所有自整除数.
  * @input: 有一行,整数n,(10 <= n < 100)
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 {
     int n;
     cin >> n;
-    for (int i = 10; i < n; i++) {
+    for (int i = 10; i <= n; i++) {
         int dec = i / 10;           // 十位的数字
         int unit = i - 10 * dec;    // 个位的数字
         int sum = dec + unit;       // 个位和十位之和
@@ -42,6 +42,6 @@ int main(int argc, char *argv[])
             cout << i << endl;      // 如果i能被它的各个数位之和整除，则i是自整除数
         }
     }
-    
+
     return 0;
 }
