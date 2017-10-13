@@ -493,6 +493,131 @@ To conclude, with a very deep network, if $\Matrix{W}^{[l]} > I$, then the activ
 and if $\Matrix{W}^{[l]} < I$, then the activations may decrease exponentially. Similarly, the
 derivatives or the gradients will also increase exponentially or decrease exponentially.
 
+\subsubsection{Weights Initialization for Deep Networks}
+A partial solution to vanishing/exploding of deep networks is more careful choice of the random
+initialization of your neural newwork. To understand this, let's start with the example of
+initializing the weights for a single neuron in
+Figure~\ref{fig:random-initialization-for-single-neuron}, and then we're going to generalize this
+to a deep network.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/random-initialization-for-single-neuron}
+    \caption{Random initialization for single neuron}
+    \label{fig:random-initialization-for-single-neuron}
+\end{figure}
+
+We can get
+$$ z = w_1 x_1 + w_2 x_2 + \cdots + w_n x_n \quad \text{(ignore b here)} $$
+With a large $n$, in order to make $z$ not blow up and not become too small, we need a smaller
+$w_i$ for each adding item. One reasonable thing to do would be to set the variance of $w_i$ to be
+equal to $\frac{1}{n}$, i.e.
+$$ \text{Var}(w:) = \frac{1}{n} $$
+where $n$ is the number of input features that's going into a neuron. So in
+practice, what you can do is set the weight matrix $\Matrix{W}$ for a certain layer to be
+$$\Matrix{W}^{[l]} = \text{np.random.randn(shape)} * \text{np.sqrt(} \frac{1}{n^{[l-1]}} \text{)}$$
+
+It turns out that if you are using a ReLU activation function $g^{[l]} = \text{ReLU}(z)$, rather
+than $\frac{1}{n}$, set the variance $\frac{2}{n}$ works a little better
+$$ \text{Var}(w:) = \frac{1}{n} $$
+$$\Matrix{W}^{[l]} = \text{np.random.randn(shape)} * \text{np.sqrt(} \frac{2}{n^{[l-1]}} \text{)}$$
+
+For more general case, if the input features of actvations are roughly mean 0 and standard variance
+1 then this would cause $z$ to also take on a similar scale. This doesn't solve the
+vanishing/exploding problem, but it definitely reduce the problem. Because it's trying to set
+$\Matrix{W}^{[l]}$ not too much bigger than 1 and not too much less than 1, so it doesn't explode
+or vanish too quickly.
+
+\paragraph{Other variaces}
+For tanh activation function,
+$$ \Matrix{W}^{[l]} = \text{np.random.randn(shape)} * \text{np.sqrt(} \frac{1}{n^{[l-1]}} \text{)}
+\quad \text{(Xavier Initialization)} $$
+or
+$$ \Matrix{W}^{[l]} = \text{np.random.randn(shape)} * \text{np.sqrt(} \frac{2}{n^{[l-1]} + n^{[l]}}
+\text{)} \quad \text{(Yoshua Bengio)} $$
+
+In practice, all these formulas just give you a starting point, it gives you a default value to use
+for the variance of the initialization of your weight matrices. If you wish the variace in the
+formula, this variance parameter could be another thing that you could tune of your hyperparameters.
+
+\subsubsection{Numerical approximation of gradients}
+When you implement backpropagation you'll find that there's a test called gradient checking that
+can really help you make sure that your implementation of backpropagation is correct.
+
+\paragraph{Checking your derivative computation}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/checking-derivatives}
+    \caption{Derivative approximation}
+    \label{fig:checking-derivatives}
+\end{figure}
+
+We can use two sided difference to estimate the derivatives:
+$$ g(\theta) \approx \frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2 \epsilon} $$
+
+For example, $f(\theta) = \theta^3$ in Figure~\ref{fig:checking-derivatives}, then we can estimate
+the derivative at $\theta = 1$ with $\epsilon = 0.01$:
+$$ g(1) \approx \frac{(1.01)^3 - (0.99)^3}{2 * 0.01} = 3.0001 $$
+
+And the real deivative at $\theta = 1$ is
+$$ g(1) = 3 \theta^2|_{\theta=1} = 3 $$
+
+So the approximation error is 0.0001 ($O(\epsilon^2)$). If we only consider the one side difference
+(in range $(\theta, \theta+\epsilon)$), so error will be 0.03 ($O(\epsilon)$). So two sided
+difference have more confident approximation than one side difference, it's more accurate, but it
+runs twice as slow as it.
+
+\subsubsection{Gradient checking}
+Gradient checking can be used to debug and verify your implementation of backpropagation.
+
+Take $\Matrix{W^{[1]}}, \Vector{b^{[1]}}, \ldots, \Matrix{W^{[L]}}, \Vector{b^{[L]}}$ and reshape
+into a big vector $\Vector{\theta}$. Then
+$$ J(\Vector{\theta}) = J(\Vector{\theta}_1, \Vector{\theta}_2, \ldots)
+= J(\Matrix{W^{[1]}}, \Vector{b^{[1]}}, \ldots, \Matrix{W^{[L]}}, \Vector{b^{[L]}}) $$
+
+Take $\text{d}\Matrix{W^{[1]}}, \text{d}\Vector{b^{[1]}}, \ldots, \text{d}\Matrix{W^{[L]}},
+\text{d}\Vector{b^{[L]}}$ and reshape into a big vector $\text{d}\Vector{\theta}$. Now we have a
+question, is $\text{d}\Vector{\theta}$ the gradient or the slope of $J(\Vector{\theta})$?
+
+\begin{algorithm}[htb]
+\For{each $i$}{
+    d$\displaystyle \Vector{\theta}_{approx}[i]
+    = \frac{J(\Vector{\theta}_1, \Vector{\theta}_2, \ldots, \Vector{\theta}_i + \epsilon, \ldots)
+     - J(\Vector{\theta}_1, \Vector{\theta}_2, \ldots, \Vector{\theta}_i-\epsilon, \ldots)}
+     {2 \epsilon}$
+}
+\end{algorithm}
+
+We have known that $\displaystyle \text{d}\Vector{\theta}_{approx}[i]
+\approx \text{d}\Vector{\theta}[i] = \frac{\partial J}{\partial \Vector{\theta}_i}$.
+
+Let $\epsilon = 10^{-7}$, then we check the value of
+$$ \frac{||\text{d}\Vector{\theta}_{approx} - \text{d}\Vector{\theta}||_2}
+{||\text{d}\Vector{\theta}_{approx}||_2 + ||\text{d}\Vector{\theta}||_2} $$
+
+If the value is close to $\epsilon$, then that's great, it means your derivative approximation is
+very likely correct. If it's maybe on the then range around $10^{-5}$, you should be careful and
+double-check the components of the vector. And if the value is about $10^{-3}$, then it's more
+concerned that there's a bug somewhere.
+
+\subsubsection{Gradient Checking Implementation Notes}
+\begin{itemize}
+    \item Don't use in training - only to debug
+    \item If algorithm fails grad check, look at componets (where are different) to try to identify
+    bug
+    \item Remember regularization
+    \item Doesn't work with dropout
+    \item Run at random initialization; perhaps again after some training
+\end{itemize}
+
+
+
+
+
+
+
+
 
 
 
