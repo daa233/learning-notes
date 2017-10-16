@@ -611,14 +611,347 @@ concerned that there's a bug somewhere.
     \item Run at random initialization; perhaps again after some training
 \end{itemize}
 
+\section{Optimization algorithms}
 
+\subsection{Optimization algorithms}
+Optimization algorithms can enable us to train our neural network much faster. Applying machine
+learning is a highly empirical process, is a highly iterative process. One thing that makes it
+more difficult is that Deep Learning does not work best in a regime of big data, we are able to
+train neural networks on a huge data set, and training on a large data set is just slow. Having
+good and fast optimization algorithms can really speed up the efficiency of you and your team.
 
+\subsubsection{Mini-batch gradient descent}
+\paragraph{Batch vs. mini-batch gradient descent}
+Vectorization allows you to efficiently compute on $m$ examples:
+$$ \Matrix{X} = \left[\begin{array}{cccc} \Vector{x^{(1)}} & \Vector{x^{(2)}} & \cdots
+& \Vector{x^{(m)}}\end{array}\right] \qquad \Matrix{X} \in \Set{R}^{(n_x, m)} $$
+$$ \Matrix{Y} = \left[\begin{array}{cccc} \Vector{y^{(1)}} & \Vector{y^{(2)}} & \cdots
+& \Vector{y^{(m)}}\end{array}\right] \qquad \Matrix{Y} \in \Set{R}^{(1, m)} $$
 
+If $m$ is very large (say 5 million), then training can be very slow. With the implementation of
+gradient descent on your whole training set, what you have to do is you have to process your entire
+training set before you take one little step of gradient descent. So it turns out you can get a
+faster algorithm if you let gradient descent start to make some progress even before you finish
+processing your entire your giant training sets.
 
+Let's say you split up your training set into little baby training sets and these baby training
+sets are called mini-batches, and use $\Matrix{X^{\{t\}}}$ and $\Matrix{Y^{\{t\}}}$ to denote them.
+Every mini-batch contains 1000 examples, there are 5000 mini-batches in total.
+$$ \Matrix{X} = \left[\begin{array}{cccc} \Matrix{X^{\{1\}}} & \Matrix{X^{\{2\}}} & \cdots
+& \Matrix{X^{\{m\}}} \end{array}\right] $$
+$$ \Matrix{Y} = \left[\begin{array}{cccc} \Matrix{Y^{\{1\}}} & \Matrix{Y^{\{2\}}} & \cdots
+& \Matrix{Y^{\{m\}}} \end{array}\right] $$
 
+\paragraph{Mini-batch gradient descent}
 
+\begin{algorithm}[htb]
+\tcp{Mini-batch gradient descent algorithm}
+\Repeat{converge}{
+    \tcp{5000 mini-batches}
+    \For{t = 1, 2, \ldots, 5000}{
+        \For{prop on $\Matrix{X^{\{t\}}}$}{
+            $\displaystyle \Matrix{Z^{[1]}} = \Matrix{W^{[1]}} \Matrix{X^{\{t\}}} + \Vector{b^{1}}$
+            $\Matrix{A^{[1]}} = g^{[1]}(\Matrix{Z^{[1]}})$
+            \ldots
+            $\Matrix{A^{[l]}} = g^{[l]}(\Matrix{Z^{[l]}})$
+        }
+        \tcp{Compute cost J, 1000 examples in each mini-batch (the size of the mini-batch)}
+        $\displaystyle J^{\{t\}} = \frac{1}{1000} \sum_{i=1}^{l}\Cal{L}
+        \underbrace{(\hat{y^{(i)}}, y^{(i)})}_{\text{from } \Matrix{X^{\{t\}}}, \Matrix{Y^{\{t\}}}}
+        + \frac{\lambda}{1000}$ \\
+        \tcp{Backprop to compute gradients w.r.t. $J^{\{t\}}$
+        (using $\Matrix{X^{\{t\}}}, \Matrix{Y^{\{t\}}}$)}
+        $\Matrix{W^{[l]}} := \Matrix{W^{[l]}} - \alpha \text{d}\Matrix{W^{[l]}}, \quad
+        \Vector{b^{[l]}} := \Vector{b^{[l]}} - \alpha \text{d}\Vector{b^{[l]}}$
+    }
+}
+\end{algorithm}
 
+With mini-batch gradient descent, a single pass through the training set, that is one epoch, allows
+you to take 5000 gradient steps.
 
+\subsubsection{Understanding mini-batch gradient descent}
+With batch gradient descent, on every iteration you go through the entire training set, you'd
+expect the cost to go down on every single iteration. On mini-batch gradient descent though, if you
+plot progress on your cost function, then it may not decrease on every iteration.
+
+In paricular, on every iteration, you are processing some $\Matrix{X^{\{t\}}}, \Matrix{Y^{\{t\}}}$
+and so if you plot the cost function $J^{\{t\}}$, which is computed using just
+$\Matrix{X^{\{t\}}}, \Matrix{Y^{\{t\}}}$, then it's as if on every iteration you're training on a
+different training dataset or really training on a different mini-batch. So you plot the cost
+function $J^{\{t\}}$, it should trend downwards, but it's also going to be a little bit noiser,
+which can be seen in Figure~\ref{fig:training-mini-batch}.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/training-mini-batch}
+    \caption{Training with mini-batch gradient descent}
+    \label{fig:training-mini-batch}
+\end{figure}
+
+\paragraph{Choosing your mini-batch size}
+$$\begin{array}{lll}
+    \text{If mini-batch size} = $m$: & \text{Batch Gradient Descent} &
+    (\Matrix{X^{\{t\}}}, \Matrix{Y^{\{t\}}}) = (\Matrix{X}, \Matrix{Y}). \\
+    \text{If mini-batch size} = $1$: & \text{Stochastic Gradient Descent} &
+    \text{Each example is its own mini-batch } (t = i)
+\end{array}$$
+
+The batch gradient descent might start somewhere and be able to take relatively low noise,
+relatively large steps, just keep matching to minimum. In contrast with stochastic gradient descent,
+if you start somewhere, then on every iteration you're taking gradient descent with just a signle
+training example, so most of the time you head toward the global optimum, but sometimes you head to
+the wrong direction if that one example happens to point you in a bad direction. So stochastic
+gradient can be extremly noisy. On average, it'll take you in a good direction, but sometimes it'll
+head in the wrong direction as well. As stochastic gradient descent won't ever converge, it will
+always just kind of oscillate and wander around the region of the minimum, which can be seen in
+Figure~\ref{fig:choosing-mini-batch-size}.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/choosing-mini-batch-size}
+    \caption{Choose mini-batch size. If the size is $m$, it's Batch Gradient Descent; If the size
+    is 1, it's Stochastic Gradient Descent; If the size is between 1 and $m$, it's Mini-batch
+    Gradient Descent.}
+    \label{fig:choosing-mini-batch-size}
+\end{figure}
+
+\subsubsection{Exponentially wighted averages}
+
+Figure~\ref{fig:temperature-in-london} shows the temperature in London for a year. The data (blue
+points) looks a little noisy, we want to compute the trends of the local average of the temperature.
+Then we can use $v_i$ to denote the temperature in $i$-th day, and
+$$v_0 = 0$$
+$$v_1 = 0.9v_0 + 0.1\theta_1$$
+$$v_2 = 0.9v_1 + 0.1\theta_2$$
+$$\vdots$$
+$$v_t = 0.9v_{t-1} + 0.1\theta_t$$
+
+We can think $v_t$ as approximately averaging over $\displaystyle \frac{1}{1-\beta}$ days'
+temperature.
+
+$$ v_t = \beta v_{t-1} + (1-\beta)\theta_t $$
+
+\begin{itemize}
+    \item $\beta = 0.9$: $approx$ 10 days' temperature
+    \item $\beta = 0.98$: $approx$ 50 day's temperature
+    \item $\beta = 0.5$: $approx$ 2 day's temperature
+\end{itemize}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=20em]{figures/temperature-in-london-1}
+    \includegraphics[width=20em]{figures/temperature-in-london-2}
+    \caption{Temperature in London for one year. $\beta = 0.9$ for red line; $\beta = 0.98$ for
+    green line; $\beta = 0.5$ for yellow line.}
+    \label{fig:temperature-in-london}
+\end{figure}
+
+\subsubsection{Understanding exponetially weighted averages}
+$$ v_t = \beta v_{t-1} + (1-\beta)\theta_t $$
+
+$$ v_{100} = 0.9 v_{99} + 0.1\theta_{100} $$
+$$ v_{99} = 0.9 v_{98} + 0.1\theta_{99} $$
+$$ v_{98} = 0.9 v_{97} + 0.1\theta_{98} $$
+$$ \ldots $$
+
+\begin{IEEEeqnarray*}{rCl}
+    v_{100} = 0.1\theta_{100} + 0.9v_{99} = 0.1 \theta_{100} + 0.1 \times 0.9 \theta_{99}
+    + 0.1 (0.9)^2 \theta_{98} + 0.1 (0.9)^3 \theta_{97} + \cdots
+\end{IEEEeqnarray*}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/exp-weighted-average}
+    \caption{The $v_{100}$ can be seen as the element-wise multiplication of $\theta_t$ and the
+    exponentially distribution.}
+    \label{fig:exp-weighted-average}
+\end{figure}
+
+$$ (1 - \epsilon)^{\frac{1}{\epsilon}} = \frac{1}{e} \approx 0.35 $$
+The hight of $\displaystyle \frac{1}{e}$ in the exponentially distribution in
+Figure~\ref{fig:exp-weighted-average} is respect to $\displaystyle \frac{1}{\epsilon}$ days on the
+horizontal axis.
+
+\paragraph{Implementing exponetially weighted averages}
+\begin{algorithm}[htb]
+    $v_{\theta} = 0$ \\
+    \Repeat{t = maxDays}{
+        Get next $\theta_t$ \\
+        $v_{\theta} := \beta v_{\theta} + (1-\beta) \theta_t$
+    }
+\end{algorithm}
+
+\subsubsection{Bias correction in exponentially weighted averages}
+When $t$ is small, there is a bias because we take $v_0 = 0$, we can correct that in the following
+way.
+
+$$ v_t = \beta v_{t-1} + (1-\beta)\theta_t $$
+
+$$ v_t := \frac{v_t}{1 - \beta^t} $$
+
+\subsubsection{Gradient descent with momentum}
+
+Because mini-batch gradient descent makes a parameter update after seeing just a subset of example,
+the direction of the update has some variance, and so the path taken by mini-batch gradient descent
+will ``oscillate'' toward convergence, like Figure~\ref{fig:momentum}. Using momentum can reduce
+these oscillations.
+
+Momentum takes into account the past gradients to smooth out the update. We will store the
+`direction' of the previous gradient in the variable $v$. Formally, this will be the exponentially
+weighted average of the gradient on previous steps. You can also think of $v$ as the ``velocity''
+of a ball rolling downhill, building up speed (and momentum) according to the direction of the
+gradient/slope of the hill.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=45em]{figures/momentum}
+    \caption{Momentum can reduce the oscillation and sooth out the update.}
+    \label{fig:momentum}
+\end{figure}
+
+\begin{algorithm}[htb]
+    \tcp{Momentum optimization algorithm}
+    $\displaystyle v_{\text{d}\Matrix{W}} = \Matrix{0}$,
+    $\displaystyle v_{\text{d}\Vector{b}} = \Vector{0}$ \\
+    \For{iteration t}{
+        Compute d$\Matrix{W}$, d$\Vector{b}$ on current mini-batch. \\
+        $\displaystyle v_{\text{d}\Matrix{W}} = \beta v_{\text{d}\Matrix{W}}
+        + (1 - \beta)\text{d}\Matrix{W}$ \qquad
+        $\displaystyle v_{\text{d}\Vector{b}} = \beta v_{\text{d}\Vector{b}}
+        + (1 - \beta)\text{d}\Vector{b}$ \\
+        $\displaystyle \Matrix{W} := \Matrix{W} - \alpha v_{\text{d}\Matrix{W}}$ \qquad
+        $\displaystyle \Vector{b} := \Vector{b} - \alpha v_{\text{d}\Vector{b}}$
+    }
+\end{algorithm}
+
+Now we have two hyperparameters $\alpha$ and $\beta$, the most common value for $\beta$ is 0.9.
+
+In practice, people usually don't do bias correction when implementing gradient descent or momentum.
+Because after just ten iterations your moving average will have warmed up and is no longer a bias
+estimate.
+
+\subsubsection{RMSprop}
+RMSprop (Root Mean Square prop) can also speed up gradient descent.
+
+\begin{algorithm}[htb]
+    \tcp{RMSprop optimization algorithm}
+    $\displaystyle s_{\text{d}\Matrix{W}} = \Matrix{0}$,
+    $\displaystyle s_{\text{d}\Vector{b}} = \Vector{0}$ \\
+    \For{iteration t}{
+        Compute d$\Matrix{W}$, d$\Vector{b}$ on current mini-batch. \\
+        $\displaystyle s_{\text{d}\Matrix{W}} = \beta_2 s_{\text{d}\Matrix{W}}
+        + (1 - \beta_2){\text{d}\Matrix{W}}^2$ \qquad
+        $\displaystyle s_{\text{d}\Vector{b}} = \beta_2 s_{\text{d}\Vector{b}}
+        + (1 - \beta_2){\text{d}\Vector{b}}^2$ \\
+        $\displaystyle \Matrix{W} := \Matrix{W}
+        - \alpha \frac{\text{d}\Matrix{W}}{\sqrt{s_{\text{d}\Matrix{W}}} + \epsilon}$ \qquad
+        $\displaystyle \Vector{b} := \Vector{b}
+        - \alpha \frac{\text{d}\Matrix{b}}{\sqrt{s_{\text{d}\Matrix{b}}} + \epsilon}$
+    }
+\end{algorithm}
+
+$\epsilon = 10^{-8}$ is reasonable default to ensure numberical stability.
+
+\subsubsection{Adam optimization algorithm}
+\begin{algorithm}[htb]
+    \tcp{Adam optimization algorithm}
+    $\displaystyle v_{\text{d}\Matrix{W}} = \Matrix{0}$,
+    $\displaystyle s_{\text{d}\Matrix{W}} = \Matrix{0}$,
+    $\displaystyle v_{\text{d}\Vector{b}} = \Vector{0}$,
+    $\displaystyle s_{\text{d}\Vector{b}} = \Vector{0}$ \\
+    \For{iteration t}{
+        Compute d$\Matrix{W}$, d$\Vector{b}$ on current mini-batch. \\
+        $\displaystyle v_{\text{d}\Matrix{W}} = \beta_1 v_{\text{d}\Matrix{W}}
+        + (1 - \beta_1)\text{d}\Matrix{W}$ \qquad
+        $\displaystyle v_{\text{d}\Vector{b}} = \beta_1 v_{\text{d}\Vector{b}}
+        + (1 - \beta_1)\text{d}\Vector{b}$ \\
+        $\displaystyle s_{\text{d}\Matrix{W}} = \beta_2 s_{\text{d}\Matrix{W}}
+        + (1 - \beta_2){\text{d}\Matrix{W}}^2$ \qquad
+        $\displaystyle s_{\text{d}\Vector{b}} = \beta_2 s_{\text{d}\Vector{b}}
+        + (1 - \beta_2){\text{d}\Vector{b}}^2$ \\
+        $\displaystyle v_{\text{d}\Matrix{W}}^{\text{corrected}}
+        = \frac{v_{\text{d}\Matrix{W}}}{1 - \beta_1^t}$ \qquad
+        $\displaystyle v_{\text{d}\Matrix{b}}^{\text{corrected}}
+        = \frac{v_{\text{d}\Matrix{b}}}{1 - \beta_1^t}$ \\
+        $\displaystyle s_{\text{d}\Matrix{W}}^{\text{corrected}}
+        = \frac{s_{\text{d}\Matrix{W}}}{1 - \beta_2^t}$ \qquad
+        $\displaystyle s_{\text{d}\Matrix{b}}^{\text{corrected}}
+        = \frac{s_{\text{d}\Matrix{b}}}{1 - \beta_2^t}$ \\
+        $\displaystyle \Matrix{W} := \Matrix{W}
+        - \alpha \frac{\text{d}\Matrix{W}}{\sqrt{s_{\text{d}\Matrix{W}}} + \epsilon}$ \qquad
+        $\displaystyle \Vector{b} := \Vector{b}
+        - \alpha \frac{\text{d}\Matrix{b}}{\sqrt{s_{\text{d}\Matrix{b}}} + \epsilon}$
+    }
+\end{algorithm}
+
+\paragraph{Hyperparameters choice}
+\begin{itemize}
+    \item $\alpha$: needs to be tune
+    \item $\beta_1$: 0.9 ($\text{d}\Matrix{W}$)
+    \item $\beta_2$: 0.999 (${\text{d}\Matrix{W}}^2$)
+    \item $\epsilon$: $10^{-8}$
+\end{itemize}
+
+\subsubsection{Learning rate decay}
+Learning rate decay can slowly reduce your learning rate over time, which can be seen in
+Figure~\ref{fig:learning-rate-decay}.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=35em]{figures/learning-rate-decay}
+    \caption{Learning rate decay}
+    \label{fig:learning-rate-decay}
+\end{figure}
+
+\begin{algorithm}[htb]
+    \tcp{Learning rate decay}
+    \For{each epoch (each pass through of data)}{
+        $\displaystyle \alpha = \frac{1}{1 + decay_rate * epoch_num} \alpha_0$
+    }
+\end{algorithm}
+
+\paragraph{Other learning rate decay methods}
+\begin{itemize}
+    \item $\displaystyle \alpha = 0.95^{epoch_num} \alpha_0$ (exponentially decay)
+    \item $\displaystyle \alpha = \frac{k}{\sqrt{epoch_num}} \alpha_0$ \quad or \quad
+    $\displaystyle \alpha = \frac{k}{\sqrt{t}} \alpha_0$ \qquad (k is constant)
+\end{itemize}
+
+\subsubsection{Local optima in neural networks}
+In the early days of deep learning, people used to worry a lot about the optimization algorithm
+getting stuck in bad local optima. But as the theory of deep learning has advanced, our
+understanding of local optima is also changing.
+
+Figure~\ref{fig:local-optima-1} is what used to have in mind when they worried about local optima,
+but this intuition is not always right. It turns out that if you create a neural network, most
+points of zero gradients are not local optima, instead most points of zero gradient in a cost
+function are saddle points, like Figure~\ref{fig:local-optima-2} shows.
+
+For high dimensional space, it's more likely to run into the local optima instead of a local optima.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/local-optima-1}
+    \caption{The local optima used to be in the mind of people}
+    \label{fig:local-optima-1}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/local-optima-2}
+    \caption{What most zero gradient points really look like, saddle points}
+    \label{fig:local-optima-2}
+\end{figure}
+
+\paragraph{Problem of plateaus}
+It turns out that plateaus can really slow down learning and a plateau is region where the
+derivatives is close to zero for a long time.
+
+\begin{itemize}
+    \item Unlikely to get stuck in a bad local optima
+    \item Plateaus can make learning slow
+\end{itemize}
 
 
 
