@@ -293,7 +293,7 @@ layer 3.
 \begin{minted}{numpy}
     keep_prob = 0.8  # the probability of keeping each unit
 
-    d3 = np.randm.rand(a3.shape[0], a3.shape[1]) < keep_prob
+    d3 = np.random.rand(a3.shape[0], a3.shape[1]) < keep_prob
     a3 = np.multiply(a3, d3)  # a3 * d3, element-wise multiplication
     a3 /= keep_prob  # inverted dropout
 \end{minted}
@@ -495,7 +495,7 @@ derivatives or the gradients will also increase exponentially or decrease expone
 
 \subsubsection{Weights Initialization for Deep Networks}
 A partial solution to vanishing/exploding of deep networks is more careful choice of the random
-initialization of your neural newwork. To understand this, let's start with the example of
+initialization of your neural network. To understand this, let's start with the example of
 initializing the weights for a single neuron in
 Figure~\ref{fig:random-initialization-for-single-neuron}, and then we're going to generalize this
 to a deep network.
@@ -617,7 +617,7 @@ concerned that there's a bug somewhere.
 Optimization algorithms can enable us to train our neural network much faster. Applying machine
 learning is a highly empirical process, is a highly iterative process. One thing that makes it
 more difficult is that Deep Learning does not work best in a regime of big data, we are able to
-train neural networks on a huge data set, and training on a large data set is just slow. Having
+train neural networks on a large data set, and training on a huge data set is just slow. Having
 good and fast optimization algorithms can really speed up the efficiency of you and your team.
 
 \subsubsection{Mini-batch gradient descent}
@@ -637,10 +637,10 @@ processing your entire your giant training sets.
 Let's say you split up your training set into little baby training sets and these baby training
 sets are called mini-batches, and use $\Matrix{X^{\{t\}}}$ and $\Matrix{Y^{\{t\}}}$ to denote them.
 Every mini-batch contains 1000 examples, there are 5000 mini-batches in total.
-$$ \Matrix{X} = \left[\begin{array}{cccc} \Matrix{X^{\{1\}}} & \Matrix{X^{\{2\}}} & \cdots
-& \Matrix{X^{\{m\}}} \end{array}\right] $$
-$$ \Matrix{Y} = \left[\begin{array}{cccc} \Matrix{Y^{\{1\}}} & \Matrix{Y^{\{2\}}} & \cdots
-& \Matrix{Y^{\{m\}}} \end{array}\right] $$
+$$ \Matrix{X} = \left[\begin{array}{ccccc} \Matrix{X^{\{1\}}} & \Matrix{X^{\{2\}}} & \cdots
+& \Matrix{X^{\{t\}}} & \cdots \end{array}\right] $$
+$$ \Matrix{Y} = \left[\begin{array}{ccccc} \Matrix{Y^{\{1\}}} & \Matrix{Y^{\{2\}}} & \cdots
+& \Matrix{Y^{\{t\}}} & \cdots \end{array}\right] $$
 
 \paragraph{Mini-batch gradient descent}
 
@@ -650,10 +650,13 @@ $$ \Matrix{Y} = \left[\begin{array}{cccc} \Matrix{Y^{\{1\}}} & \Matrix{Y^{\{2\}}
     \tcp{5000 mini-batches}
     \For{t = 1, 2, \ldots, 5000}{
         \For{prop on $\Matrix{X^{\{t\}}}$}{
-            $\displaystyle \Matrix{Z^{[1]}} = \Matrix{W^{[1]}} \Matrix{X^{\{t\}}} + \Vector{b^{1}}$
-            $\Matrix{A^{[1]}} = g^{[1]}(\Matrix{Z^{[1]}})$
-            \ldots
-            $\Matrix{A^{[l]}} = g^{[l]}(\Matrix{Z^{[l]}})$
+            $\displaystyle \Matrix{Z^{[1]}} = \Matrix{W^{[1]}} \Matrix{X^{\{t\}}}
+                + \Vector{b^{[1]}}$ \\
+            $\displaystyle \Matrix{A^{[1]}} = g^{[1]}(\Matrix{Z^{[1]}})$ \\
+            \ldots \\
+            $\displaystyle \Matrix{Z^{[l]}} = \Matrix{W^{[1]}} \Matrix{X^{\{t\}}}
+                + \Vector{b^{[l]}}$ \\
+            $\displaystyle \Matrix{A^{[l]}} = g^{[l]}(\Matrix{Z^{[l]}})$
         }
         \tcp{Compute cost J, 1000 examples in each mini-batch (the size of the mini-batch)}
         $\displaystyle J^{\{t\}} = \frac{1}{1000} \sum_{i=1}^{l}\Cal{L}
@@ -773,8 +776,8 @@ The hight of $\displaystyle \frac{1}{e}$ in the exponentially distribution in
 Figure~\ref{fig:exp-weighted-average} is respect to $\displaystyle \frac{1}{\epsilon}$ days on the
 horizontal axis.
 
-\paragraph{Implementing exponetially weighted averages}
 \begin{algorithm}[htb]
+    \tcp{Implementing exponetially weighted averages}
     $v_{\theta} = 0$ \\
     \Repeat{t = maxDays}{
         Get next $\theta_t$ \\
@@ -954,9 +957,269 @@ derivatives is close to zero for a long time.
 \end{itemize}
 
 
+\section{Hyperparameter tuning, Batch Normalization and Programming Frameworks}
+\subsection{Hyperparameter tuning}
+\subsubsection{Tuning process}
+The guideline to tune hyperparameters:
+\begin{enumerate}
+    \item $\alpha$ \quad (Learning rate, the most important hyperparameter)
+    \item $\beta$ \quad (Momentum, default 0.9)
+    \item mini-batch size
+    \item \#hidden units
+    \item \#layers
+    \item learning rate decay
+    \item $\beta_1$, $\beta_2$, $\epsilon$ \quad (Adam, default 0.9/0.999/$10^{-8}$)
+\end{enumerate}
 
+\paragraph{Try random values: Don't use a grid}
+In earlier generations of machine learning algorithms, grid is okay when the number of
+hyperparameters is small. But in deep learning, it's better to sample hyperparameters randomly,
+because it's more likely to get a good performance within fewer times.
 
+\paragraph{Coarse to fine}
+Like Figure~\ref{fig:coarse-to-fine} shows, you can try some sample points in the hyperparameters
+space first, and get some good points. Then zoom in and search in the zoomed region densely. This
+is called coarse to fine.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/coarse-to-fine}
+    \caption{Coarse to fine}
+    \label{fig:coarse-to-fine}
+\end{figure}
+
+\subsubsection{Using an appropriate scale to pick hyperparameters}
+\paragraph{Appropriate scale for hyperparameters}
+For example,
+$$\alpha \in [0.0001, 1]$$
+
+Search in a log scale instead of linear scale.
+
+\begin{minted}{numpy}
+    r = -4 * np.random.rand() # r ranges in [-4, 0] ([a, b])
+    alpha = 10 ** r
+\end{minted}
+
+\paragraph{Hyperparameters for exponentially weighted averages}
+$$ \beta = [0.9, \ldots, 0.999] $$
+$$ 1 - \beta = [0.1, \ldots, 0.001] $$
+\begin{minted}{numpy}
+    r = -2 * np.random.rand() - 1 # r ranges in [-3, -1] ([a, b])
+    beta = 1 - 10 ** r
+\end{minted}
+
+Because $\frac{1}{1-\beta}$,
+$$ \beta: 0.9000 \rightarrow 0.9005 \quad \text{small impact} $$
+$$ \beta: 0.9990 \rightarrow 0.9995 \quad \text{huge impact} $$
+
+\subsubsection{Hyperparameter tuning in Practice: Pandas vs. Caviar}
+Figure~\ref{fig:pandas-vs-caviar} shows two ways of tuning hyperparameters.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/pandas-vs-caviar}
+    \caption{Coarse to fine}
+    \label{fig:pandas-vs-caviar}
+\end{figure}
+
+\subsection{Batch Normalization}
+\subsubsection{Normalization activations in a network}
+For example, we can normalize $\Vector{a^{[2]}}$ so as to train $\Matrix{W^{[3]}},
+\Vector{b^{[3]}}$ faster, this is called Batch Normalization.
+It's more common to do normalization on $\Vector{z^{[2]}}$ instead of $\Vector{a^{[2]}}$.
+
+\begin{algorithm}[htb]
+    \tcp{Implementing Batch Norm}
+    Given some intermediate values in NN, $\Vector{z^{[l](1)}}, \Vector{z^{[l](2)}}, \ldots,
+    \Vector{z^{[l](m)}}$ \\
+    $\displaystyle \mu = \frac{1}{m} \sum_{i} \Vector{z^{[l](i)}}$ \\
+    $\displaystyle \sigma^2 = \frac{1}{m} \sum_i (\Vector{z^{[l](i)}} - \mu)^2$ \\
+    $\displaystyle \Vector{z_{\text{norm}}^{[l](i)}} = \frac{\Vector{z^{[l](i)}}-\mu}
+    {\sqrt{\sigma^2 + \epsilon}}$ \\
+    $\displaystyle \widetilde{z^{[l](i)}} = \gamma z_{\text{norm}}^{[l](i)} + \beta$ \qquad
+    ($\beta$ and $\gamma$ are learnable parameters of the model)
+\end{algorithm}
+
+If
+$$ \gamma = \sqrt{\sigma^2 + \epsilon} $$
+$$ \beta = \mu $$
+then
+$$ \widetilde{z^{[l](i)}} = z^{[l](i)} $$
+
+Use $\widetilde{z^{[l](i)}}$ instead of $z^{[l](i)}$.
+
+What Batch Norm really does is normalizing in mean and variance of the hidden units values
+($z^{[l](i)}$), to have some fixed mean and variance, which are controlled by $\beta$ and $\gamma$.
+
+\subsubsection{Fitting Batch Norm into a neural network}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/add-batch-norm-to-a-network}
+    \caption{Add Batch Norm to a network}
+    \label{fig:add-batch-norm-to-a-network}
+\end{figure}
+
+Parameters: $\Matrix{W^{[1]}}$, $\Vector{b^{[1]}}$, $\Matrix{W^{[2]}}$, $\Vector{b^{[2]}}$, \ldots,
+$\Matrix{W^{[L]}}$, $\Vector{b^{[L]}}$, \quad
+$\beta^{[1]}$, $\gamma^{[1]}$, $\beta^{[2]}$, $\gamma^{[2]}$, \ldots, $\beta^{[L]}$, $\gamma^{[L]}$
+
+Update parameters in the same way:
+$$ \beta^{[l]} = \beta^{[l]} - \alpha \text{d}\beta^{[l]} $$
+
+In TensorFlow, we can implement Batch Normalization with
+\mintinline{python}{tf.nn.batch_normalization}.
+
+\paragraph{Working with mini-batches}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/batch-norm-with-mini-batches}
+    \caption{Batch Norm working with mini-batches}
+    \label{fig:batch-norm-with-mini-batches}
+\end{figure}
+
+Parameters: $\Matrix{W^{[l]}}$, {\color{red} $\Vector{b^{[l]}}$}, $\beta^{[l]}$, $\gamma^{[l]}$.
+
+$$ \Vector{z^{[l]}} = \Matrix{W^{[l]}} \Vector{a^{[l-1]}} + {\color{red} \Vector{b^{[l]}}}
+\qquad \longrightarrow \qquad \Vector{z^{[l]}} = \Matrix{W^{[l]}} \Vector{a^{[l-1]}} $$
+
+$$ \widetilde{z^{[l]}} = \gamma^{[l]} z_{\text{norm}}^{[l]} + \beta^{[l]} $$
+
+$\beta^{[l]}$ and $\gamma^{[l]}$ have the same dimension with $b^{[l]}$
+
+\begin{algorithm}[htb]
+    \tcp{Implementing gradeint descent with Batch Norm}
+    \For{t = 1 $\cdots$ num\_mini\_batches}{
+        Compute forward prop on $\Matrix{X^{\{t\}}}$ \\
+        In each layer, use Batch Norm to replace $z^{[l]}$ with $\widetilde{z^{[l]}}$. \\
+        Use backprop to compute d$\Matrix{W^{[l]}}$, ${\color{red} \text{d}\Vector{b^{[l]}}}$,
+        d$\Vector{\beta^{[l]}}$, d$\Vector{\gamma^{[l]}}$ \\
+        Update parameters (working with Momentum, RMSprop, Adam etc.)
+    }
+\end{algorithm}
+
+\subsubsection{Why does Batch Norm work?}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/learning-on-shifting-input-distribution}
+    \caption{Batch Norm can help learn on shifting input distribution. Like we learned a netowrk
+    which can recognize black cats at first, then we want to use the network to recognize colorful
+    cats.}
+    \label{fig:learning-on-shifting-input-distribution}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/batch-norm-stable-activations}
+    \caption{Batch Norm can stablize the activations in the hidden layers, because of the constains
+    of $\beta^{[l]}$ and $\gamma^{[l]}$.}
+    \label{fig:batch-norm-stable-activations}
+\end{figure}
+
+See Figure~\ref{fig:learning-on-shifting-input-distribution} and
+Figure~\ref{fig:batch-norm-stable-activations} for the intuition.
+
+\paragraph{Batch Norm as regularization}
+\begin{itemize}
+    \item Each mini-batch is scaled by the mean/variance computed on just that mini-batch.
+    \item This adds some noise to the values $z^{[l]}$ within that mini-batch. So similar to
+    dropout, it adds some noise to each hidden layer's activations.
+    \item This has a slight regularization effect. Using lager mini-batch size will reduce this
+    effect.
+    \item Don't turn to Batch Norm as a regularization.
+\end{itemize}
+
+\subsubsection{Batch Norm at test time}
+Batch Norm process your data one mini-batch at a time, but at test time you might need to process
+the examples one at a time.
+
+When training
+$$\displaystyle \mu = \frac{1}{m} \sum_{i} \Vector{z^{[l](i)}}$$
+$$\displaystyle \sigma^2 = \frac{1}{m} \sum_i (\Vector{z^{[l](i)}} - \mu)^2$$
+$$\displaystyle \Vector{z_{\text{norm}^{[l](i)}}} = \frac{\Vector{z^{[l](i)}}-\mu}
+{\sqrt{\sigma^2 + \epsilon}}$$
+$$\displaystyle \widetilde{z^{[l](i)}} = \gamma z_{\text{norm}}^{[l](i)} + \beta$$
+
+When testing, using exponentially weighted average (running average) to get estimation of $\mu$ and
+$\sigma^2$, then
+$$\displaystyle z_{\text{norm}} = \frac{z-\mu}{\sqrt{\sigma^2 + \epsilon}}$$
+$$\displaystyle \widetilde{z} = \gamma z_{\text{norm}} + \beta$$
+
+\subsection{Multi-class classification}
+\subsubsection{Softmax Regression}
+So far, the classfication examples we've talked about have used binary classification, where you
+had two possible labels, 0 or 1. There's a generalization of logistic regression called Softmax
+regression, which lets you make predictions when you try to recognize one of C or one of the
+multiple classes, rather than just recognize just two classes.
+
+$$ \Vector{z^{[L]}} = \Matrix{W^{L}} \Vector{a^{L-1}} + \Vector{b^{[L]}} $$
+
+Activation function:
+$$ t = e^{(\Vector{z^{[L]}})} $$
+$$ \Vector{a^{L}} = \frac{e^{(\Vector{z^{[L]}})}}{\sum_{j=1}^c t_i}, \quad
+\Vector{a_i^{L}} = \frac{t_i}{\sum_{j=1}^c t_i} $$
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/softmax-examples}
+    \caption{Softmax examples, which can be seen as a generalization of logistic regression with
+    sort of linear decision boundaries, but with more than two classes.}
+    \label{fig:softmax-examples}
+\end{figure}
+
+\subsubsection{Training a softmax classifier}
+\paragraph{Understanding softmax}
+$$ z^{[L]} = \left[\begin{array}{c} 5 \\ 2 \\ -1 \\ 3 \end{array}\right] \qquad
+t = \left[\begin{array}{c} e^5 \\ e^2 \\ e^{-1} \\ e^3 \end{array}\right] $$
+$$ a^{[L]} = g^{[L]}(z^{[L]}) = \left[\begin{array}{c} e^5/(e^5+e^2+e^{-1}+e^3) \\
+e^2/(e^5+e^2+e^{-1}+e^3) \\ e^{-1}/(e^5+e^2+e^{-1}+e^3) \\ e^3/(e^5+e^2+e^{-1}+e^3)
+\end{array}\right] = \left[\begin{array}{c} 0.842 \\ 0.042 \\ 0.002 \\ 0.114 \end{array}\right]
+\qquad \text{(soft max)}$$
+
+$$ \left[\begin{array}{c} 1 \\ 0 \\ 0 \\ 0 \end{array}\right] \qquad \text{(hard max)} $$
+
+Softmax regression generalizes logistic regression to $C$ classes. If $C = 2$, softmax essentially
+reduce to logistic regression.
+
+\paragraph{Loss function}
+$$ \Vector{y} = \left[\begin{array}{c} 0 \\ 1 \\ 0 \\ 0 \end{array}\right] \quad \text{(- cat)}
+\qquad \qquad \Vector{a^{[L]}} = \hat{\Vector{y}}
+= \left[\begin{array}{c} 0.3 \\ 0.2 \\ 0.1 \\ 0.4 \end{array}\right] $$
+
+$$ \Cal{L}(\hat{\Vector{y}}, \Vector{y}) = - \sum_{j=1}^c \Vector{y}_j \log \hat{\Vector{y}}_j $$
+
+Cost function
+$$ J(\Matrix{W^{[1]}}, \Vector{b^{[1]}}, \ldots)
+= \frac{1}{m} \sum_{i=1}^m \Cal{L}(\hat{\Vector{y^{(i)}}}, \Vector{y^{(i)}}) $$
+
+\paragraph{Gradient descent with softmax}
+$$ \text{d}\Vector{z^{L}} = \hat{\Vector{y}} - \Vector{y} \qquad \text{(Backprop)}$$
+
+\subsection{Introduction to programming frameworks}
+\subsubsection{Deep learning frameworks}
+\begin{itemize}
+    \item Caffe/Caffe2
+    \item CNTK
+    \item DL4J
+    \item Keras
+    \item Lasagne
+    \item mxnet
+    \item PaddlePaddle
+    \item TensorFlow
+    \item Theano
+    \item Torch
+\end{itemize}
+
+Choosing deep learning frameworks
+\begin{itemize}
+    \item Ease of programming (development and deployment)
+    \item Running speed
+    \item Truly open (open source with good governance)
+\end{itemize}
+
+\subsubsection{TensorFlow}
+\paragraph{Movivating problem} $ J(w) = w^2 - 10w + 25 $
+
+See \texttt{examples/tensorflow-example.ipynb} for details.
 
 
 \end{document}
