@@ -161,7 +161,7 @@ ideas and models.
     \centering
     \includegraphics[width=30em]{figures/old-ways-splitting-data}
     \caption{Old ways of splitting data}
-    \label{figures/old-ways-splitting-data}
+    \label{fig:old-ways-splitting-data}
 \end{figure}
 
 \paragraph{Modern era --- Big data}
@@ -172,7 +172,7 @@ a greater portion to train the model.
     \centering
     \includegraphics[width=30em]{figures/modern-era-splitting-data}
     \caption{The way of splitting data in big data era}
-    \label{figures/modern-era-splitting-data}
+    \label{fig:modern-era-splitting-data}
 \end{figure}
 
 Guidelines
@@ -188,13 +188,13 @@ Guidelines
 \paragraph{Example: Cat vs Non-cat}
 A cat classifier tries to find a great amount of cat images to show to to cat loving users. The
 evaluation metric used is a classification error, as it is shown in
-Figure~\ref{figures/classification-error}.
+Figure~\ref{fig:classification-error}.
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=25em]{figures/classification-error}
     \caption{The classification error of Algorithm A and Algorithm B}
-    \label{figures/classification-error}
+    \label{fig:classification-error}
 \end{figure}
 
 It seems that Algorithm A is better than Algorithm B since there is only a 3\% error, however for
@@ -236,13 +236,13 @@ a machine learning system, is much more efficient than before.
 Moreover, some of the tasks that humans do are close to ``perfection'', which is why machine
 learning tries to mimic human-level performance.
 
-Figure~\ref{figures/human-level} shows the performance of humans and machine learning over time.
+Figure~\ref{fig:human-level} shows the performance of humans and machine learning over time.
 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=40em]{figures/human-level}
     \caption{The performance of humans and machine learning over time.}
-    \label{figures/human-level}
+    \label{fig:human-level}
 \end{figure}
 
 Machine learning progresses slowly when it surpasses human-level performance. One of the reason is
@@ -269,10 +269,10 @@ performing well or not.
     \centering
     \includegraphics[width=25em]{figures/avoidable-bias}
     \caption{Different human-level in different scenarios}
-    \label{figures/avoidable-bias}
+    \label{fig:avoidable-bias}
 \end{figure}
 
-In the case that Figure~\ref{figures/avoidable-bias} shows, the human-level error as a proxy for
+In the case that Figure~\ref{fig:avoidable-bias} shows, the human-level error as a proxy for
 Bayes error since humans are good to identify images. If you want to improve the performance of the
 training set but you can't do better than the Bayes error otherwise the training set is overfitting.
 By knowing the Bayes error, it is easier to focus on whether bias or variance avoidance tactics
@@ -299,7 +299,7 @@ Human-level error gives an estimate of Bayes error.
     \centering
     \includegraphics[width=25em]{figures/medical-image-classification}
     \caption{Medical image classification}
-    \label{figures/medical-image-classification}
+    \label{fig:medical-image-classification}
 \end{figure}
 
 This is an example of a medical image classification in which the input is a radiology image and
@@ -314,7 +314,7 @@ by definition the Bayes error is lower or equal to 0.5\%.
     \centering
     \includegraphics[width=30em]{figures/error-analysis}
     \caption{Error analysis in different scenarios according to human-levels}
-    \label{figures/error-analysis}
+    \label{fig:error-analysis}
 \end{figure}
 
 \subparagraph{Scenario A}
@@ -349,7 +349,7 @@ human-level performance otherwise the training set is overfitting. Also, the avo
     \centering
     \includegraphics[width=30em]{figures/surpass-human-level}
     \caption{Classification task}
-    \label{figures/surpass-human-level}
+    \label{fig:surpass-human-level}
 \end{figure}
 
 \paragraph{Scenario A}
@@ -376,7 +376,7 @@ There are 2 fundamental assumptions of supervised learning. The first one is to 
 avoidable bias which means that the training set fits well. The second one is to have a low or
 acceptable variance which means that the training set performance generalizes well to the
 development set and test set. The strategy of improving your model can be seen in
-Figure~\ref{figures/improve-model}.
+Figure~\ref{fig:improve-model}.
 
 If the different between human-level error and the training error is bigger than the difference
 between the training error and the development error, the focus should be on bias reduction
@@ -392,27 +392,301 @@ try various hyperparameters search.
     \centering
     \includegraphics[width=40em]{figures/improve-model}
     \caption{The strategy to improve your models.}
-    \label{figures/improve-model}
+    \label{fig:improve-model}
 \end{figure}
 
+\subsection{Error Analysis}
+\subsubsection{Carrying out error analysis}
+\paragraph{Look at dev examples to evaluate ideas}
+Should you try to make your cat classifier do better on
+dogs?
 
+Error analysis:
+\begin{itemize}
+    \item Get $\sim$100 mislabeled dev set examples.
+    \item Count up how many are dogs.
+\end{itemize}
 
+\paragraph{Evaluate multiple ideas in parallel}
+Ideas for cat detection:
+\begin{itemize}
+    \item Fix pictures of dogs being recognized as cats
+    \item Fix great cats (lions, panthers, etc\ldots) being misrecognized
+    \item Improve performance on blurry images
+\end{itemize}
 
+\subsubsection{Cleaning up incorrectly labeled data}
+DL algorithms are quite robust to random errors in the training set.
 
+Look insight of the overall dev set errors, and compare between the errors due to incorrect labels
+and the errors due to other causes. The goal of dev set is to help you select between classifier A
+\& B.
 
+\paragraph{Correcting incorrect dev/test set examples}
+\begin{itemize}
+    \item Apply same process to your dev and test sets to make sure they continue to come from the
+    same distribution.
+    \item Consider examining examples your algorithm got right as well as ones it got wrong.
+    \item Train and dev/test data may now come from slightly different distributions.
+\end{itemize}
 
+\subsubsection{Build your first system quickly, then iterate}
+Depending on the area of application, the guideline below will help you prioritize when you build
+your system.
 
+\paragraph{Guideline}
+\begin{enumerate}
+    \item Set up development/test set and metrics
+    \begin{itemize}
+        \item Set up a target
+    \end{itemize}
+    \item Build an initial system quickly
+    \begin{itemize}
+        \item Train training set quickly: Fit the parameters
+        \item Development set: Tune the parameters
+        \item Test set: Assess the performance
+    \end{itemize}
+    \item Use Bias/Variance analysis \& Error analysis to prioritize next steps
+\end{enumerate}
 
+\subsection{Mismatched training and dev/test set}
+\subsubsection{Training and testing on different distributions}
+\paragraph{Example Cat vs Non-cat}
+In this example, we want to create a mobile application that will classify and recognize pictures
+of cats taken and uploaded by users.
 
+There are two sources of data used to develop the mobile app. The first data distribution is small,
+10,000 pictures uploaded from the mobile application. Since they are from amateur users, the
+pictures are not professionally shot, not well framed and blurrier. The second source is from the
+web, you downloaded 200,000 pictures where cat’s pictures are professionally framed and in high
+resolution.
 
+The problem is that you have a different distribution:
+\begin{enumerate}
+    \item small data set from pictures uploaded by users. This distribution is important for the
+    mobile app.
+    \item bigger data set from the web.
+\end{enumerate}
 
+The guideline used is that you have to choose a development set and test set to reflect data you
+expect to get in the future and consider important to do well.
 
+The data is split as the Figure~\ref{fig:split-data-with-two-diff-sources}. The advantage of this
+way of splitting up is that the target is well defined.
 
+The disadvantage is that the training distribution is different from the development and test set
+distributions. However, this way of splitting the data has a better performance in long term.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/split-data-with-two-diff-sources}
+    \caption{The split of the data, which have }
+    \label{fig:split-data-with-two-diff-sources}
+\end{figure}
 
+\subsubsection{Bias and Variance with mismatched data distributions}
+\paragraph{Example: Cat classifier with mismatched data distribution}
+When the training set is from a different distribution than the development and test sets, the
+method to analyze bias and variance changes, see
+Figure~\ref{fig:bias-variance-with-mismatched-data}.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=50em]{figures/bias-variance-with-mismatched-data}
+    \caption{Bias and variance with mismatched data.}
+    \label{fig:bias-variance-with-mismatched-data}
+\end{figure}
 
+\paragraph{Scenario A}
+If the development data comes from the same distribution as the training set, then there is a large
+variance problem and the algorithm is not generalizing well from the training set.
 
+However, since the training data and the development data come from a different distribution, this
+conclusion cannot be drawn. There isn't necessarily a variance problem. The problem might be that
+the development set contains images that are more difficult to classify accurately.
+
+When the training set, development and test sets distributions are different, two things change at
+the same time. First of all, the algorithm trained in the training set but not in the development
+set. Second of all, the distribution of data in the development set is different. It's difficult to
+know which of these two changes what produces this 9\% increase in error between the training set
+and the development set. To resolve this issue, we define a new subset called training-development
+set. This new subset has the same distribution as the training set, but it is not used for training
+the neural network.
+
+\paragraph{Scenario B}
+The error between the training set and the training-development set is 8\%. In this case, since the
+training set and training-development set come from the same distribution, the only difference
+between them is the neural network sorted the data in the training and not in the training
+development. The neural network is not generalizing well to data from the same distribution that it
+hadn't seen before. Therefore, we have really a variance problem.
+
+\paragraph{Scenario C}
+In this case, we have a mismatch data problem since the 2 data sets come from different
+distribution.
+
+\paragraph{Scenario D}
+In this case, the avoidable bias is high since the difference between Bayes error and training
+error is 10\%.
+
+\paragraph{Scenario E}
+In this case, there are 2 problems. The first one is that the avoidable bias is high since the
+difference between Bayes error and training error is 10\% and the second one is a data mismatched
+problem.
+
+\paragraph{Scenario F}
+Development should never be done on the test set. However, the difference between the development
+set and the test set gives the degree of overfitting to the development set.
+
+Figure~\ref{fig:data-mismatched-general-formulation} shows the general formulation.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/data-mismatched-general-formulation}
+    \caption{The general formulation of bias and variance with mismatched data.}
+    \label{fig:data-mismatched-general-formulation}
+\end{figure}
+
+\subsubsection{Addressing data mismatch}
+This is a general guideline to address data mismatch:
+\begin{itemize}
+    \item Perform manual error analysis to understand the error differences between training,
+    development/test sets. Development should never be down on test set to avoid overfitting.
+    \item Make training data or collect data similar to development and test sets. To make the
+    training data more similar to your development set, you can use is artificial data synthesis.
+    However, it is possible that if you might be accidentally simulating data only from a tiny
+    subset of the space all possible examples.
+\end{itemize}
+
+\subsection{Learning from multiple tasks}
+\subsubsection{Transfer learning}
+Transfer learning refers to using the neural network knowledge from for another application.
+
+When to use transfer learning
+\begin{itemize}
+    \item Task A and B have same input $x$
+    \item A lot more data for Task A than Task B
+    \item Low level features from Task A could be helpful for Task B
+\end{itemize}
+
+\paragraph{Example 1: Cat recognition --- radiology diagnosis}
+The following neural network is trained for cat recognition, but we want to adapt it for radiology
+diagnosis. The neural network will learn about the structure and the nature of images. This initial
+phase of training on image recognition is called pre-training, since it will pre-initialize the
+weights of the neural network. Updating all the weights afterwards is called fine-tuning.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=45em]{figures/transfer-learning}
+    \caption{Transfer learning example, from Task cats recognition to Task radiology diagnosis.}
+    \label{fig:transfer-learning}
+\end{figure}
+
+For cat recognition
+\begin{itemize}
+    \item Input $x$: image
+    \item Output $y$: 1---cat; 0---non-cat
+\end{itemize}
+
+For Radiology diagnosis
+\begin{itemize}
+    \item Input $x$: Radiology images --- CT Scan, X-rays
+    \item Output $y$: Radiology diagnosis, 1---tumor malign; 0---tumor benign
+\end{itemize}
+
+\paragraph{Guideline}
+\begin{itemize}
+    \item Delete last layer of neural network
+    \item Delete weights feeding into the last output layer of the neural network
+    \item Create a new set of randomly initialized weights for the last layer only
+    \item New dataset $(x, y)$
+\end{itemize}
+
+\subsubsection{Multi-task learning}
+Multi-task learning refers to having one neural network do simultaneously several tasks.
+
+When to use multi-task learning
+\begin{itemize}
+    \item Training on a set of tasks that could benefit from having shared lower-level features
+    \item Usually: Amount of data you have for each task is quite similar
+    \item Can train a big enough neural network to do well on all tasks
+\end{itemize}
+
+\paragraph{Example: Simplified autonomous vehicle}
+The vehicle has to detect simultaneously several things: pedestrians, cars, road signs, traffic
+lights, cyclists, etc. We could have trained four separate neural networks, instead of train one to
+do four tasks. However, in this case, the performance of the system is better when one neural
+network is trained to do four tasks than training four separate neural networks since some of the
+earlier features in the neural network could be shared between the different types of objects.
+
+The input $x^{(i)}$ is the image with multiple labels. The output $y^{(i)}$ has 4 labels which are
+represents:
+$$ \Vector{y^{(i)}} = \left[\begin{array}{c} 0 \\ 1 \\ 1 \\ 0 \end{array}\right]
+\left.\begin{array}{l}
+\text{Pedestrians} \\ \text{Cars} \\ \text{Road signs - Stop} \\ \text{Traffic lights}
+\end{array}\right. \quad \longrightarrow \quad
+\Matrix{Y} = \left[\begin{array}{cccc}
+\vRule & \vRule & \vRule & \vRule \\
+\Vector{y^{(1)}} & \Vector{y^{(2)}} & \Vector{y^{(3)}} & \Vector{y^{(4)}} \\
+\vRule & \vRule & \vRule & \vRule \end{array}\right] \qquad
+\Matrix{Y} \in \Set{R}^{(4, m)} $$
+
+To train this neural network, the cost function is defined as follow:
+$$ -\frac{1}{m} \sum_{i=1}^m \sum_{j=1}^4 (y_j^{(i)} \log(\hat{y}_j^{(i)})) + (1-y_j^{(i)})
+\log(1-\hat{y}_j^{(i)})) $$
+
+Also, the cost can be compute such as it is not influenced by the fact that some entries are not
+labeled. For example:
+$$ \Matrix{Y} = \left[\begin{array}{cccc} 1 & 0 & ? & ? \\ 0 & 1 & ? & 0 \\ 0 & 1 & ? & 1 \\
+? & 0 & 1 & 0 \end{array}\right] $$
+
+\subsection{End-to-end deep learning}
+\subsubsection{What is end-to-end deep learning?}
+End-to-end deep learning is the simplification of a processing or learning systems into one neural
+network.
+
+\paragraph{Example: Speech recognition model}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=45em]{figures/end-to-end-learning}
+    \caption{Different ways to train a speech recognition model.}
+    \label{fig:end-to-end-learning}
+\end{figure}
+
+End-to-end deep learning cannot be used for every problem since it needs a lot of labeled data. It
+is used mainly in audio transcripts, image captures, image synthesis, machine translation, steering
+in self-driving cars, etc.
+
+\subsubsection{Whether to use end-to-end deep learning}
+Before applying end-to-end deep learning, you need to ask yourself the following question: Do you
+have enough data to learn a function of the complexity needed to map $x$ and $y$?
+
+\paragraph{Pros:}
+\begin{itemize}
+    \item Let the data speak
+    \begin{itemize}
+        \item By having a pure machine learning approach, the neural network will learn from $x$ to
+        $y$. It will be able to find which statistics are in the data, rather than being forced to
+        reflect human preconceptions.
+    \end{itemize}
+    \item Less hand-designing of components needed
+    \begin{itemize}
+        \item It simplifies the design work flow.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Cons:}
+\begin{itemize}
+    \item Large amount of labeled data
+    \begin{itemize}
+        \item It cannot be used for every problem as it needs a lot of labeled data.
+    \end{itemize}
+    \item Excludes potentially useful hand-designed component
+    \begin{itemize}
+        \item Data and any hand-design's components or features are the 2 main sources of knowledge
+        for a learning algorithm. If the dataset is small, a hand-design system is a way to give
+        manual knowledge into the algorithm.
+    \end{itemize}
+\end{itemize}
 
 
 \end{document}
