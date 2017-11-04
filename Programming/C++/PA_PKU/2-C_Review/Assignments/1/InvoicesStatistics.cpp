@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
                 default:
                     break;
             }
-            totalMoney[i] += price;
+            totalMoney[id-1] += price;
         }
     }
     for (int i = 0; i < 3; i++) {
