@@ -410,7 +410,7 @@ pi = &e;                    // now pi points to e
 ``` C++
     int *get(int arr[][4], int n, int m)
     {
-        it *pt;
+        int *pt;
         pt = *(arr + n - 1) + m - 1;
         return(pt);
     }
