@@ -436,12 +436,13 @@ Network.
 
 \begin{figure}[htb]
     \centering
-    \includegraphics[width=25em]{figures/inception-module}
+    \includegraphics[width=35em]{figures/inception-module}
     \includegraphics[width=40em]{figures/inception-network}
     \caption{Inception module and Inception Network}
     \label{fig:inception-module-and-inception-network}
 \end{figure}
 
+\subsection{Practical advices for using ConvNets}
 \subsubsection{Using Open-Source Implementation}
 It turns out that a lot of effective neural networks are difficult or finicky to replicate because
 a lot of details about tuning the hyperparameters such as learning rate and other things that make
@@ -566,34 +567,257 @@ Use open source code:
     \item Use pretrained models and fine-tune on your dataset
 \end{itemize}
 
+\section{Object detection}
+\subsection{Detection algorithms}
+\subsubsection{Object Localization}
+Object detection is one of the areas of computer vision that's just exploding and it's working so
+much better than just a couple years ago. In order to build up to object detection, you first learn
+about object localization. The Figure~\ref{fig:detection-definition} shows the definition of
+Detection.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/detection-definition}
+    \caption{The definition for Detection}
+    \label{fig:detection-definition}
+\end{figure}
 
+Classfication algorithm outputs not just a class label but also the four parameters to tell you
+where is the bounding box of the object it detected.
 
+There maybe one of the four classses in the image:
+\begin{enumerate}
+    \item pedestrian
+    \item car
+    \item motorcycle
+    \item background
+\end{enumerate}
 
+Target label $\Vector{y}$:
+$$ \Vector{y} = \left[\begin{array}{c} p_c \\ b_x \\ b_y \\ b_h \\ b_w \\ c_1 \\ c_2 \\ c_3
+\end{array}\right] $$
 
+For example, if the classifier predicts there is a car in the image, then the target label will be
+$$ \Vector{y} = \left[\begin{array}{c} 1 \\ b_x \\ b_y \\ b_h \\ b_w \\ 0 \\ 1 \\ 0
+\end{array}\right] $$
+if the classifier predicts there is no object (just background) in the image, then the target label
+will be
+$$ \Vector{y} = \left[\begin{array}{c} 0 \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \end{array}\right] $$
+where ``$?$'' means ``we don't care''.
 
+If you use squared error, the cost function can be
+$$ \Cal{L}(\hat{y}, y) = \left\{\begin{array}{ll} (\hat{y}_1 - y_1)^2 + (\hat{y}_2 - y_2)^2 + \cdots
++ (\hat{y}_8 - y_8)^2 & \text{if } y_1 = 1 \\ (\hat{y}_1 - y_1)^2 & \text{if } y_1 = 0 \end{array}
+\right. $$
 
+\subsubsection{Landmark Detection}
+In more general cases, you can have a neural network just outputs $x$ and $y$ coordinates of
+important points in image, sometimes called the landmarks that you want the neural network to
+recognize.
 
+\subsubsection{Object Detection}
+\paragraph{Sliding windows detection}
+As we can see from Figure~\ref{fig:sliding-window-detection}, by picking a certain window sizes and
+then pick the region in the red box as the input of the conv net. The conv net is a classifiert that
+can output the whether the image contains a car (0 or 1). With a fixed stride, then you go
+through every region of the image. Last, pick another window size, and repeat over again.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/sliding-window-detection}
+    \caption{Sliding window detection}
+    \label{fig:sliding-window-detection}
+\end{figure}
 
+\subsubsection{Convolutional Implementation of Sliding Windows}
+\paragraph{Turning FC layers into convolutional layers}
+Figure~\ref{fig:turning-fc-layer-into-conv-layers} shows how to turn FC layer into 1 $\times$ 1
+CONV layers.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/turning-fc-layer-into-conv-layers}
+    \caption{Turning FC layer into CONV layers}
+    \label{fig:turning-fc-layer-into-conv-layers}
+\end{figure}
 
+\paragraph{Convolutional implementation of sliding windows}
+Like Figure~\ref{fig:conv-implementation-of-sliding-windows} shows, the conv net inputs 14 $\times$
+14 $\times$ 3 images and your test set image is 16 $\times$ 16 $\times$ 3 so now added that yellow
+stide to the border of the image. So in the original sliding windows algorithm, you might want to
+input the blue region into a conv net and run that once to generate a classification 0 or 1 and
+then slide it down a bit.
 
+Originally, to run sliding windows on this 16 $\times$ 16 $\times$ 3 image, you run the 14 $\times$
+14 $\times$ 3 conv net four times in order to get 4 labels. But it turns out a lot of this
+computation done by these 4 conv nets is highly duplicated. So what the convolutional implementation
+of sliding windows does is it allows these 4 forward passes of the conv nets to share a lot of
+computation.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/conv-implementation-of-sliding-windows}
+    \caption{Convolution implementation of sliding windows}
+    \label{fig:conv-implementation-of-sliding-windows}
+\end{figure}
 
+\subsubsection{Bounding Box Predictions}
+Using a convolutional implementation of sliding windows is more computationally efficient but the
+it's still have a problem of not quite outputting the most accurate bouding boxes.
 
+\paragraph{YOLO algorithm}
+``YOLO'' means ``You Only Look Once''.
 
+Let's say you have an input image that is 100 $\times$ 100, you're going to place down a grid on
+this image and for the purposes of illustration, we use 3 $\times$ 3 grid.
 
+The basic idea is that you are going to take the image classification and localization algorithm
+and apply it to each of the nine grid cells of this image. So the more concrete here's how you
+define the labels you use for training.
 
+For each grid cell:
+$$ \Vector{y} = \left[\begin{array}{c} p_c \\ b_x \\ b_y \\ b_h \\ b_w \\ c_1 \\ c_2 \\ c_3
+\end{array}\right] $$
 
+To give a bit more detail, if the image contains two objects, what the YOLO algorithm does is it
+takes the midpoint of each of the two objects and it assigns the object to the grid cell containing
+the midpoint. And so even though some grid cells have some parts of the cars will pretend that it
+has no interesting object.
 
+How to specify the bounding box? In the YOLO algorithm, relative to one grid cell, we take the
+convention that the upper-left point is $(0, 0)$ and the lower-right point is $(1, 1)$, refers to
+Figure~\ref{fig:bounding-boxes}. To specify the position of the midpoint of interesting object. The
+$b_x$, $b_y$, $b_h$, $b_w$ are specified relative to the grid cell. So $b_x$ and $b_y$ are must
+between 0 and 1, but $b_h$ and $b_w$ could be larger than 1.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/bounding-boxes}
+    \caption{Specify the bounding boxes}
+    \label{fig:bounding-boxes}
+\end{figure}
 
+\subsubsection{Intersection over Union}
+$IoU$, which means Intersection over Union, Figure~\ref{fig:IoU}. More generally, $IoU$ is a
+measure of the overlap between two bounding boxes.
 
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/IoU}
+    \caption{IoU}
+    \label{fig:IoU}
+\end{figure}
 
+$$ IoU = \frac{\text{size of intersection}}{\text{size of union}} $$
 
+Maybe we think the bounding box is correct only if $IoU \geq 0.5$.
 
+\subsubsection{Non-max Suppression}
+One of the problems of object detection as you've learned about so far is that your algorithm may
+find multiple detections of the same object so rather than detecting an object just once, it might
+detect it multiple times. Non-max suppression is a way for you to make sure that your algorithm
+detects each object only once.
 
+Like Figure~\ref{fig:non-max-surppression-example} shows, we will run image and localization
+algorithm on every grid cell on 361 grid cells. It's possible that many of them will raise their
+hand and say my $p_c$ chance of thinking I've an object in it. So when you run your algorithm, you
+might end up with multiple detections of each ojbect. What non-max suppression does is it clean up
+these detections and end upo with just one detection per car rather than multiple detections per
+car.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=25em]{figures/non-max-surppression-example}
+    \caption{Non-max surppression example}
+    \label{fig:non-max-surppression-example}
+\end{figure}
+
+Concretely what it does is it first looks at the probabilities associated with each of these
+detection. It first takes the largest one which in this case is 0.9 and says that's my most
+confident detection so let's highlight that I'm just say I found a car there. Having done that the
+non-max suppression part then looks at all of remaining rectangles and all the ones with a high
+overlap ($IoU$) with this one you've just output will get suppressed. Next you then go through the
+remaining and find the one with the highest probability ($p_c$) and repeat the above steps.
+
+\begin{enumerate}
+    \item On 19 $\times$ 19 grid you're going to run and get a 19 $\times$ 19 $\times$ 8 output
+    volume. Although for this example, to simplify it to say that you're only doing car detection
+    so we get rid of the $c_1$, $c_2$ and $c_3$. Then each output prediction we get is:
+    $\displaystyle \left[\begin{array}{c} p_c \\ b_x \\ b_y \\ b_h \\ b_w \end{array}\right]$
+    \item Discard all boxes with $p_c \leq 0.6$
+    \item While there are any remaining boxes:
+    \begin{itemize}
+        \item Pick the box with the largest $p_c$, output that as a prediction.
+        \item Discard any remaining box with $IoU \geq 0.5$ with the box output in the previous
+        step
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Anchor Boxes}
+One of the problems with object detection as you've seen it so far is that each of the grid cells
+can detect only one object whatever grid cell wants to detect multiple objects. What if grid cells
+want to detect multiple objects? We can use anchor boxes.
+
+See the example shows in Figure~\ref{fig:anchor-boxes-example}. In this example, notice that the
+midpoint of the pedestrian and the midpoint of the car are in almost the same place and both of
+them fall into the same grid cell. But it won't be able to output two detections so you have to pick
+one of the two detections to output.
+
+With the idea of anchor boxes, what you're going to do is predefined two different shapes called
+anchor boxes or anchor boxes shapes. And what you're going to do is now be able to associate two
+predictions with the two anchor boxes. Define
+$$ \Vector{y} = \left[\begin{array}{c} p_c^{(1)} \\ b_x^{(1)} \\ b_y^{(1)} \\ b_h^{(1)} \\ b_w^{(1)}
+\\ c_1^{(1)} \\ c_2^{(1)} \\ c_3^{(1)} \\ p_c^{(2)} \\ b_x^{(2)} \\ b_y^{(2)} \\ \vdots \\ c_3^{(2)}
+\end{array}\right]
+\begin{array}{llll} \left.\begin{array}{c} \\ \\ \\ \\ \\ \\ \\ \\ \\ \end{array}\right\}
+\begin{array}{c}\text{anchor box 1}\end{array} \\
+\left.\begin{array}{c} \\ \\ \\ \\ \\ \\ \end{array}\right\}
+\begin{array}{c}\text{anchor box 2}\end{array} \end{array} $$
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/anchor-boxes-example}
+    \caption{Anchor boxes example}
+    \label{fig:anchor-boxes-example}
+\end{figure}
+
+Previously: Each object in training image is assigned to grid cell that contains that object's
+midpoint. Output $\Vector{y}$: 3 $\times$ 3 $\times$ 8.
+
+With two anchor boxes: Each object in training image is assigned to grid cell that contains object's
+midpoint and anchor box for the grid cell with highest $IoU$. Output $\Vector{y}$: 3 $\times$ 3
+$\times$ 16.
+
+\subsubsection{YOLO algorithm}
+Suppose you are trying to train an algorithm to detect three objects, pedestrians, cars and
+motorcycle. If you're using two anchor boxes, your output $\Vector{y}$ will be 3 $\times$ 3
+$\times$ 2 $\times$ 8.
+
+\begin{enumerate}
+    \item Training
+    \item Making predictions
+    \item Outputting the non-max suppressed outputs
+    \begin{itemize}
+        \item For each grid call, get 2 predicted bounding boxes.
+        \item Get rid of low probability predictions.
+        \item For each class (pedestrain, car, motorcycle), use non-max suppression to generate
+        final predictions.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Region Proposals}
+Region proposal: R-CNN.
+\begin{enumerate}
+    \item Use segmentation algorithms to find blobs with bounding boxes.
+    \item Run classifier on the blobs.
+\end{enumerate}
+
+R-CNN: Propose regions. Classify proposed regions one at a time. Output label and bounding boxes.
+
+Fast R-CNN: Propose regions. Use convolution implementation of sliding windows to classify all the
+proposed regions.
+
+Faster R-CNN: Use convolution network to propose regions.
 
 
 
