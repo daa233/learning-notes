@@ -258,7 +258,7 @@ Pooling layers have no parameters to learn.
 \subsubsection{CNN Example}
 Figure~\ref{fig:cnn-example} shows a CNN example inpired by LeNet-5.
 
-In the literature of a Conv net, there are two conventions which are slightly in consistence about
+In the literature of a ConvNet, there are two conventions which are slightly in consistence about
 what you call a layer. One convention is call CONV+POOL a layer. Another convention would be to
 count the CONV layer as a layer, and the POOL layer as a layer. When people report a number of
 layers in a neural network, usually people report just the number of layers that have weights
@@ -618,7 +618,7 @@ recognize.
 \subsubsection{Object Detection}
 \paragraph{Sliding windows detection}
 As we can see from Figure~\ref{fig:sliding-window-detection}, by picking a certain window sizes and
-then pick the region in the red box as the input of the conv net. The conv net is a classifiert that
+then pick the region in the red box as the input of the ConvNet. The ConvNet is a classifiert that
 can output the whether the image contains a car (0 or 1). With a fixed stride, then you go
 through every region of the image. Last, pick another window size, and repeat over again.
 
@@ -642,16 +642,16 @@ CONV layers.
 \end{figure}
 
 \paragraph{Convolutional implementation of sliding windows}
-Like Figure~\ref{fig:conv-implementation-of-sliding-windows} shows, the conv net inputs 14 $\times$
+Like Figure~\ref{fig:conv-implementation-of-sliding-windows} shows, the ConvNet inputs 14 $\times$
 14 $\times$ 3 images and your test set image is 16 $\times$ 16 $\times$ 3 so now added that yellow
 stide to the border of the image. So in the original sliding windows algorithm, you might want to
-input the blue region into a conv net and run that once to generate a classification 0 or 1 and
+input the blue region into a ConvNet and run that once to generate a classification 0 or 1 and
 then slide it down a bit.
 
 Originally, to run sliding windows on this 16 $\times$ 16 $\times$ 3 image, you run the 14 $\times$
-14 $\times$ 3 conv net four times in order to get 4 labels. But it turns out a lot of this
-computation done by these 4 conv nets is highly duplicated. So what the convolutional implementation
-of sliding windows does is it allows these 4 forward passes of the conv nets to share a lot of
+14 $\times$ 3 ConvNet four times in order to get 4 labels. But it turns out a lot of this
+computation done by these 4 ConvNets is highly duplicated. So what the convolutional implementation
+of sliding windows does is it allows these 4 forward passes of the ConvNets to share a lot of
 computation.
 
 \begin{figure}[htb]
@@ -818,6 +818,236 @@ Fast R-CNN: Propose regions. Use convolution implementation of sliding windows t
 proposed regions.
 
 Faster R-CNN: Use convolution network to propose regions.
+
+
+\section{Special applications: Face recognition \& Neural style transfer}
+\subsection{Face Recognition}
+\subsubsection{What is face recognition?}
+Face verification vs. face recognition
+
+Verification
+\begin{itemize}
+    \item Input image, name/ID
+    \item Output whether the input image is that of the claimed person
+\end{itemize}
+
+Recognition
+\begin{itemize}
+    \item Has a database of $K$ persons
+    \item Get an input image
+    \item Output ID if the image is any of the $K$ persons (or ``not recognized'')
+\end{itemize}
+
+\subsubsection{One Shot Learning}
+One of the challenges of face recognition is that you need to solve the one-shot learning problem.
+What that means is that for most face recognition applications you need together recognize a person
+given just one single image or given just one example of that person's face.
+
+Softmax function doesn't work well on this problem, because if you have such a small training set,
+it is not enough to train a robust neural network for this task. And whatever new person joins your
+team, so now you have to retrain the ConvNets every time.
+
+\paragraph{Learning a ``similarity'' function}
+$$ d(img1, img2) = \text{degree of difference between images} $$
+
+If $d(img1, img2) \leq \tau$, predict ``same''; if $d(img1, img2) > \tau$, predict ``different''.
+
+\subsubsection{Siamese network}
+Like Figure~\ref{fig:siamese-network} shows, say we have two images $x^{(1)}$ and $x^{(2)}$, and
+we want to judge if they are the same person. What we can do is input the two images to Simamese
+network independently, and get their encoding $f(x^{(1)})$ and $f(x^{(2)})$. Then we use $L_2$ Norm
+as the similarity function
+$$ d(x^{(1)}, x^{(2)}) = ||f(x^{(1)}) - f(x^{(2)})||_2^2 $$
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/siamese-network}
+    \caption{Siamese network}
+    \label{fig:siamese-network}
+\end{figure}
+
+Parameters of NN define an encoding $f(x^{(i)})$. Learn parameters so that if $x^{(i)}$, $x^{(j)}$
+are the same person, $||f(x^{(i)}) - f(x^{(j)})||_2^2$ is small; if $x^{(i)}$, $x^{(j)}$ are
+different persons, $||f(x^{(i)}) - f(x^{(j)})||_2^2$ is large.
+
+\subsubsection{Triplet Loss}
+One way to learn the parameters of the neural network so that it gives you a good encoding for your
+images of faces is to define and apply gradient descent on the triplet loss function.
+
+\paragraph{Learning Objective}
+Given an Anchor image $A$, for each Positive image $P$ and Negative image $N$, we want
+$$ \underbrace{||f(A)-f(P)||^2}_{d(A, P)} \leq \underbrace{||f(A)-f(N)||^2}_{d(A, N)} $$
+
+$$ ||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 \leq 0 $$
+
+To prevent $f(img) = \Vector{0}$
+$$ ||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 + \alpha \leq 0 $$
+where $\alpha$ is a hyperparameter, also called ``margin'', it can push the anchor positive pair
+and the anchor negative pair further away from each other.
+
+\paragraph{Loss function}
+Given 3 images, $A$, $P$, $N$, on a single triplet:
+$$ \Cal{L}(A, P, N) = \text{max}(||f(A)-f(P)||^2 - ||f(A)-f(N)||^2 + \alpha, 0) $$
+
+Overall cost function:
+$$ J = \sum_{i=1}^m \Cal{L}(A^{(i)}, P^{(i)}, N^{(i)}) $$
+
+\paragraph{Choosing the triplets $A$, $P$, $N$}
+During training, if $A$, $P$, $N$ are chosen randomly, $d(A, P) + \alpha \leq d(A, N)$ is easily
+satisfied, so the network won't learn much in this way.
+
+Choose triplets that are ``hard'' to train on:
+$$ d(A, P) + \alpha \leq d(A, N) $$
+$$ d(A, P) \approx d(A, N) $$
+
+\subsubsection{Face verification and binary classification}
+The triplet loss is one good way to learn the parameters of a ConvNet for face recognition. Face
+recognition can also be posed as a straight binary classification problem.
+
+Another way to train a neural network is to take the pair of neural networks to take Siamese
+network and have them both compute the 128 dimensional embeddings. And then have these be input to
+a logistic regression unit to make a prediction, where the target output will be 1 if both of these
+are same persons and 0 if both of these are of different persons. So like
+Figure~\ref{fig:face-verification-and-binary-classification} shows, this is a way to treat face
+recognition just as a binary classificaion problem.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/face-verification-and-binary-classification}
+    \caption{Learning the similarity function}
+    \label{fig:face-verification-and-binary-classification}
+\end{figure}
+
+$$ \hat{y} = \sigma(\sum_{k=1}^{128} w_i ||f(x^{(i)})_k - f(x^{(j)})_k|| + b) $$
+or
+$$ \hat{y} = \sigma(\sum_{k=1}^{128} w_i \frac{(f(x^{(i)})_k - f(x^{(j)})_k)^2}{f(x^{(i)})_k
++ f(x^{(j)})_k} + b) $$
+where $\displaystyle \frac{(f(x^{(i)})_k - f(x^{(j)})_k)^2}{f(x^{(i)})_k + f(x^{(j)})_k}$ is
+sometimes called $\chi^2$ similarity.
+
+\paragraph{Face verification supervised learning}
+To treat face verification as supervised learning, you create a training set of just pairs of
+images now, instead of triplets. And pairs of images where the target label is 1 when these are
+a pair of pictures of the same person and where the target label is 0 when these are pictures of
+different persons. So you use pairs of images to train the Siamese network using backpropagation.
+
+\subsection{Neural Style Transfer}
+\subsubsection{What is neural style transfer?}
+One of the most fun and exciting applications of ConvNets recently has been neural style transfer.
+
+Figure~\ref{fig:neural-style-transfer-examples} shows two examples of neural style transfer. We use
+$C$ to denote the Content image, $S$ to denote the Style image, and $G$ to denote the generated
+image.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/neural-style-transfer-examples}
+    \caption{Neural style transfer examples}
+    \label{fig:neural-style-transfer-examples}
+\end{figure}
+
+\subsubsection{What are deep ConvNets learning?}
+\paragraph{Visualizing what a deep network is learning}
+Pick a unit layer 1. Find the nine image patches that maximize the unit's activation. Then repeat
+for other units.
+
+Repeat the procedure and you can visualize more deep layers.
+
+\subsubsection{Cost function}
+$$ J(G) = \alpha J_{\text{content}}(C, G) + \beta J_{\text{style}}(S, G) $$
+
+$J_{\text{content}}$ measures how similar the contents of the generated image is to the content of
+Content image. $J_{style}$ measures how similar to the style of the generated image is to the style
+of the Style image.
+
+\paragraph{Find the generated image $G$}
+\begin{enumerate}
+    \item Initiate $G$ randomly \\
+    e.g. $G$ 100 $\times$ 100 $\times$ 3
+    \item Use gradient descent to minimize $J(G)$
+    $$ G := G - \frac{\partial}{\partial G} J(G) $$
+\end{enumerate}
+
+\subsubsection{Content Cost Function}
+\begin{itemize}
+    \item Say you use hidden layer $l$ to compute content cost.
+    \begin{itemize}
+        \item If $l$ is a very small number, if you used in there 1, then it would really force your generated
+        image and the pixel values very similar to your Content image; whereas if you use a very deep
+        layer, then it's just asking well if there's a dog in your content image then make sure there's a
+        dog somewhere in the generated image. So in practice, the layer $l$ is chosen somewhere in between
+        is neither too shallow nor too deep in the neural network.
+    \end{itemize}
+    \item Use pre-trained ConvNet. (E.g., VGG network)
+    \item Let $a^{[l](C)}$ and $a^{[l](G)}$ be the activation of layer $l$ on the images
+    \item If $a^{[l](C)}$ and $a^{[l](G)}$ are similar, both images have similar content
+\end{itemize}
+
+$$ J_{\text{content}}(C, G) = \frac{1}{2} ||a^{[l](C) - a^{[l][G]}}||^2 $$
+
+\subsubsection{Style Cost Function}
+\begin{itemize}
+    \item Say you are using layer $l$'s activation to measure ``style''.
+    \item Define style as \emph{correlation} between activations across channels.
+    \begin{itemize}
+        \item The correlation tells you which of these high level texture components tend to occur
+        or not occur together in part of the image.
+    \end{itemize}
+    \item Compute Style matrix (Gram matrix)
+    \begin{itemize}
+        \item Let $a_{i,j,k}^{[l]} = \text{activation at } (i, j, k).$ \quad $G^{[l]}$ is $n_C^{[l]}
+        \times n_C^{[l]}$
+        \item Define and compute the Style matrix
+        $$ G_{kk'}^{[l](S)} = \sum_{i=1}^{n_H^{[l]}} \sum_{j=1}^{n_W^{[l]}} a_{ijk}^{[l](S)}
+        a_{ijk'}^{[l](S)} $$
+        $$ G_{kk'}^{[l](G)} = \sum_{i=1}^{n_H^{[l]}} \sum_{j=1}^{n_W^{[l]}} a_{ijk}^{[l](G)}
+        a_{ijk'}^{[l](G)} $$
+    \end{itemize}
+\end{itemize}
+
+$$ J_{\text{style}}^{[l]}(S, G) = \frac{1}{(2 n_H^{[l]} n_W^{[l]} n_C^{[l]})^2}
+|| G^{[l](S)} - G^{[l](G)} ||_F^2 = \frac{1}{(2 n_H^{[l]} n_W^{[l]} n_C^{[l]})^2} \sum_k \sum_{k'}
+(G_{kk'}^{[l](S)} - G_{kk'}^{[l](G)}) $$
+
+It turns out that you get more visually better result if you use the sum of cost functions from
+multiple different layers.
+
+The overall style cost function
+$$ J_{\text{style}}(S, G) = \sum_l \lambda^{[l]} J_{\text{style}}^{[l]}(S, G) $$
+
+\subsubsection{1D and 3D Generalizations}
+Like Figure~\ref{fig:conv-nets-on-1d-data} and Figure~\ref{fig:conv-nets-on-3d-data} shows,
+ConvNets can also be used on 1D and 3D data.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/conv-nets-on-1d-data}
+    \caption{Convolution in 2D and 1D}
+    \label{fig:conv-nets-on-1d-data}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=40em]{figures/conv-nets-on-3d-data}
+    \caption{3D convolution}
+    \label{fig:conv-nets-on-3d-data}
+\end{figure}
+
+For a long upon 1D data applications you actually use a Recurrent Neural Network, but some people
+also try using ConvNets in these problems.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
