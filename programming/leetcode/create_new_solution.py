@@ -206,9 +206,14 @@ def create_new_solution(solution, solution_base_path):
         os.makedirs(solution_path)
     file_content = process_solution_file(solution)
     solution_file = os.path.join(solution_path, solution.filename)
-    with open(solution_file, 'w') as f:
-        f.writelines(file_content)
-    return solution_file
+    if os.path.exists(solution_file):
+        exit("==> A solution file \'{}\' already exists. Nothing changed.".format(
+            solution_file))
+    else:
+        with open(solution_file, 'w') as f:
+            f.writelines(file_content)
+        print("==> The solution file have been created at \'{}\'".format(solution_file))
+        print("==> All is ready! Enjoy programming!")
 
 
 def main():
@@ -285,9 +290,8 @@ def main():
         solution = Solution(args.id, lang_slug, urls, author_name, date)
         solution.get_stat(problems_list_json_filename)
         # Prepare a new solution for LeetCode problem
-        solution_file = create_new_solution(solution, solution_base_path)
-        print("==> The solution file have been created at {}".format(solution_file))
-        print("==> All is ready! Enjoy programming!")
+        create_new_solution(solution, solution_base_path)
+
     else:
         exit('==> ERROR: Invalid problem id: {}'.format(args.id))
 
