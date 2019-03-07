@@ -133,9 +133,9 @@ def format_description(desc_text, comment_mark):
                     new_subsec_text_list.append(comment_mark + item)
             else:
                 new_subsec_text_list.append(comment_mark + subsec_text)
-        new_sec_text_list.append('\n'.join(new_subsec_text_list))
-    desc_text = '\n#\n'.join(new_sec_text_list)
-
+        if len(new_subsec_text_list) > 0:
+            new_sec_text_list.append('\n'.join(new_subsec_text_list))
+    desc_text = ('\n' + comment_mark + '\n').join(new_sec_text_list)
     return desc_text
 
 
