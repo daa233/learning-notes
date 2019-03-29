@@ -31,6 +31,7 @@ struct ListNode {
     ListNode(int x) : val(x), next(NULL) {}
 };
 
+// Add two lists to a new list
 class Solution1 {
    public:
     ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {
@@ -63,6 +64,7 @@ class Solution1 {
     }
 };
 
+// Add two lists to one of the two lists
 class Solution {
    public:
     ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {
