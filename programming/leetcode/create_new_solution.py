@@ -58,7 +58,7 @@ class Solution(object):
                     self.id))
 
             print('==> Found problem  {}. {}'.format(
-                self.id, self.title_slug))
+                self.id, self.title))
 
             try:
                 # Send requests and get the specific problem description
