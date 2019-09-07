@@ -364,3 +364,6 @@ TSWLatexianTemp*
 ############ Mac OS ##############
 ###################################
 *.DS_store
+
+# VS Code
+.vscode
