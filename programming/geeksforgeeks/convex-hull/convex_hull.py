@@ -35,7 +35,9 @@
 
 import sys
 import math
+import enum
 from typing import List
+
 
 class Point:
     def __init__(self, x, y):
@@ -49,6 +51,7 @@ class Point:
 
     def __str__(self):
         return "({}, {})".format(self.x, self.y)
+
 
 class Vector:
     def __init__(self, p1: Point, p2: Point):
@@ -72,6 +75,37 @@ class Vector:
     def __str__(self):
         return "({}, {})".format(self.x, self.y)
 
+
+class Direction(enum.Enum):
+    colinear = 0
+    counter_clockwise = 1
+    clockwise = -1
+
+
+def orientation(p: Point, q: Point, r: Point) -> int:
+    """
+    colinear: 0
+    counter-clockwise: 1
+    clockwise: -1
+    """
+    v1 = Vector(p, q)
+    v2 = Vector(q, r)
+    cross_prod = v1.cross_mul(v2)
+    if cross_prod == 0:
+        return Direction.colinear
+    elif cross_prod > 0:
+        return Direction.counter_clockwise
+    else:
+        return Direction.clockwise
+
+
+def same_direction(v1: Vector, v2: Vector) -> bool:
+    """
+    Check if v1 and v2 has the same direction
+    """
+    return v1.dot_mul(v2) >= 0
+
+
 # Gift wrapping algorithm (Jarvis's match, O(nh))
 # https://algorithmtutor.com/Computational-Geometry/Convex-Hull-Algorithms-Jarvis-s-March/
 class Solution1:
@@ -90,15 +124,15 @@ class Solution1:
                 if r == p or r == q:
                     continue
                 # find the leftmost
-                o = self.orientation(points[p], points[r], points[q])
-                if o == -1:
+                o = orientation(points[p], points[r], points[q])
+                if o == Direction.clockwise:
                     # clockwise
                     q = r
-                elif o == 0:
+                elif o == Direction.colinear:
                     # colinear, choose the far one
                     v1 = Vector(points[p], points[q])
                     v2 = Vector(points[q], points[r])
-                    if self.same_direction(v1, v2):
+                    if same_direction(v1, v2):
                         q = r
             p = q
             if p == index:
@@ -109,28 +143,6 @@ class Solution1:
             return -1
         else:
             return res
-
-    def orientation(self, p: Point, q: Point, r: Point) -> int:
-        """
-        colinear: 0
-        counter-clockwise: 1
-        clockwise: -1
-        """
-        v1 = Vector(p, q)
-        v2 = Vector(q, r)
-        cross_prod = v1.cross_mul(v2)
-        if cross_prod == 0:
-            return 0
-        elif cross_prod > 0:
-            return 1
-        else:
-            return -1
-
-    def same_direction(self, v1: Vector, v2: Vector) -> bool:
-        """
-        Check if v1 and v2 has the same direction
-        """
-        return v1.dot_mul(v2) >= 0
 
 
 # Graham Scan (O(n))
@@ -154,30 +166,25 @@ class Solution2:
         # sort the points according to the angle
         points.sort(key=sort_key)
 
-        # p_list = []
-        # for p in points:
-        #     p_list.append(str(p))
-        # print(p_list)
-        
         res = [len(points)-1, 0]
         r = 1
         while r < len(points):
             p = res[-2]
             q = res[-1]
-            o = self.orientation(points[p], points[q], points[r])
-            if o == -1:
+            o = orientation(points[p], points[q], points[r])
+            if o == Direction.clockwise:
                 # clockwise
                 if r != len(points) - 1:
                     res.append(r)
                 r += 1
-            elif o == 0:
+            elif o == Direction.colinear:
                 # colinear
                 if r != len(points) - 1:
                     res.append(r)
                 else:
                     v1 = Vector(points[p], points[q])
                     v2 = Vector(points[q], points[r])
-                    if not self.same_direction(v1, v2):
+                    if not same_direction(v1, v2):
                         # for the last point, colinear but not the same 
                         # direction --> all points are colinear
                         return -1
@@ -191,44 +198,137 @@ class Solution2:
         else:
             return [points[i] for i in res]
 
-    def orientation(self, p: Point, q: Point, r: Point) -> int:
-        """
-        colinear: 0
-        counter-clockwise: 1
-        clockwise: -1
-        """
-        v1 = Vector(p, q)
-        v2 = Vector(q, r)
-        cross_prod = v1.cross_mul(v2)
-        if cross_prod == 0:
-            return 0
-        elif cross_prod > 0:
-            return 1
-        else:
-            return -1
-
-    def same_direction(self, v1: Vector, v2: Vector) -> bool:
-        """
-        Check if v1 and v2 has the same direction
-        """
-        return v1.dot_mul(v2) >= 0
-
 
 # Divide and Conquer (O(nlogn))
 # https://algorithmtutor.com/Computational-Geometry/Convex-Hull-Algorithms-Divide-and-Conquer/
 class Solution3:
     def convex_hull(self, points: List[Point]) -> List[Point]:
-        pass
+        # sort the points
+        points.sort(key=lambda point: (point.x, point.y))
+        res = self.convex_hull_helper(points)
+        # NOTE: If all points are colinear, there will be only two points in the res.
+        if len(res) < 3:
+            return -1
+        else:
+            return res
 
-    def merge(self, c_hull_a, c_hull_b):
-        pass
+    def convex_hull_helper(self, points: List[Point]) -> List[Point]:
+        if len(points) == 1:
+            points[0].cw_next = points[0]
+            points[0].ccw_next = points[0]
+            return points
+
+        left_half = self.convex_hull_helper(points[0:len(points)//2])
+        right_half = self.convex_hull_helper(points[len(points)//2:])
+        res = self.merge(left_half, right_half)
+        return res
+
+    def merge(self, c_hull_a: List[Point], c_hull_b: List[Point]) -> List[Point]:
+        p = max(c_hull_a, key=lambda point: point.x)
+        q = min(c_hull_b, key=lambda point: point.x)
+        cp_p = p
+        cp_q = q
+
+        # find the upper tangent
+        prev_p = None
+        prev_q = None
+        while True:
+            prev_p = p
+            prev_q = q
+            if q.cw_next:
+                # move q clockwise as long as it makes left turn
+                while orientation(p, q, q.cw_next) == Direction.counter_clockwise:
+                    q = q.cw_next
+            if p.ccw_next:
+                # move p counter-clockwise as long as it makes right turn
+                while orientation(q, p, p.ccw_next) == Direction.clockwise:
+                    p = p.ccw_next
+            if p == prev_p and q == prev_q:
+                break
+        
+        # find the lower tangent
+        prev_p = None
+        prev_q = None
+        while True:
+            prev_p = cp_p
+            prev_q = cp_q
+            if cp_q.ccw_next:
+                # move q as long as it makes right turn
+                while orientation(cp_p, cp_q, cp_q.ccw_next) == Direction.clockwise:
+                    cp_q = cp_q.ccw_next
+            if cp_q.cw_next:
+                # move p as long as it makes left turn
+                while orientation(cp_q, cp_p, cp_p.cw_next) == Direction.counter_clockwise:
+                    cp_p = cp_p.cw_next
+            if cp_p == prev_p and cp_q == prev_q:
+                break
+        
+        # remove all other points
+        p.cw_next = q
+        q.ccw_next = p
+        cp_p.ccw_next = cp_q
+        cp_q.cw_next = cp_p
+
+        # final result
+        res = []
+        start = p
+        while True:
+            res.append(p)
+            p = p.ccw_next
+
+            if p == start:
+                break
+        
+        return res
 
 
 # Quick Hull
 # https://algorithmtutor.com/Computational-Geometry/Convex-Hull-Algorithms-Divide-and-Conquer/
 class Solution:
     def convex_hull(self, points: List[Point]) -> List[Point]:
-        pass
+        min_x = min(points, key=lambda point: point.x)
+        max_x = max(points, key=lambda point: point.x)
+
+        res = [min_x, max_x]
+        queue = [(min_x, max_x, points), (max_x, min_x, points)]
+        while queue:
+            left_end, right_end, points = queue.pop(0)
+            if not points:
+                continue
+
+            fp, part_points = self.find_farest_point(left_end, right_end, points)
+            
+            if part_points:
+                res.append(fp)
+
+            queue.append((left_end, fp, part_points))
+            queue.append((fp, right_end, part_points))
+        
+        if len(res) < 3:
+            return -1
+        else:
+            return res
+
+    def find_farest_point(self, left_end, right_end, points):
+        part_points = []
+        fp = None
+        if not points:
+            return fp, part_points
+        
+        max_area = 0
+        v1 = Vector(left_end, right_end)
+        for p in points:
+            v2 = Vector(right_end, p)
+            area = v1.cross_mul(v2)
+            if p == left_end or p == right_end:
+                continue
+            elif area > 0:
+                part_points.append(p)
+                if area > max_area:
+                    max_area = area
+                    fp = p
+
+        return fp, part_points
 
 
 def get_input():
@@ -292,7 +392,7 @@ def test(s: Solution):
     ]
     for coords_list, gt in zip(coords_lists, results):
         my_res = process_result(s.convex_hull(coords_to_points(coords_list)))
-        assert my_res == gt, "\ngt: \t{}\nmy_res: {}".format(gt, my_res)
+        assert my_res == gt, "\ngt: {}\nmy: {}".format(gt, my_res)
 
 
 if __name__ == "__main__":
@@ -305,7 +405,3 @@ if __name__ == "__main__":
         convex_hull = s.convex_hull(points)
         print(process_result(convex_hull))
         
-
-
-
-
