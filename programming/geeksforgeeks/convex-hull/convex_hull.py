@@ -111,7 +111,7 @@ def same_direction(v1: Vector, v2: Vector) -> bool:
 class Solution1:
     def convex_hull(self, points: List[Point]) -> List[Point]:
         # find the left most point as the initial point
-        init = min(points, key=lambda point: point.x)
+        init = min(points, key=lambda point: (point.x, point.y))
         index = points.index(init)
 
         # selection sort
@@ -150,7 +150,7 @@ class Solution1:
 class Solution2:
     def convex_hull(self, points: List[Point]) -> List[Point]:
         # find the left most point as the initial point
-        init = min(points, key=lambda point: point.x)
+        init = min(points, key=lambda point: (point.x, point.y))
 
         def sort_key(point):
             if point == init:
@@ -161,7 +161,7 @@ class Solution2:
                 neg_cos = - v1.dot_mul(v2) / (v1.norm() * v2.norm())
                 neg_cos = round(neg_cos, 9)
                 # print('neg_cos', neg_cos)
-            return (neg_cos, abs(point.y-init.y))
+            return (neg_cos, point.y-init.y, init.x-point.x)
 
         # sort the points according to the angle
         points.sort(key=sort_key)
