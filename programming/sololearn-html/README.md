@@ -290,7 +290,7 @@ Table rows are divided into table columns (table data) with the **`<td>`** tag.
 
 In HTML, most elements are defined as **block level** or **inline** elements. Block level elements *start from a new line*. Inline elements are normally *displayed without line breaks*.
 
-**block level elements**: `<h1>`, `<form>`, `<li>`, `<ol>`, `<ul>`, `<p>`, <pre>, `<table>`, `<div>`, etc.
+**block level elements**: `<h1>`, `<form>`, `<li>`, `<ol>`, `<ul>`, `<p>`, `<pre>`, `<table>`, `<div>`, etc.
 
 **inline elements**: `<b>`, `<a>`, `<strong>`, `<img>`, `<input>`, `<em>`, `<span>`, etc.
 
