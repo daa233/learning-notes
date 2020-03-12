@@ -358,3 +358,272 @@ In [39]: while i != 1.5:
 1.6000000000000005
 ```
 
+### 建议14：警惕eval()的安全漏洞
+
+Python中eval()函数将字符串str当成有效的表达式来求值并返回计算结果。
+
+```python
+eval(expression, globals=None, locals=None)
+```
+
+“eval is evil”（eval是邪恶的），这是一句广为人知的对eval的评价，它主要针对的是eval()的安全性。
+
+对于有经验的侵入者来说，他可能会有一系列强大的手段，使得eval可以解释和调用这些方法，从而带来更大的破坏。此外，eval()函数也给程序的调试带来一定困难，要查看eval()里面表达式具体的执行过程很难。
+
+如果使用对象不是信任源，应该尽量避免使用eval，在需要使用eval的地方可用安全性更好的 `ast.literal_eval` 替代。
+
+### 建议15：使用enumerate()获取序列迭代的索引和值
+
+因为它代码清晰简洁，可读性最好。
+
+```python
+enumerate(sequence, start=0)
+```
+
+`enumerate()` 函数的内部实现非常简单，实际相当于下面的代码：
+
+```python
+def enumerate(sequence, start=0):
+    n = start
+    for elem in sequence:
+        yield n, elem
+        n += 1
+```
+
+因此利用这个特性用户还可以实现自己的enumerate()函数。比如，myenumerate()以反序的方式获取序列的索引和值。
+
+需要提醒的是，对于字典的迭代循环，enumerate()函数并不适合，虽然在使用上并不会提示错误，但输出的结果与期望的大相径庭，这是因为字典默认被转换成了序列进行处理。
+
+```python
+In [53]: d = {'a': 1, 'b': 2}
+In [55]: for i, e in enumerate(d):
+    ...:     print(i, e)
+    ...:
+0 a
+1 b
+```
+
+要获取迭代过程中字典的key和value，应该使用如下items()方法：
+
+```python
+In [56]: for k, v in d.items():
+    ...:     print(k, v)
+    ...:
+a 1
+b 2
+```
+
+### 建议16：分清==与is的适用场景
+
+在判断两个字符串是否相等的时候，混用is和==是很多初学者经常犯的错误，造成的结果是程序在不同情况下表现不一。
+
+```python
+In [58]: a = "hi"
+
+In [59]: b = "hi"
+
+In [60]: a == b
+Out[60]: True
+
+In [61]: a is b
+Out[61]: True
+
+In [62]: a1 = "hello world"
+
+In [63]: b1 = "hello world"
+
+In [64]: a1 == b1
+Out[64]: True
+
+In [65]: a1 is b1
+Out[65]: False
+```
+
+`is` 表示的是对象标示符（object identity），而 `==` 表示的意思是相等（equal）。
+
+实际上，造成上面输出结果不一致的根本原因在于：`is` 的作用是用来检查对象的标示符是否一致的，也就是比较两个对象在内存中是否拥有同一块内存空间，它并不适合用来判断两个字符串是否相等。`x is y`仅当`x`和`y`是同一个对象的时候才返回`True`，`x is b` 基本相当于`id(x) == id(y)`。而 **`==`才是用来检验两个对象的值是否相等的** ，它实际调用内部 `__eq__()`方法，因此`a == b`相当于`a.__eq__(b)`，所以`==`操作符是可以被重载的，而is不能被重载。一般情况下，如果`x is y`为`True`的话`x == y`的值也为`True`（特殊情况除外，如`NaN`，`a =float('NaN')`；`a is a` 为`True`，`a==a`为`False`），反之则不然。
+
+```python
+In [66]: a = float('NaN')
+
+In [67]: a
+Out[67]: nan
+
+In [68]: a is a
+Out[68]: True
+
+In [69]: a == a
+Out[69]: False
+```
+
+### 建议17：考虑兼容性，尽可能使用Unicode
+
+Python 默认编码：
+
+```python
+In [71]: import sys; sys.getdefaultencoding()
+Out[71]: 'utf-8'
+```
+
+字符编码不一致导致出现乱码时，可以使用 `str.decode` 和 `str.encode`。
+
+Python2 中默认编码是 ASCII，为了避免解析错误，可以在源文件中进行编码声明 `"coding[:=]\s*([-\w.]+)"`：
+
+```python
+# 1. 
+# coding=<encoding name>
+
+# 2.
+#!/usr/bin/python
+# -*- coding: <encoding name> -*-
+
+# 3.
+#!/usr/bin/python
+# vim: set fileencoding=<encoding name> :
+```
+
+### 建议18：构建合理的包层次来管理module
+
+本质上每一个Python文件都是一个模块，使用模块可以增强代码的可维护性和可重用性。
+
+简单说包即是目录，但与普通目录不同，它除了包含常规的Python文件（也就是模块）以外，还包含一个__init__.py文件，同时它允许嵌套。
+
+```python
+Package/ __init__.py
+	  Module1.py
+    Module2.py
+    Subpackage/ __init__.py
+    		Module1.py
+        Module2.py
+```
+
+包中的模块可以通过“.”访问符进行访问，即“包名.模块名”。
+
+`__init__.py`文件最明显的作用就是使包和普通目录区分；其次可以在该文件中申明模块级别的`import` 语句从而使其变成包级别可见。
+
+```python
+from Package.Module1 import Test
+```
+
+但如果在 `__init__.py`文件中添加`from Module1 import Test`语句，则可以直接使用`from Package import Test`来导入类`Test`。
+
+ `__init__.py`文件还有一个作用就是通过在该文件中定义 `__all__` 变量，控制需要导入的子包或者模块。
+
+```python
+__all__ = ['Module1', 'Module2', 'Subpackage']
+```
+
+使用包能够**合理组织代码，便于维护和使用、能够有效地避免名称空间冲突**。
+
+可供参考的 Python 项目结构：
+
+```text
+ProjectName/
+|---README
+    |----LICENSE
+    |----setup.py
+    |-----requirements.txt
+    |------sample/
+    |    |----__init__.py
+    |    |----core.py
+    |    |----helpers.py
+    |-------docs/
+    |    |------conf.py
+    |    |------index.rst
+    |-------bin/
+    |-------package/
+    |    |-----__init__.py
+    |    |-----subpackage/
+    |    |-------......
+    |-------tests/
+    |    |-----test_basic.py
+    |    |-----test_advanced.py
+```
+
+## 第3章 基础语法
+
+### 建议19：有节制地使用from...import语句
+
+Python提供了3种方式来引入外部模块：`import` 语句、`from...import...` 及 `__import__` 函数。
+
+在使用 `import` 的时候注意以下几点：
+
+- 一般情况下尽量优先使用 `import a` 形式，如访问 `B` 时需要使用 `a.B` 的形式。
+- 有节制地使用 `from a import B` 形式，可以直接访问 `B`。
+- 尽量避免使用 `from a import *`，因为这会污染命名空间，并且无法清晰地表示导入了哪些对象。
+
+### 建议20：优先使用absolute import来导入模块
+
+了解相对导入和绝对导入的一些东西。
+
+### 建议21：i+=1不等于++i
+
+Python解释器会将 `++i` 操作解释为 `+(+i)`，其中 `+` 表示正数符号。对于 `--1` 操作也是类似。
+
+因此 `++i` 在Python中语法上是合法的，但并不是我们理解的通常意义上的自增操作。
+
+### 建议22：使用with自动关闭资源
+
+```python
+In [76]: f = open('demo.txt', 'w')
+
+In [77]: f.write('test')
+Out[77]: 4
+
+In [78]: ls
+Applications/   Documents/      Library/        Music/          Pictures/       Softwares/      demo.txt
+Desktop/        Downloads/      Movies/         Nutstore Files/ Public/         Sync/           ssh.sh*
+
+In [79]: !cat demo.txt
+
+In [80]: f.close()
+
+In [81]: !cat demo.txt
+test
+```
+
+对文件操作完成后应该立即关闭它们，这是一个常识。我们都知道需要这么做，在很多编程语言中都会强调这个问题，因为打开的文件不仅会占用系统资源，而且可能影响其他程序或者进程的操作，甚至会导致用户期望与实际操作结果不一致。但实际应用中真相往往是：即使我们心中记得这个原则，但仍然可能会忘记关闭它。为什么？因为编程人员会把更多的精力和注意力放在对具体文件内容的操作和处理上；或者设计的正常流程是处理完毕关闭文件，但结果程序执行过程中发生了异常导致关闭文件的代码没有被执行到。
+
+```python
+with expression as exp:
+    ...
+```
+
+`with` 语句能够保证当写操作执行完毕后自动关闭文件。
+
+`with` 语句可以在代码块执行完毕后还原进入该代码块时的现场。
+
+`with` 的神奇实际得益于一个称为上下文管理器（context manager）的东西，它用来创建一个运行时的环境。上下文管理器是这样一个对象：它定义程序运行时需要建立的上下文，处理程序的进入和退出，实现了上下文管理协议，即在对象中定义 `__enter__()` 和 `exit__()` 方法。
+
+用户也可以定义自己的上下文管理器来控制程序的运行，只需要实现上下文协议便能够和 `with` 语句一起使用：
+
+```python
+In [85]: class MyContextManager:
+    ...:     def __enter__(self):
+    ...:         print("entering...")
+    ...:     def __exit__(self, exception_type, exception_value, traceback):
+    ...:         print("leaving...")
+    ...:         if exception_type is None:
+    ...:             print("no exceptions!")
+    ...:             return False
+    ...:         elif exception_type is ValueError:
+    ...:             print("value error!")
+    ...:             return True
+    ...:         else:
+    ...:             print("other error!")
+    ...:             return True
+    ...:
+
+In [86]: with MyContextManager() as f:
+    ...:     print("test my context manager")
+    ...:
+entering...
+test my context manager
+leaving...
+no exceptions!
+```
+
+Python还提供了contextlib模块，该模块是通过Generator实现的，contextlib中的contextmanager作为装饰器来提供一种针对函数级别的上下文管理机制，可以直接作用于函数/对象而不用去关心`enter()__`和`__exit()__`方法的具体实现。
+
+### 
+
