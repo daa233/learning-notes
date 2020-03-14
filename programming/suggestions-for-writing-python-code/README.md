@@ -625,5 +625,619 @@ no exceptions!
 
 Python还提供了contextlib模块，该模块是通过Generator实现的，contextlib中的contextmanager作为装饰器来提供一种针对函数级别的上下文管理机制，可以直接作用于函数/对象而不用去关心`enter()__`和`__exit()__`方法的具体实现。
 
-### 
+### 建议23：使用else子句简化循环（异常处理）
+
+在Python中，不仅分支语句有else子句，而且循环语句也有，甚至连异常处理也有。
+
+当循环“自然”终结（循环条件为假）时else从句会被执行一次，而当循环是由break语句中断时，else子句就不被执行。与for语句相似，while语句中的else子句的语意是一样的：else块在循环正常结束和循环条件不成立时被执行。
+
+在Python的异常处理中，也提供了else子句语法，这颗“语法糖”的意义跟循环语句中的else是相似的：try块没有抛出任何异常时，执行else块。
+
+### 建议24：遵循异常处理的几点基本原则
+
+异常处理流程：
+
+![image-20200313122442627](README.assets/image-20200313122442627.png)
+
+异常处理通常需要遵循以下几点基本原则：
+
+1）注意异常的粒度，不推荐在try中放入过多的代码。
+
+2）谨慎使用单独的except语句处理所有异常，最好能定位具体的异常。同样也不推荐使用except Exception或者except StandardError来捕获异常。
+
+3）注意异常捕获的顺序，在合适的层次处理异常。为了更精确地定位错误发生的原因，推荐的方法是将继承结构中子类异常在前面的except语句中抛出，而父类异常在后面的except语句抛出。
+
+4）使用更为友好的异常信息，遵守异常参数的规范。
+
+### 建议25：避免finally中可能发生的陷阱
+
+无论try语句中是否有异常抛出，finally语句总会被执行。由于这个特性，finally语句经常被用来做一些清理工作，如打开一个文件，抛出异常后在finally语句中对文件句柄进行关闭等。
+
+```python
+In [90]: def FinallyTest():
+    ...:     print("starting")
+    ...:     while True:
+    ...:         try:
+    ...:             print("i an running")
+    ...:             raise IndexError("r")
+    ...:         except NameError as e:
+    ...:             print("NameError")
+    ...:             break
+    ...:         finally:
+    ...:             print("finally executed")
+    ...:             break
+    ...:
+
+In [91]: FinallyTest()
+starting
+i an running
+finally executed
+```
+
+当try块中发生异常的时候，如果在except语句中找不到对应的异常处理，异常将会被临时保存起来，当finally执行完毕的时候，临时保存的异常将会再次被抛出，但如果finally语句中产生了新的异常或者执行了return或者break语句，那么临时保存的异常将会被丢失，从而导致异常屏蔽。这是finally使用时需要小心的第一个陷阱。
+
+```python
+In [92]: def ReturnTest(a):
+    ...:     try:
+    ...:         if a <= 0:
+    ...:             raise ValueError("data can not be negative")
+    ...:         else:
+    ...:             return a
+    ...:     except ValueError as e:
+    ...:         print(e)
+    ...:     finally:
+    ...:         print("the end")
+    ...:         return -1
+    ...:
+
+In [93]: print(ReturnTest(0))
+data can not be negative
+the end
+-1
+
+In [94]: print(ReturnTest(2))
+the end
+-1
+
+In [95]: print(ReturnTest(-1))
+data can not be negative
+the end
+-1
+```
+
+那么对于第二个调用ReturnTest(2)为什么也返回-1呢？这是因为a>0，会执行else分支，但由于存在finally语句，在执行else语句的return a语句之前会先执行finally中的语句，此时由于finally语句中有return -1，程序直接返回了，所以永远不会返回a对应的值2。此为使用finally语句需要注意的第二个陷阱。在实际应用程序开发过程中，并不推荐在finally中使用return语句进行返回，这种处理方式不仅会带来误解而且可能会引起非常严重的错误。
+
+### 建议26：深入理解None，正确判断对象是否为空
+
+```python
+In [96]: id(None)
+Out[96]: 4454561896
+
+In [97]: None == 0
+Out[97]: False
+
+In [98]: None == False
+Out[98]: False
+
+In [99]: None == ""
+Out[99]: False
+
+In [100]: a = None
+
+In [101]: id(a)
+Out[101]: 4454561896
+
+In [102]: b = None
+
+In [103]: a == b
+Out[103]: True
+```
+
+不能用 `list1 is not None` 判断 list1 是否为空，正确方式：
+
+```python
+In [104]: list1 = []
+In [108]: if list1:
+     ...:     print("list is:", list1)
+     ...: else:
+     ...:     print("list is empty")
+     ...:
+list is empty
+```
+
+`if` 判断执行过程中会调用内部方法`__nonzero__()`来判断变量`list1`是否为空并返回其结果。下面介绍一下`__nonzero__()`方法：该内部方法用于对自身对象进行空值测试，返回`0`/`1`或`True`/`False`。如果一个对象没有定义该方法，Python将获取`__len__()`方法调用的结果来进行判断。`__len__()`返回值为`0`则表示为空。如果一个类中既没有定义`__len__()`方法也没有定义`__nonzero__()`方法，该类的实例用`if`判断的结果都为`True`。
+
+### 建议27：连接字符串应优先使用join而不是+
+
+分别使用join()方法和使用+操作符来连接字符串，join()方法的效率要高于+操作符，特别是字符串规模较大的时候，join()方法的优势更为明显（如连接数为100000的时候，两者耗时相差上百倍）。
+
+当用操作符+连接字符串的时候，由于字符串是不可变对象，其工作原理实际上是这样的：如果要连接如下字符串：S1+S2+S3+.......+SN，执行一次+操作便会在内存中申请一块新的内存空间，并将上一次操作的结果和本次操作的右操作数复制到新申请的内存空间，即当执行S1+S2的时候会申请一块内存，并将S1、S2复制到该内存中，依次类推。
+
+而当用join()方法连接字符串的时候，会首先计算需要申请的总的内存空间，然后一次性申请所需内存并将字符序列中的每一个元素复制到内存中去，所以join操作的时间复杂度为O(n)。
+
+### 建议28：格式化字符串时尽量使用.format方式而不是%
+
+`format` 详细用法参考：https://docs.python.org/3/library/string.html#format-string-syntax
+
+为什么要尽量使用format方式而不是%操作符来格式化字符串：
+
+理由一：format方式在使用上较%操作符更为灵活。
+
+理由二：format方式可以方便地作为参数传递。
+
+理由三：%最终会被.format方式所代替。
+
+理由四：%方法在某些特殊情况下使用时需要特别小心。如果字符本身为元组，则需要使用在%使用(itemname,)这种形式才能避免错误，注意逗号。
+
+### 建议29：区别对待可变对象和不可变对象
+
+对象根据其值能否修改分为可变对象和不可变对象，其中数字、字符串、元组属于不可变对象，字典以及列表、字节数组属于可变对象。
+
+```python
+In [109]: s = "hello world"
+
+In [110]: s[2] = 'c'
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-110-e815df64247c> in <module>
+----> 1 s[2] = 'c'
+
+TypeError: 'str' object does not support item assignment
+  
+In [111]: import array
+In [114]: a = array.array('u', s)
+
+In [115]: a[2] = 'c'
+
+In [116]: a
+Out[116]: array('u', 'heclo world')
+```
+
+```python
+# by my girlfriend Li Qingyun
+In [43]: list1 = [[1], 2, 3]
+
+In [44]: list2 = list1[:]
+
+In [45]: list2
+Out[45]: [[1], 2, 3]
+
+In [46]: list1[2]=-2
+
+In [47]: list1
+Out[47]: [[1], 2, -2]
+
+In [48]: list2
+Out[48]: [[1], 2, 3]
+
+In [49]: list1[0][0]=-1
+
+In [50]: list1
+Out[50]: [[-1], 2, -2]
+
+In [51]: list2
+Out[51]: [[-1], 2, 3]
+```
+
+list 的切片操作是浅拷贝，切片操作实际会重新生成一个对象。
+
+关于深拷贝和浅拷贝，参考：[python深拷贝和浅拷贝的区别](https://www.cnblogs.com/xiaxiaoxu/p/9742452.html)
+
+`list1 = list2` 这种操作不能称为”浅拷贝“，这只是建立一个引用或者别名。
+
+list 作为类的属性时，最好默认为 `None`，并正确完成初始化，避免多个对象的属性为同一个 list 的情况。
+
+### 建议30：[]、()和{}：一致的容器初始化形式
+
+提倡使用列表解析（list comprehension）。
+
+1）使用列表解析更为直观清晰，代码更为简洁。
+
+2）列表解析的效率更高。
+
+### 建议31：记住函数传参既不是传值也不是传引用
+
+Python中的赋值与我们所理解的C/C++等语言中的赋值的意思并不一样。C/C++中当执行b=a的时候，在内存中申请一块内存并将a的值复制到该内存中；但在Python中赋值并不是复制，b=a操作使得b与a引用同一个对象。而b=7则是将b指向对象7，可以简单理解为，b=a传递的是对象的引用。
+
+对于Python函数参数是传值还是传引用这个问题的答案是：都不是。正确的叫法应该是传对象（call by object）或者说传对象的引用（call-by-object-reference）。函数参数在传递的过程中将整个对象传入，对可变对象的修改在函数外部以及内部都可见，调用者和被调用者之间共享这个对象，而对于不可变对象，由于并不能真正被修改，因此，修改往往是通过生成一个新对象然后赋值来实现的。
+
+### 建议32：警惕默认参数潜在的问题
+
+```python
+In [229]: append_test.__defaults__
+Out[229]: ([1, 2],)
+
+In [230]: def append_test(item, l=[]):
+     ...:     print(id(l))
+     ...:     l.append(item)
+     ...:     print(id(l))
+     ...:     return l
+     ...:
+
+In [231]: append_test.__defaults__
+Out[231]: ([],)
+
+In [232]: append_test(1)
+4525111408
+4525111408
+Out[232]: [1]
+
+In [233]: append_test.__defaults__
+Out[233]: ([1],)
+
+In [234]: append_test(2)
+4525111408
+4525111408
+Out[234]: [1, 2]
+
+In [235]: append_test.__defaults__
+Out[235]: ([1, 2],)
+```
+
+def在Python中是一个可执行的语句，当解释器执行def的时候，默认参数也会被计算，并存在函数的~~.func_defaults~~ `__defaults__`属性中。由于Python中函数参数传递的是对象，可变对象在调用者和被调用者之间共享，因此当首次调用appendtest(1)的时候，[]变为[1]，而再次调用的时候由于默认参数不会重新计算，在[1]的基础上便变为了[1,'a']。
+
+注意：The function attributes named `func_X` have been renamed to use the `__X__` form。参考：https://docs.python.org/3/whatsnew/3.0.html#operators-and-special-methods
+
+如果不想让默认参数所指向的对象在所有的函数调用中被共享，而是在函数调用的过程中动态生成，可以在定义的时候使用 `None` 对象作为占位符。
+
+```python
+In [236]: def append_test(item, l=None):
+     ...:     if l is None:
+     ...:         l = []
+     ...:     print(id(l))
+     ...:     l.append(item)
+     ...:     print(id(l))
+     ...:     return l
+     ...:
+
+In [237]: append_test(1)
+4525500848
+4525500848
+Out[237]: [1]
+
+In [238]: append_test(2)
+4613946496
+4613946496
+Out[238]: [2]
+```
+
+假设report()函数需要传入当前系统的时间并做一些处理，下面两种参数传递方式哪种正确呢？
+
+```python
+In [239]: import time
+
+In [240]: def report(when=time.time()):
+     ...:     print(when)
+     ...:
+
+In [241]: report()
+1584111697.303294
+
+In [242]: report()
+1584111697.303294
+
+In [243]: report()
+1584111697.303294
+
+In [244]: def report2(when=time.time):
+     ...:     print(when())
+     ...:
+
+In [245]: report2()
+1584111744.239531
+
+In [246]: report2()
+1584111745.933495
+```
+
+### 建议33：慎用变长参数
+
+Python支持可变长度的参数列表，可以通过在函数定义的时候使用 `*args` 和 `**kwargs` 这两个特殊语法来实现（`args` 和 `kwargs` 可以替换成任意你喜欢的变量名）。
+
+慎用变长参数的原因：
+
+1）使用过于灵活。在混合普通参数或者默认参数的情况下，变长参数意味着这个函数的签名不够清晰，存在多种调用方式。另外变长参数可能会破坏程序的健壮性。
+
+2）如果一个函数的参数列表很长，虽然可以通过使用*args和**kwargs来简化函数的定义，但通常这意味着这个函数可以有更好的实现方式，应该被重构。
+
+3）可变长参数适合在下列情况下使用（不仅限于以下场景）：
+
+- 为函数添加一个装饰器。
+
+  ```python
+  In [247]: def my_decorator(fun):
+       ...:     def wrap(*args, **kwargs):
+       ...:         # ...
+       ...:         return fun(*args, **kwargs)
+       ...:     return wrap
+       ...:
+  ```
+
+- 如果参数的数目不确定，可以考虑使用变长参数。
+
+  ```python
+  In [248]: def my_sum(*args):
+       ...:     s = 0
+       ...:     for i in args:
+       ...:         s += i
+       ...:     return s
+       ...:
+  
+  In [249]: my_sum(1, 2)
+  Out[249]: 3
+  
+  In [250]: my_sum(1, 2, 3, 4, 5)
+  Out[250]: 15
+  ```
+
+- 用来实现函数的多态或者在继承情况下子类需要调用父类的某些方法的时候。
+
+  ```python
+  In [251]: class A:
+       ...:     def fun(self, p1, p2):
+       ...:         pass
+       ...:
+  
+  In [252]: class B(A):
+       ...:     def my_fun(self, p3, *args, **kwargs):
+       ...:         super(B, self).fun(*args, **kwargs)
+       ...:
+  ```
+
+### 建议34：深入理解str()和repr()的区别
+
+函数str()和repr()都可以将Python中的对象转换为字符串。
+
+1）两者之间的目标不同：str()主要面向用户，其目的是可读性，返回形式为用户友好性和可读性都较强的字符串类型；而repr()面向的是Python解释器，或者说开发人员，其目的是准确性，其返回值表示Python解释器内部的含义，常作为编程人员debug用途。
+
+2）在解释器中直接输入a时默认调用repr()函数，而print a则调用str()函数。3）repr()的返回值一般可以用eval()函数来还原对象，通常来说有如下等式。
+
+1）两者之间的目标不同：str()主要面向用户，其目的是可读性，返回形式为用户友好性和可读性都较强的字符串类型；而repr()面向的是Python解释器，或者说开发人员，其目的是准确性，其返回值表示Python解释器内部的含义，常作为编程人员debug用途。2）在解释器中直接输入a时默认调用repr()函数，而print a则调用str()函数。3）repr()的返回值一般可以用eval()函数来还原对象，通常来说有如下等式。
+
+```python
+obj == eval(repr(obj))
+```
+
+4）这两个方法分别调用内建的`__str__()`和`__repr__()方`法，一般来说在类中都应该定义`__repr__()`方法，而`__str__()`方法则为可选，当可读性比准确性更为重要的时候应该考虑定义`__str__()`方法。如果类中没有定义`__str__()`方法，则默认会使用`__repr__()`方法的结果来返回对象的字符串表示形式。用户实现`__repr__()`方法的时候最好保证其返回值可以用`eval()`方法使对象重新还原。
+
+参考：https://www.geeksforgeeks.org/str-vs-repr-in-python/
+
+### 建议35：分清staticmethod和classmethod的适用场景
+
+这里讲 staticmethod 和 classmethod 知识点的时候不太清晰，可以参考：https://www.geeksforgeeks.org/class-method-vs-static-method-python/
+
+**Class Method**
+A class method receives the class as implicit first argument, just like an instance method receives the instance
+**Syntax:**
+
+```python
+class C(object):
+    @classmethod
+    def fun(cls, arg1, arg2, ...):
+       ....
+fun: function that needs to be converted into a class method
+returns: a class method for function.
+```
+
+- A class method is a method which is bound to the class and not the object of the class.
+- They have the access to the state of the class as it takes a class parameter that points to the class and not the object instance.
+- It can modify a class state that would apply across all the instances of the class. For example it can modify a class variable that will be applicable to all the instances.
+
+**Static Method**
+
+A static method does not receive an implicit first argument.
+**Syntax:**
+```python
+class C(object):
+    @staticmethod
+    def fun(arg1, arg2, ...):
+        ...
+returns: a static method for function fun.
+```
+
+- A static method is also a method which is bound to the class and not the object of the class.
+- A static method can’t access or modify class state.
+- It is present in a class because it makes sense for the method to be present in class.
+
+**Class method vs Static Method**
+
+- A class method takes cls as first parameter while a static method needs no specific parameters.
+- A class method can access or modify class state while a static method can’t access or modify it.
+- In general, static methods know nothing about class state. They are utility type methods that take some parameters and work upon those parameters. On the other hand class methods must have class as parameter.
+- We use @classmethod decorator in python to create a class method and we use @staticmethod decorator to create a static method in python.
+
+```python
+# Python program to demonstrate  
+# use of class method and static method. 
+from datetime import date 
+  
+class Person: 
+    def __init__(self, name, age): 
+        self.name = name 
+        self.age = age 
+      
+    # a class method to create a Person object by birth year. 
+    @classmethod
+    def fromBirthYear(cls, name, year): 
+        return cls(name, date.today().year - year) 
+      
+    # a static method to check if a Person is adult or not. 
+    @staticmethod
+    def isAdult(age): 
+        return age > 18
+  
+person1 = Person('mayank', 21) 
+person2 = Person.fromBirthYear('mayank', 1996) 
+  
+print(person1.age)	# 21
+print(person2.age)	# 21
+  
+# print the result 
+print(Person.isAdult(22))	# True
+```
+
+静态方法和类方法都可以通过类名.方法名（如C.f()）或者实例.方法名（C().f()）的形式来访问。
+
+既不跟特定的实例相关也不跟特定的类相关，因此将其定义为静态方法是个不错的选择，这样代码能够一目了然。也许你会问：为什么不将该方法定义成外部函数呢？这是因为静态方法定义在类中，较之外部函数，能够更加有效地将代码组织起来，从而使相关代码的垂直距离更近，提高代码的可维护性。
+
+## 第4章 库
+
+### 建议36：掌握字符串的基本用法
+
+无名氏说：编程有两件事，一件是处理数值，另一件是处理字符串。要我说，对于商业应用编程来说，处理字符串的代码可能超过八成，所以掌握字符串的基本用法尤其重要。
+
+Python 遇到未闭合的小括号时会自动将多行代码拼接成一行，因此可以用于字符串的拼接：
+
+```python
+In [4]: s = ('hello '
+   ...:      'world')
+
+In [5]: s
+Out[5]: 'hello world'
+```
+
+str对象有以下几个方法：isalnum()、isalpha()、isdigit()、islower()、isupper()、isspace()、istitle()、startswith(prefix[, start[, end]])、endswith(suffix[,start[, end]])，前面几个is*()形式的函数很简单，顾名思义无非是判定是否数字、字母、大小写、空白符之类的，istitle()作为东方人用得少些，它是判定字符串是否每个单词都有且只有第一个字母是大写的。
+
+```python
+In [15]: "hello world".istitle()
+Out[15]: False
+
+In [16]: "Hello World".istitle()
+Out[16]: True
+
+In [17]: "Hello world".istitle()
+Out[17]: False
+```
+
+count( sub[, start[, end]])、find( sub[, start[, end]])、index( sub[, start[, end]])、rfind( sub[, start[,end]])、rindex( sub[, start[, end]])这些方法都接受start、end参数，善加利用，可以优化性能。其中count()能够查找子串sub在字符串中出现的次数，这个数值在调用replace方法的时候用得着。此外，需要注意find()和index()方法的不同：find()函数族找不到时返回-1，index()函数族则抛出ValueError异常。但对于判定是否包含子串的判定并不推荐调用这些方法，而是推荐使用in和not in操作符。
+
+```python
+In [18]: "hello".count('l')
+Out[18]: 2
+
+In [19]: "hello".count('llo')
+Out[19]: 1
+
+In [20]: "hello".find('l')
+Out[20]: 2
+
+In [21]: "hello".index('l')
+Out[21]: 2
+
+In [22]: "hello".rfind('l')
+Out[22]: 3
+
+In [23]: "hello".rindex('l')
+Out[23]: 3
+```
+
+replace(old, new[,count])用以替换字符串的某些子串，如果指定count参数的话，就最多替换count次，如果不指定，就全部替换。
+
+```python
+In [26]: "ha ha ha hello".replace('ha', 'hi')
+Out[26]: 'hi hi hi hello'
+
+In [27]: "ha ha ha hello".replace('ha', 'hi', 1)
+Out[27]: 'hi ha ha hello'
+```
+
+partition(sep)、rpartition(sep)、splitlines([keepends])、split([sep[,maxsplit]])、 rsplit([sep[,maxsplit]])，别看这些方法好像很多，其实只要弄清楚partition()和split()就可以了。*partition()函数族是2.5版本新增的方法，它接受一个字符串参数，并返回一个3个元素的元组对象。如果sep没出现在母串中，返回值是(sep, '','')；否则，返回值的第一个元素是sep左端的部分，第二个元素是sep自身，第三个元素是sep右端的部分。而split()的参数maxsplit是分切的次数，即最大的分切次数，所以返回值最多有maxsplit+1个元素。但split()有不少小陷阱，需要注意，比如对于字符串s、s.split()和s.split('')的返回值是不相同的。
+
+```python
+In [39]: 'hello world'.partition('l')
+Out[39]: ('he', 'l', 'lo world')
+
+In [40]: 'hello world'.rpartition('l')
+Out[40]: ('hello wor', 'l', 'd')
+
+In [41]: 'hello \nworld'.splitlines()
+Out[41]: ['hello ', 'world']
+
+In [42]: 'hello world'.split('l')
+Out[42]: ['he', '', 'o wor', 'd']
+
+In [43]: 'hello world'.split('l', 1)
+Out[43]: ['he', 'lo world']
+
+In [44]: 'hello world'.rsplit('l', 1)
+Out[44]: ['hello wor', 'd']
+
+In [45]: ' hello   world'.split()
+Out[45]: ['hello', 'world']
+
+In [46]: ' hello   world'.split(' ')
+Out[46]: ['', 'hello', '', '', 'world']
+```
+
+掌握了split()，可以说字符串最大的陷阱已经跨过去了。下面是关于变形的内容。lower()、upper()、capitalize()、swapcase()、title()这些无非是大小写切换的小事，不过需要注意的是titile()的功能是将每一个单词的首字母大写，并将单词中的非首字母转换为小写（英文文章的标题通常是这种格式）。
+
+```python
+In [47]: 'Hello World'.lower()
+Out[47]: 'hello world'
+
+In [48]: 'Hello World'.upper()
+Out[48]: 'HELLO WORLD'
+
+In [49]: 'Hello World'.capitalize()
+Out[49]: 'Hello world'
+
+In [50]: 'Hello World'.swapcase()
+Out[50]: 'hELLO wORLD'
+
+In [51]: 'hello world'.title()
+Out[51]: 'Hello World'
+
+In [52]: ' hello   world'.title()
+Out[52]: ' Hello   World'
+```
+
+string模块中的capwords(s)函数，它能够去除两端的空白符，再将连续的空白符用一个空格代替。
+
+```python
+In [52]: ' hello   world'.title()
+Out[52]: ' Hello   World'
+
+In [53]: import string
+
+In [54]: string.capwords(' hello   world')
+Out[54]: 'Hello World'
+```
+
+删减在文本处理是很常用，我们常常得把字符串掐头去尾，就用得上它们。如果strip([chars])、lstrip([chars])、rstrip([chars])中的chars参数没有指定，就是删除空白符，空白符由string.whitespace常量定义。
+
+```python
+In [59]: ' hello world '.strip()
+Out[59]: 'hello world'
+
+In [60]: ' hello world '.lstrip()
+Out[60]: 'hello world '
+
+In [61]: ' hello world '.rstrip()
+Out[61]: ' hello world'
+
+In [62]: string.whitespace
+Out[62]: ' \t\n\r\x0b\x0c'
+```
+
+填充则常用于字符串的输出，借助它们能够排出漂亮的版面。center(width[, fillchar])、ljust(width[, fillchar])、rjust(width[,fillchar])、zfill(width)、expandtabs([tabsize])，看，有了它们，居中、左对齐、右对齐什么的完全不在话下，这些方法中的fillchar参数是指用以填充的字符，默认是空格。而zfill()中的z是指zero，所以顾名思义，zfill()即是以字符0进行填充，在输出数值时比较常用。expandtabs()的tabsize参数默认为8，它的功能是把字符串中的制表符（tab）转换为适当数量的空格。
+
+```python
+In [69]: 'hi'.center(10)
+Out[69]: '    hi    '
+
+In [70]: 'hi'.rjust(10, '-')
+Out[70]: '--------hi'
+
+In [71]: 'hi'.ljust(10, '-')
+Out[71]: 'hi--------'
+
+In [72]: 'hi'.rjust(10, '-')
+Out[72]: '--------hi'
+
+In [73]: '123'.zfill(10)
+Out[73]: '0000000123'
+
+In [74]: '\thi'.expandtabs()
+Out[74]: '        hi'
+```
 
