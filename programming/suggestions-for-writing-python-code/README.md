@@ -1241,3 +1241,58 @@ In [74]: '\thi'.expandtabs()
 Out[74]: '        hi'
 ```
 
+### 建议37：按需选择sort()或者sorted()
+
+Python中的排序相对简单，常用的函数有sort()和sorted()两种。这两种函数并不完全相同，各有各的用武之地。
+
+```python
+sorted(iterable, *, key=None, reverse=False)
+list.sort(*, key=None, reverse=False)
+```
+
+1）相比于sort()，sorted()使用的范围更为广泛。从函数的定义形式可以看出，sorted()作用于任意可迭代的对象，而sort()一般作用于列表。
+
+2）当排序对象为列表的时候两者适合的场景不同。sorted()函数是在Python2.4版本中引入的，在这之前只有sort()函数。sorted()函数会返回一个排序后的列表，原有列表保持不变；而sort()函数会直接修改原有列表，函数返回为None。因此如果实际应用过程中需要保留原有列表，使用sorted()函数较为适合，否则可以选择sort()函数，因为sort()函数不需要复制原有列表，消耗的内存较少，效率也较高。
+
+```python
+In [77]: a = [5, 2, 3, 1, 4]
+
+In [78]: sorted(a)
+Out[78]: [1, 2, 3, 4, 5]
+
+In [79]: a
+Out[79]: [5, 2, 3, 1, 4]
+
+In [80]: a.sort()
+
+In [81]: a
+Out[81]: [1, 2, 3, 4, 5]
+```
+
+3）无论是sort()还是sorted()函数，传入参数key比传入参数cmp效率要高。cmp参数是旧的用法，不推荐使用。
+
+Both [`list.sort()`](https://docs.python.org/3/library/stdtypes.html#list.sort) and [`sorted()`](https://docs.python.org/3/library/functions.html#sorted) have a *key* parameter to specify a function to be called on each list element prior to making comparisons.
+
+```python
+In [83]: sorted("This is a test string from Ang".split(), key=str.lower)
+Out[83]: ['a', 'Ang', 'from', 'is', 'string', 'test', 'This']
+```
+
+4）sorted()函数功能非常强大，使用它可以方便地针对不同的数据结构进行排序，从而满足不同需求。这时可以使用 [`operator`](https://docs.python.org/3/library/operator.html#module-operator) 模块的 [`itemgetter()`](https://docs.python.org/3/library/operator.html#operator.itemgetter)、[`attrgetter()`](https://docs.python.org/3/library/operator.html#operator.attrgetter)和 [`methodcaller()`](https://docs.python.org/3/library/operator.html#operator.methodcaller) 函数。
+
+更多用法参考：https://docs.python.org/3/howto/sorting.html
+
+### 建议38：使用copy模块深拷贝对象
+
+- 浅拷贝（shallow copy）：构造一个新的复合对象并将从原对象中发现的引用插入该对象中。浅拷贝的实现方式有多种，如工厂函数、切片操作、copy模块中的copy操作等。
+- 深拷贝（deep copy）：也构造一个新的复合对象，但是遇到引用会继续递归拷贝其所指向的具体内容，也就是说它会针对引用所指向的对象继续执行拷贝，因此产生的对象不受其他引用对象操作的影响。深拷贝的实现需要依赖 copy 模块的deepcopy()操作。
+
+Python 中赋值语句不复制对象，而是在目标和对象之间创建绑定 (bindings) 关系。
+
+制作字典的浅层复制可以使用 [`dict.copy()`](https://docs.python.org/zh-cn/3/library/stdtypes.html#dict.copy) 方法，而制作列表的浅层复制可以通过赋值整个列表的切片完成，例如，`copied_list = original_list[:]`。
+
+类可以使用与控制序列化（pickling）操作相同的接口来控制复制操作，关于这些方法的描述信息请参考 [`pickle`](https://docs.python.org/zh-cn/3/library/pickle.html#module-pickle) 模块。实际上，[`copy`](https://docs.python.org/zh-cn/3/library/copy.html#module-copy) 模块使用的正是从 [`copyreg`](https://docs.python.org/zh-cn/3/library/copyreg.html#module-copyreg) 模块中注册的 pickle 函数。
+
+想要给一个类定义它自己的拷贝操作实现，可以通过定义特殊方法 `__copy__()` 和 `__deepcopy__()`。 调用前者以实现浅层拷贝操作，该方法不用传入额外参数。 调用后者以实现深层拷贝操作；它应传入一个参数即 `memo` 字典。
+
+具体参考：https://docs.python.org/zh-cn/3/library/copy.html
