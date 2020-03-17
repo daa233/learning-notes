@@ -1402,5 +1402,201 @@ Out[32]: Counter({'a': 4, 'b': 2, 'c': 1, 'd': 2})
 
 看到 docopt 想到了 [python-fire](https://github.com/google/python-fire) 这个库，目前还没用过，但是看上去也是可以很方便地自动生成命令行接口。
 
+### 建议42：使用pandas处理大型CSV文件
+
+CSV（Comma Separated Values）作为一种逗号分隔型值的纯文本格式文件，在实际应用中经常用到，如数据库数据的导入导出、数据分析中记录的存储等。
+
+Python 自带 csv 模块用于处理 CSV 文件，例如下面是 csv.writer 和 csv.reader 这两个函数的用法：
+
+```python
+In [39]: import csv
+
+In [40]: with open('eggs.csv', 'w', newline='') as csvfile:
+    ...:     writer = csv.writer(csvfile, delimiter=' ',
+    ...:                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    ...:     writer.writerow(['Spam'] * 5 + ['Backed Beans'])
+    ...:     writer.writerow(['Spam', 'Lovely Spam', 'Wonderful|Spam'])
+    ...:
+
+In [41]: cat eggs.csv
+Spam Spam Spam Spam Spam |Backed Beans|
+Spam |Lovely Spam| |Wonderful||Spam|
+
+In [42]: with open('eggs.csv', newline='') as csvfile:
+    ...:     reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    ...:     for row in reader:
+    ...:         print(', '.join(row))
+    ...:
+Spam, Spam, Spam, Spam, Spam, Backed Beans
+Spam, Lovely Spam, Wonderful|Spam
+```
+
+其中，quotechar 默认是 `"`，当数据中包含特殊字符（如 delimiter 或 quotechar）时，会用 quotechar 包起来。
+
+csv.DictWriter 和 csv.DictReader 同前面的 writer()/reader() 方法类似，不同的是将读入的信息映射到一个字典中去，其中字典的key由fieldnames指定，该值省略的话将使用CSV文件第一行的数据作为key值。如果读入行的字段的个数大于filednames中指定的个数，多余的字段名将会存放在restkey中，而restval主要用于当读取行的域的个数小于fieldnames的时候，它的值将会被用作剩下的key对应的值。
+
+```python
+In [45]: with open('names.csv', 'w', newline='') as csvfile:
+    ...:     filednames = ['first_name', 'last_name']
+    ...:     writer = csv.DictWriter(csvfile, fieldnames=filednames)
+    ...:     writer.writeheader()
+    ...:     writer.writerow({'first_name': 'Zhang', 'last_name': 'San'})
+    ...:     writer.writerow({'first_name': 'Li', 'last_name': 'Si'})
+    ...:
+
+In [46]: cat names.csv
+first_name,last_name
+Zhang,San
+Li,Si
+
+In [47]: with open('names.csv', newline='') as csvfile:
+    ...:     reader = csv.DictReader(csvfile)
+    ...:     for row in reader:
+    ...:         print(row['first_name'], row['last_name'])
+    ...:
+Zhang San
+Li Si
+```
+
+当数据量很大时，csv 模块就应付不了了，这时可以使用 pandas 模块。
+
+Pandas即Python Data Analysis Library，是为了解决数据分析而创建的第三方工具，它不仅提供了丰富的数据模型，而且支持多种文件格式处理，包括CSV、HDF5、HTML等，能够提供高效的大型数据处理。
+
+```python
+In [1]: import numpy as np
+
+In [2]: import pandas as pd
+
+In [3]: dates = pd.date_range('20130101', periods=6)
+
+In [4]: dates
+Out[4]:
+DatetimeIndex(['2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04',
+               '2013-01-05', '2013-01-06'],
+              dtype='datetime64[ns]', freq='D')
+
+In [5]: df = pd.DataFrame(np.random.randn(6, 4), index=dates, columns=list('ABC$
+   ...: '))
+
+In [6]: df
+Out[6]:
+                   A         B         C         D
+2013-01-01  1.547008  1.853517  1.923480 -0.588120
+2013-01-02  0.247856 -0.948811  0.226641  1.197179
+2013-01-03  1.034333  1.050445  0.168136 -1.212203
+2013-01-04 -1.454071  0.206255  0.895034 -0.449949
+2013-01-05 -0.230535 -0.278828 -1.347200  0.430614
+2013-01-06 -0.296014  0.813650  1.878278 -0.100102
+                                                                           
+In [7]: df.to_csv('foo.csv')
+
+In [8]: cat foo.csv
+,A,B,C,D
+2013-01-01,1.547007536724579,1.853516780606236,1.9234804277076158,-0.5881204500971102
+2013-01-02,0.24785644424722078,-0.9488105318077334,0.22664124734929103,1.1971794282800785
+2013-01-03,1.034333388789879,1.0504446083724601,0.16813578886637434,-1.2122033159973318
+2013-01-04,-1.4540712358647334,0.20625514905098016,0.8950344715519865,-0.4499488353959729
+2013-01-05,-0.2305346028122321,-0.27882793750867696,-1.3471995118100193,0.4306136932276177
+2013-01-06,-0.29601395675300063,0.8136500076783513,1.8782778959189432,-0.10010196418023806
+
+In [9]: pd.read_csv('foo.csv')
+Out[9]:
+   Unnamed: 0         A         B         C         D
+0  2013-01-01  1.547008  1.853517  1.923480 -0.588120
+1  2013-01-02  0.247856 -0.948811  0.226641  1.197179
+2  2013-01-03  1.034333  1.050445  0.168136 -1.212203
+3  2013-01-04 -1.454071  0.206255  0.895034 -0.449949
+4  2013-01-05 -0.230535 -0.278828 -1.347200  0.430614
+5  2013-01-06 -0.296014  0.813650  1.878278 -0.100102
+```
+
+在读取时，可以设置只读取部分数据、与 Excel 格式兼容等。有关 pandas 的更多内容参考：https://pandas.pydata.org/pandas-docs/stable/getting_started/10min.html。
+
+### 建议43：一般情况使用ElementTree解析XML
+
+xml.dom.minidom和xml.sax大概是Python中解析XML文件最广为人知的两个模块了，原因一是这两个模块自Python 2.0以来就成为Python的标准库；二是网上关于这两个模块的使用方面的资料最多。作为主要解析XML方法的两种实现，DOM需要将整个XML文件加载到内存中并解析为一棵树，虽然使用较为简单，但占用内存较多，性能方面不占优势，并且不够Pythonic；而SAX是基于事件驱动的，虽不需要全部装入XML文件，但其处理过程却较为复杂。实际上Python中对XML的处理还有更好的选择，ElementTree便是其中一个，一般情况下使用ElementTree便已足够。
+
+ElementTree在解析XML文件上具有以下特性：
+
+- 使用简单。它将整个XML文件以树的形式展示，每一个元素的属性以字典的形式表示，非常方便处理。
+- 内存上消耗明显低于DOM解析。由于ElementTree底层进行了一定的优化，并且它的iterparse解析工具支持SAX事件驱动，能够以迭代的形式返回XML部分数据结构，从而避免将整个XML文件加载到内存中，因此性能上更优化，相比于SAX使用起来更为简单明了。
+- 支持XPath查询，非常方便获取任意节点的值。
+
+如果在实际过程中需要处理的XML文件大小在GB或近似GB级别，第三方模块lxml会获得较优的处理结果。
+
+### 建议44：理解模块pickle优劣
+
+序列化，简单地说就是把内存中的数据结构在不丢失其身份和类型信息的情况下转成对象的文本或二进制表示的过程。Python中有很多支持序列化的模块，如pickle、json、marshal和shelve等。最广为人知的为pickle。
+
+~~pickle估计是最通用的序列化模块了，它还有个C语言的实现cPickle，相比pickle来说具有较好的性能，其速度大概是pickle的1000倍，因此在大多数应用程序中应该优先使用cPickle。~~ (Python3 中，cPickle 属于标准库了，使用时就用 pickle 就可以了)
+
+```python
+In [1]: import pickle
+
+In [2]: data = {'name': 'python', 'type': 'language', 'version': '3.7.6'}
+  
+In [4]: with open('pickle.dat', 'wb') as f:
+   ...:     pickle.dump(data, f)
+   ...:
+
+In [5]: cat pickle.dat
+}q(XnameqXpythonqXtypeqlanguageqXversionqX3.7.6qu.
+   
+In [6]: with open('pickle.dat', 'rb') as f:
+   ...:     out = pickle.load(f)
+   ...:     print(out)
+   ...:
+{'name': 'python', 'type': 'language', 'version': '3.7.6'}
+```
+
+pickle之所以能成为通用的序列化模块，与其良好的特性是分不开的，总结为以下几点：
+
+1）接口简单，容易使用。通过dump()和load()便可轻易实现序列化和反序列化。
+
+2）pickle的存储格式具有通用性，能够被不同平台的Python解析器共享。
+
+3）支持的数据类型广泛。
+
+4）pickle模块是可以扩展的。比如实例化自定义类、不可序列化对象等，具体参考 https://docs.python.org/3/library/pickle.html。
+
+5）能够自动维护对象间的引用，如果一个对象上存在多个引用，pickle后不会改变对象间的引用，并且能够自动处理循环和递归引用。
+
+但pickle使用也存在以下一些限制：
+
+- pickle不能保证操作的原子性。pickle并不是原子操作，也就是说在一个pickle调用中如果发生异常，可能部分数据已经被保存，另外如果对象处于深递归状态，那么可能超出Python的最大递归深度。递归深度可以通过sys.setrecursionlimit()进行扩展。
+- pickle存在安全性问题。Python的文档清晰地表明它不提供安全性保证，因此对于一个从不可信的数据源接收的数据不要轻易进行反序列化。
+- pickle协议是Python特定的，不同语言之间的兼容性难以保障。
+
+### 建议45：序列化的另一个不错的选择——JSON
+
+JSON（JavaScript Object Notation）是一种轻量级数据交换格式，它基于JavaScript编程语言的一个子集，于1999年12月成为一个完全独立于语言的文本格式。由于其格式使用了其他许多流行编程的约定，如C、C++、C＃、Java、JS、Python等，加之其简单灵活、可读性和互操作性较强、易于解析和使用等特点，逐渐变得流行起来，甚至有代替XML的趋势。
+
+```python
+In [7]: import json
+
+In [8]: json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
+Out[8]: '["foo", {"bar": ["baz", null, 1.0, 2]}]'
+
+In [11]: json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]')
+Out[11]: ['foo', {'bar': ['baz', None, 1.0, 2]}]
+```
+
+在序列化方面，相比pickle，JSON具有以下优势：
+
+1）使用简单，支持多种数据类型。JSON文档的构成非常简单，仅存在以下两大数据结构。
+
+	- 名称/值对的集合。在各种语言中，它被实现为一个对象、记录、结构、字典、散列表、键列表或关联数组。
+	- 值的有序列表。在大多数语言中，它被实现为数组、向量、列表或序列。在Python中对应支持的数据类型包括字典、列表、字符串、整数、浮点数、True、False、None等。
+
+2）存储格式可读性更为友好，容易修改。
+
+3）json支持跨平台跨语言操作，能够轻易被其他语言解析，如Python中生成的json文件可以轻易使用JavaScript解析，互操作性更强，而pickle格式的文件只能在Python语言中支持。
+
+4）具有较强的扩展性。json模块还提供了编码（JSONEncoder）和解码类（JSONDecoder）以便用户对其默认不支持的序列化类型进行扩展。
+
+5）json在序列化datetime的时候会抛出TypeError异常，这是因为json模块本身不支持datetime的序列化，因此需要对json本身的JSONEncoder进行扩展。
+
+更多用法参考：https://docs.python.org/3/library/json.html
+
 
 
