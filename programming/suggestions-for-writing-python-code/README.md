@@ -1598,5 +1598,112 @@ Out[11]: ['foo', {'bar': ['baz', None, 1.0, 2]}]
 
 更多用法参考：https://docs.python.org/3/library/json.html
 
+### 建议46：使用traceback获取栈信息
 
+面对异常开发人员最希望看到的往往是异常发生时候的现场信息，traceback模块可以满足这个需求，它会输出完整的栈信息。
+
+```python
+# traceback_demo.py
+import sys
+import traceback
+
+g_list = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
+
+def f():
+    g_list[5]
+    return g()
+
+
+def g():
+    return h()
+
+
+def h():
+    del g_list[2]
+    return i()
+
+
+def i():
+    g_list.append('i')
+    print(g_list[7])
+
+
+if __name__ == '__main__':
+    try:
+        f()
+    except Exception as e:
+        print("Sorry, out of range error")
+        print(e)
+        print("-"*60)
+        traceback.print_exc(file=sys.stdout)
+        print("-"*60)
+```
+
+```shell
+$ python traceback_demo.py
+Sorry, out of range error
+list index out of range
+------------------------------------------------------------
+Traceback (most recent call last):
+  File "traceback_demo.py", line 23, in <module>
+    f()
+  File "traceback_demo.py", line 7, in f
+    return g()
+  File "traceback_demo.py", line 10, in g
+    return h()
+  File "traceback_demo.py", line 14, in h
+    return i()
+  File "traceback_demo.py", line 18, in i
+    print(g_list[7])
+IndexError: list index out of range
+------------------------------------------------------------
+```
+
+更多用法参考：https://docs.python.org/3/library/traceback.html
+
+本质上模块trackback获取异常相关的数据都是通过sys.exc_info()函数得到的。当有异常发生的时候，该函数以元组的形式返回(type, value, traceback)，其中type为异常的类型，value为异常本身，traceback为异常发生时候的调用和堆栈信息，它是一个traceback对象，对象中包含出错的行数、位置等数据。上面的例子中也可以通过如下方式输出异常发生时候的详细信息：
+
+```python
+def print_custom_traceback():
+    tb_type, tb_val, exc_tb = sys.exc_info()
+    print("Custom Traceback (most recent call last):")
+    for filename, linenum, funcname, source in traceback.extract_tb(exc_tb):
+        print('  File "{}", line {}, in {}\n    {}'.format(
+            filename, linenum, funcname, source
+        ))
+
+
+if __name__ == '__main__':
+    try:
+        f()
+    except Exception as e:
+        print("Sorry, out of range error")
+        print(e)
+        print("-"*60)
+        # traceback.print_exc(file=sys.stdout)
+        print_custom_traceback()
+        print("-"*60)
+```
+
+```shell
+$ python traceback_demo.py
+Sorry, out of range error
+list index out of range
+------------------------------------------------------------
+Custom Traceback (most recent call last):
+  File "traceback_demo.py", line 37, in <module>
+    f()
+  File "traceback_demo.py", line 9, in f
+    return g()
+  File "traceback_demo.py", line 13, in g
+    return h()
+  File "traceback_demo.py", line 18, in h
+    return i()
+  File "traceback_demo.py", line 23, in i
+    print(g_list[7])
+------------------------------------------------------------
+```
+
+实际上除了traceback模块本身，inspect模块也提供了获取traceback对象的接口，inspect.trace([context])可以返回当前帧对象以及异常发生时进行捕获的帧对象之间的所有栈帧记录列表。我没有看到 inspect 和 traceback 相比有什么优点。
 
