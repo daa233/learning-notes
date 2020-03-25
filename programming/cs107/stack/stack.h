@@ -20,7 +20,7 @@ int StackIsEmpty(stack *s);
 void StackPrint(stack *s);
 
 // type-specific free functions
-void IntFree(void *elem);
+void (*IntFree)(void *);
 void StringFree(void *elem);
 
 // type-specific print functions

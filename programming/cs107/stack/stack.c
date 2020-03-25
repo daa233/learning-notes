@@ -67,7 +67,7 @@ void StackPrint(stack *s)
 }
 
 // free function for int
-void IntFree(void *elem) {}
+void (*IntFree)(void *) = NULL;
 
 // free function for c-string
 void StringFree(void *elem)
