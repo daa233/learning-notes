@@ -2,19 +2,28 @@
 This is simple demo to compile C program to Assembly code.
 
 Steps:
-1. Compilation
+1. Pre-processing
+	```shell
+	$ cpp demo.c > demo.i
+2. Compilation
     ```shell
-    $ gcc -S demo.c -o demo.s
+    $ gcc -S demo.i -o demo.s
     ```
-2. Assembly
+3. Assembly
     ```shell
     $ as demo.s -o demo.o
     ```
-3. Linking
+4. Linking
+
+	A short version:
     ```shell
     $ gcc -o demo demo.o
     ```
-4. Run
+	A long version (see it with `gcc -v -o demo demo.o`):
+	```shell
+	$ /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccGHkUNF.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o demo /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. demo.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o
+	```
+5. Run
     ```shell
     $ ./demo
     Hello World!
@@ -71,3 +80,8 @@ main:
         leave
         ret
 ```
+
+
+References:
+- [GCC and Make - Compiling, Linking and Building C/C++ Applications](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
+- [How to link C++ object files with ld](https://stackoverflow.com/questions/14163208/how-to-link-c-object-files-with-ld)

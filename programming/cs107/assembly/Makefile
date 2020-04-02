@@ -1,7 +1,8 @@
 CFLAGS= -Wall -g
 
 all:
-	gcc -S demo.c -o demo.s
+	cpp demo.c > demo.i
+	gcc -S demo.i -o demo.s
 	as demo.s -o demo.o
 	gcc -o demo demo.o
 
@@ -12,4 +13,4 @@ check:
 	valgrind ./demo
 
 clean:
-	rm -rf demo.s demo.o demo
+	rm -rf demo.i demo.s demo.o demo
