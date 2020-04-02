@@ -1,5 +1,5 @@
-#include "qsort_int.c"
-#include "qsort.c"
+#include "qsort_int.h"
+#include "qsort.h"
 #include <stdio.h>
 
 int main(int argc, char const *argv[])

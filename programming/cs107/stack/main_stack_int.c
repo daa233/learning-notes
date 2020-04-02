@@ -1,4 +1,3 @@
-#include "stack_int.c"
 #include "stack_int.h"
 #include <stdio.h>
 

@@ -1,6 +1,7 @@
-#include "stack.c"
 #include "stack.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void test_int_stack()
 {

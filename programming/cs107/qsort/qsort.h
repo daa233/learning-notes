@@ -1,3 +1,6 @@
+#ifndef __qsort_h__
+#define __qsort_h__
+
 #include <stdio.h>
 
 void qsort(void *base, size_t nel, size_t elemSize,
@@ -15,3 +18,5 @@ static void _swap_elem(void *base, int i, int j, size_t elemSize);
 int IntCmp(const void *elem1, const void *elem2);
 
 int StringCmp(const void *elem1, const void *elem2);
+
+#endif
