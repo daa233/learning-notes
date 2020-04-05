@@ -185,6 +185,26 @@ bool imdb::getCredits(const string& player, vector<film>& films) const
   return false;
 }
 
+bool imdb::getCreditsNum(const string& player, short &num) const
+{
+  // binary search the player in the actorFile
+  int numActor = *(int *) actorFile;
+  int playerOffset = 0;
+  // use the binary search in the standard library
+  ActorKey actorKey{player, actorFile};
+  void *offsetActorFile = (void *)((int *)actorFile + 1);
+  void *elemAddr = bsearch(&actorKey, offsetActorFile, numActor, sizeof(int),
+                           ActorCmp);
+  playerOffset = *(int *)elemAddr;
+
+  if (playerOffset > 0) {
+    parseActorRecord(actorFile, playerOffset, NULL, &num, NULL, NULL);
+    return true;
+  }
+
+  return false;
+}
+
 bool imdb::getCast(const film& movie, vector<string>& players) const
 {
   // binary search the movie in the movieFile

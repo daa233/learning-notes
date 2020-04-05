@@ -23,7 +23,8 @@ using namespace std;
  *         empty string.
  */
 
-static string promptForActor(const string& prompt, const imdb& db)
+static string promptForActor(const string& prompt, const imdb& db,
+                             short &creditsNum)
 {
   string response;
   while (true) {
@@ -31,7 +32,7 @@ static string promptForActor(const string& prompt, const imdb& db)
     getline(cin, response);
     if (response == "") return "";
     vector<film> credits;
-    if (db.getCredits(response, credits)) return response;
+    if (db.getCreditsNum(response, creditsNum)) return response;
     cout << "We couldn't find \"" << response << "\" in the movie database. "
 	 << "Please try again." << endl;
   }
@@ -62,22 +63,34 @@ int main(int argc, const char *argv[])
   }
   
   while (true) {
-    string source = promptForActor("Actor or actress", db);
+    short sourceCreditsNum = 0;
+    short targetCreditsNum = 0;
+    string source = promptForActor("Actor or actress", db, sourceCreditsNum);
     if (source == "") break;
-    string target = promptForActor("Another actor or actress", db);
+    string target = promptForActor("Another actor or actress", db, targetCreditsNum);
     if (target == "") break;
     if (source == target) {
       cout << "Good one.  This is only interesting if you specify two different people." << endl;
     } else {
       // replace the following line by a call to your generateShortestPath routine... 
-      path p(source);
       int maxDegrees = 6;
       bool found = false;
+      bool reverse = false;
+      path shortestPath{source};
+
+      // search from the actor with the smaller number of movies
+      if (sourceCreditsNum > targetCreditsNum) {
+        // swap the value of source and target
+        string temp = source;
+        source = target;
+        target = temp;
+        reverse = true;
+      }
 
       /*
        * Breadth-First Search
        */
-      list<path> pathList{path(source)};  // init the list
+      list<path> pathList{shortestPath};  // init the list
 
       while (!pathList.empty() && !found) {
         path p = pathList.front();
@@ -92,24 +105,26 @@ int main(int argc, const char *argv[])
             if (found)  break;
             vector<string> players;
             db.getCast(f, players);
-            for (auto player : players) {
-              if (found) break;
-              if (p.contain(player)) {
-                continue;
-              }
-              path newPath = p;
-              newPath.addConnection(f, player);
-              if (newPath.getLength() > maxDegrees) {
-                continue;
-              } else {
-                if (player == target) {
-                  // found the path
-                  found = true;
-                  cout << newPath << endl;
-                  break;
+            if (!players.empty()) {
+              for (auto player : players) {
+                if (found) break;
+                if (p.contain(player)) {
+                  continue;
+                }
+                path newPath = p;
+                newPath.addConnection(f, player);
+                if (newPath.getLength() > maxDegrees) {
+                  continue;
                 } else {
-                  // add new path to the pathList
-                  pathList.push_back(newPath);
+                  if (player == target) {
+                    // found the path
+                    found = true;
+                    shortestPath = newPath;
+                    break;
+                  } else {
+                    // add new path to the pathList
+                    pathList.push_back(newPath);
+                  }
                 }
               }
             }
@@ -117,7 +132,12 @@ int main(int argc, const char *argv[])
         }
       }
 
-      if (!found)
+      if (reverse)
+        shortestPath.reverse();
+
+      if (found)
+        cout << shortestPath << endl;
+      else
         cout << endl << "No path between those two people could be found." << endl << endl;
     }
   }

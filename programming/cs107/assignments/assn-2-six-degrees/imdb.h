@@ -55,6 +55,19 @@ class imdb {
   bool getCredits(const string& player, vector<film>& films) const;
 
   /**
+   * Method: getCreditsNum
+   * ---------------------
+   * Searches for an actor/actress's list of movie credits, get the number
+   * of the credits.
+   * 
+   * @param player the name of the actor or actresses being queried.
+   * @param num the number of the specified actor/actress's credits.
+   * @return true if and only if the specified actor/actress appeared in the
+   *              database, and false otherwise.
+   */
+  bool getCreditsNum(const string& player, short &num) const;
+
+  /**
    * Method: getCast
    * ---------------
    * Searches the receiving imdb for the specified film and returns the cast
