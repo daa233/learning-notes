@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 #include <list>
 #include <set>
 #include <string>
@@ -39,6 +40,68 @@ static string promptForActor(const string& prompt, const imdb& db,
 }
 
 /**
+ * Get the credits of a given player. If the player's credits are already
+ * in cache, return the credits in cache directly; else search in the imdb
+ * and cache the result.
+ * 
+ * @param db a const reference to the imdb that should queried.
+ * @param player the name of the actor or actresses being queried.
+ * @param films a reference to the vector of films that should be updated
+ *            with the list of the specified actor/actress's credits.
+ * @param creditsCache a reference to the credits cache
+ */
+
+void getCredits(const imdb &db, const string &player,
+                vector<film> &films,
+                map<string, vector<film>> &creditsCache)
+{
+  // search the player's credits in the cache
+  map<string, vector<film>>::const_iterator it;
+  it = creditsCache.find(player);
+  if (it != creditsCache.end()) {
+    // already in cache
+    films = it->second;
+  } else {
+    // not in cache
+    db.getCredits(player, films);
+    // now cache it
+    creditsCache.insert(pair<string, vector<film>>(player, films));
+  }
+}
+
+/**
+ * Get the cast of a given film. If the film's cast are already in cache,
+ * return the cast in cache directly; else search in the imdb and cache the
+ * result.
+ * 
+ * @param db a const reference to the imdb that should queried.
+ * @param movie an instance of film being queried.
+ * @param players a reference to the vector of strings to be updated with the
+ *                the list of actors and actresses starring in the specified
+ *                film.
+ * @param castCache a reference to the cast cache
+ */
+
+void getCast(const imdb &db, const film &movie,
+             vector<string> &players,
+             map<film, vector<string>> &castCache)
+{
+  // search the cast in the cache
+  map<film, vector<string>>::const_iterator it;
+  it = castCache.find(movie);
+  if (it != castCache.end()) {
+    // already in cache
+    players = it->second;
+  } else {
+    // not in cache
+    db.getCast(movie, players);
+    // now cache it
+    castCache.insert(pair<film, vector<string>>(movie, players));
+  }
+}
+
+
+/**
  * Serves as the main entry point for the six-degrees executable.
  * There are no parameters to speak of.
  *
@@ -76,6 +139,8 @@ int main(int argc, const char *argv[])
       int maxDegrees = 6;
       bool found = false;
       bool reverse = false;
+      map<string, vector<film>> creditsCache;
+      map<film, vector<string>> castCache;
       path shortestPath{source};
 
       // search from the actor with the smaller number of movies
@@ -99,12 +164,12 @@ int main(int argc, const char *argv[])
         // search the target in all the costars of the player
         string player = p.getLastPlayer();
         vector<film> films;
-        db.getCredits(player, films);
+        getCredits(db, player, films, creditsCache);
         if (!films.empty()) {
           for (auto f : films) {
             if (found)  break;
             vector<string> players;
-            db.getCast(f, players);
+            getCast(db, f, players, castCache);
             if (!players.empty()) {
               for (auto player : players) {
                 if (found) break;
