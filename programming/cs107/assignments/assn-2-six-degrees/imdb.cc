@@ -175,9 +175,9 @@ bool imdb::getCredits(const string& player, vector<film>& films) const
   void *offsetActorFile = (void *)((int *)actorFile + 1);
   void *elemAddr = bsearch(&actorKey, offsetActorFile, numActor, sizeof(int),
                            ActorCmp);
-  playerOffset = *(int *)elemAddr;
-
-  if (playerOffset > 0) {
+  
+  if (elemAddr != NULL) {
+    playerOffset = *(int *)elemAddr;
     parseActorRecord(actorFile, playerOffset, NULL, NULL, movieFile, &films);
     return true;
   }
@@ -195,9 +195,9 @@ bool imdb::getCreditsNum(const string& player, short &num) const
   void *offsetActorFile = (void *)((int *)actorFile + 1);
   void *elemAddr = bsearch(&actorKey, offsetActorFile, numActor, sizeof(int),
                            ActorCmp);
-  playerOffset = *(int *)elemAddr;
 
-  if (playerOffset > 0) {
+  if (elemAddr != NULL) {
+    playerOffset = *(int *)elemAddr;
     parseActorRecord(actorFile, playerOffset, NULL, &num, NULL, NULL);
     return true;
   }
@@ -216,9 +216,9 @@ bool imdb::getCast(const film& movie, vector<string>& players) const
   void *offsetMovieFile = (void *)((int *)movieFile + 1);
   void *elemAddr = bsearch(&movieKey, offsetMovieFile, numFilms, sizeof(int),
                            MovieCmp);
-  movieOffset = *(int *)elemAddr;
-
-  if (movieOffset > 0) {
+  
+  if (elemAddr != NULL) {
+    movieOffset = *(int *)elemAddr;
     parseMovieRecord(movieFile, movieOffset, NULL, NULL, NULL,
                      actorFile, &players);
     return true;
