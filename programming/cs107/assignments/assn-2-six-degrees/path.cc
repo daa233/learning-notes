@@ -62,13 +62,22 @@ void path::reverse()
   *this = reverseOfPath;
 }
 
-bool path::contain(const string& player)
+void path::combine(const path& p, path &result) const
 {
-  for (auto link : links) {
-    if (link.player == player)
-      return true;
+  result.startPlayer = startPlayer;
+  result.links = links;
+  path secondPath = p;
+  string lastPlayer = getLastPlayer();
+  if (lastPlayer == secondPath.getLastPlayer()) {
+    secondPath.reverse();
   }
-  return false;
+  result.links.insert(result.links.end(), secondPath.links.begin(),
+                      secondPath.links.end());
+}
+
+bool path::empty() const
+{
+  return links.empty();
 }
 
 ostream& operator<<(ostream& os, const path& p)

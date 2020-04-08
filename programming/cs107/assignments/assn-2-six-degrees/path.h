@@ -115,12 +115,21 @@ class path {
   void reverse();
 
   /**
-   * Method: inConnection
-   * --------------------
-   * Check if the connection contains a player
+   * Method: combine
+   * ---------------
+   * Combine two path to one path and store it in path &result.
+   * Assumes the path have a common last player or the one path's last player
+   * is the other path's start player.
    */
-  bool contain(const string& player);
-  
+  void combine(const path& p, path &result) const;
+
+  /**
+   * Method: empty
+   * Check if a path object is empty. Return true if the links member is empty,
+   * instead false.
+   */
+  bool empty() const;
+
  private:
   // private struct definition... no one else uses it, so I define it internally
   // if you think about it, the existence of this struct is really an implementation detail,

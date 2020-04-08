@@ -100,8 +100,11 @@ void getCast(const imdb &db, const film &movie,
   }
 }
 
+/**
+ * Check if the elem is in the set container.
+ */
 template <typename T, typename E>
-bool inSet(set<T> &s, const E &elem)
+bool inSet(const set<T> &s, const E &elem)
 {
   typename set<T>::const_iterator it;
   it = s.find(elem);
@@ -112,6 +115,24 @@ bool inSet(set<T> &s, const E &elem)
   }
 }
 
+/**
+ * Check if the elem is in the map container.
+ */
+template <typename T1, typename T2, typename E>
+bool inMap(const map<T1, T2> &m, const E &elem)
+{
+  typename map<T1, T2>::const_iterator it;
+  it = m.find(elem);
+  if (it != m.end()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Unidirectional breadth-first search from the endpoint with fewer credits.
+ */
 void unidirectionalSearch(const imdb &db, const string &sourcePlayer,
                           const string &targetPlayer,
                           short &sourceCreditsNum, short &targetCreditsNum)
@@ -182,6 +203,127 @@ void unidirectionalSearch(const imdb &db, const string &sourcePlayer,
   cout << endl << "No path between those two people could be found." << endl << endl;
 }
 
+/**
+ * Bidirectional breadth-first search helper function
+ */
+void explore(list<path> &pathList, const bool &isSourcePath,
+             map<string, path> &sourcePathMap,
+             map<string, path> &targetPathMap,
+             set<film> &exploredFilms, path &shortestPath,
+             const imdb &db,
+             map<string, vector<film>> &creditsCache,
+             map<film, vector<string>> &castCache)
+{
+  // preparation
+  map<string, path> *pathMap1;
+  map<string, path> *pathMap2;
+  if (isSourcePath) {
+    pathMap1 = &sourcePathMap;
+    pathMap2 = &targetPathMap;
+  } else {
+    pathMap1 = &targetPathMap;
+    pathMap2 = &sourcePathMap;
+  }
+
+  // explore one step from the given path
+  path p = pathList.front();
+  pathList.pop_front();
+  string lastPlayer = p.getLastPlayer();
+  vector<film> films;
+  getCredits(db, lastPlayer, films, creditsCache);
+  for (auto f : films) {
+    if (inSet(exploredFilms, f)) {
+      continue;
+    } else {
+      exploredFilms.insert(f);
+    }
+    vector<string> players;
+    getCast(db, f, players, castCache);
+    for (auto player : players) {
+      if (inMap(*pathMap1, player)) {
+        continue;
+      }
+      p.addConnection(f, player);
+      (*pathMap1).insert(pair<string, path>(player, p));
+      // check if the player is in the other path map
+      map<string, path>::const_iterator it;
+      it = (*pathMap2).find(player);
+      if (it != (*pathMap2).end()) {
+        // found the path in both endpoints
+        // combine them into shortestPath
+        int len = p.getLength() + it->second.getLength();
+        if (shortestPath.empty() || len < shortestPath.getLength()) {
+          if (isSourcePath) {
+          p.combine(it->second, shortestPath);
+          } else {
+            it->second.combine(p, shortestPath);
+          }
+        }
+      } else {
+        // add new path to the pathList
+        pathList.push_back(p);
+      }
+      p.undoConnection();
+    }
+  }
+}
+
+/**
+ * Bidirectional breadth-first search from both endpoints
+ */
+void bidirectionalSearch(const imdb &db, const string &source,
+                         const string &target)
+{
+  int maxDegrees = 6;
+  path shortestPath{source};
+  map<string, vector<film>> creditsCache;
+  map<film, vector<string>> castCache;
+  
+  /*
+   * Breadth-First Search from both endpoints
+   */
+  path sourcePath{source};
+  path targetPath{target};
+  list<path> sourcePathList{sourcePath};  // init the source list
+  list<path> targetPathList{targetPath};  // init the target list
+  // init the source path map
+  map<string, path> sourcePathMap{pair<string, path>(source, sourcePath)};
+  // init the target path map
+  map<string, path> targetPathMap{pair<string, path>(target, targetPath)};
+  set<film> sourceExploredFilms;
+  set<film> targetExploredFilms;
+
+  int len = 0;
+  while ((!sourcePathList.empty() || !targetPathList.empty()) &&
+          len <= maxDegrees) {
+    // explore one step from the source path list
+    if (!sourcePathList.empty()) {
+      explore(sourcePathList, true, sourcePathMap, targetPathMap,
+              sourceExploredFilms, shortestPath, db, creditsCache, castCache);
+      len = sourcePathList.front().getLength() 
+            + targetPathList.front().getLength();
+      if (!shortestPath.empty() && shortestPath.getLength() <= len) {
+        break;
+      }
+    }
+    
+    // explore one step from the target path list
+    if (!targetPathList.empty()) {
+      explore(targetPathList, false, sourcePathMap, targetPathMap,
+              targetExploredFilms, shortestPath, db, creditsCache, castCache);
+      len = sourcePathList.front().getLength()
+            + targetPathList.front().getLength();
+      if (!shortestPath.empty() && shortestPath.getLength() <= len) {
+        break;
+      }
+    }
+  }
+
+  if (!shortestPath.empty())
+    cout << shortestPath << endl;
+  else
+    cout << endl << "No path between those two people could be found." << endl << endl;
+}
 
 /**
  * Serves as the main entry point for the six-degrees executable.
@@ -218,7 +360,8 @@ int main(int argc, const char *argv[])
       cout << "Good one.  This is only interesting if you specify two different people." << endl;
     } else {
       // replace the following line by a call to your generateShortestPath routine... 
-      unidirectionalSearch(db, source, target, sourceCreditsNum, targetCreditsNum);
+      // unidirectionalSearch(db, source, target, sourceCreditsNum, targetCreditsNum);
+      bidirectionalSearch(db, source, target);
     }
   }
   
