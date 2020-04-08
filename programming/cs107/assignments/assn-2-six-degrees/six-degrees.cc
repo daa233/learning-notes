@@ -100,6 +100,88 @@ void getCast(const imdb &db, const film &movie,
   }
 }
 
+template <typename T, typename E>
+bool inSet(set<T> &s, const E &elem)
+{
+  typename set<T>::const_iterator it;
+  it = s.find(elem);
+  if (it != s.end()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void unidirectionalSearch(const imdb &db, const string &sourcePlayer,
+                          const string &targetPlayer,
+                          short &sourceCreditsNum, short &targetCreditsNum)
+{
+  int maxDegrees = 6;
+  bool reverse = false;
+  map<string, vector<film>> creditsCache;
+  map<film, vector<string>> castCache;
+  set<string> exploredPlayers;
+  set<film> exploredFilms;
+
+  string source = sourcePlayer;
+  string target = targetPlayer;
+
+  // search from the actor with the smaller number of movies
+  if (sourceCreditsNum > targetCreditsNum) {
+    // swap the value of source and target
+    string temp = source;
+    source = target;
+    target = temp;
+    reverse = true;
+  }
+
+  /**
+    * Breadth-First Search
+    */
+  list<path> pathList{path{source}};  // init the list
+  exploredPlayers.insert(source);
+
+  while (!pathList.empty() && pathList.front().getLength() < maxDegrees) {
+    path p = pathList.front();
+    pathList.pop_front();
+
+    // search the target in all the costars of the player
+    string lastPlayer = p.getLastPlayer();
+    vector<film> films;
+    getCredits(db, lastPlayer, films, creditsCache);
+    for (auto f : films) {
+      if (inSet(exploredFilms, f)) {
+        continue;
+      } else {
+        exploredFilms.insert(f);
+      }
+      vector<string> players;
+      getCast(db, f, players, castCache);
+      for (auto player : players) {
+        if (inSet(exploredPlayers, player)) {
+          continue;
+        } else {
+          exploredPlayers.insert(player);
+        }
+        p.addConnection(f, player);
+        if (player == target) {
+          // found the path
+          if (reverse)
+            p.reverse();
+          cout << p << endl;
+          return;
+        } else {
+          // add new path to the pathList
+          pathList.push_back(p);
+        }
+        p.undoConnection();
+      }
+    }
+  }
+
+  cout << endl << "No path between those two people could be found." << endl << endl;
+}
+
 
 /**
  * Serves as the main entry point for the six-degrees executable.
@@ -136,74 +218,7 @@ int main(int argc, const char *argv[])
       cout << "Good one.  This is only interesting if you specify two different people." << endl;
     } else {
       // replace the following line by a call to your generateShortestPath routine... 
-      int maxDegrees = 6;
-      bool found = false;
-      bool reverse = false;
-      map<string, vector<film>> creditsCache;
-      map<film, vector<string>> castCache;
-      path shortestPath{source};
-
-      // search from the actor with the smaller number of movies
-      if (sourceCreditsNum > targetCreditsNum) {
-        // swap the value of source and target
-        string temp = source;
-        source = target;
-        target = temp;
-        reverse = true;
-      }
-
-      /*
-       * Breadth-First Search
-       */
-      list<path> pathList{shortestPath};  // init the list
-
-      while (!pathList.empty() && !found) {
-        path p = pathList.front();
-        pathList.pop_front();
-        
-        // search the target in all the costars of the player
-        string player = p.getLastPlayer();
-        vector<film> films;
-        getCredits(db, player, films, creditsCache);
-        if (!films.empty()) {
-          for (auto f : films) {
-            if (found)  break;
-            vector<string> players;
-            getCast(db, f, players, castCache);
-            if (!players.empty()) {
-              for (auto player : players) {
-                if (found) break;
-                if (p.contain(player)) {
-                  continue;
-                }
-                path newPath = p;
-                newPath.addConnection(f, player);
-                if (newPath.getLength() > maxDegrees) {
-                  continue;
-                } else {
-                  if (player == target) {
-                    // found the path
-                    found = true;
-                    shortestPath = newPath;
-                    break;
-                  } else {
-                    // add new path to the pathList
-                    pathList.push_back(newPath);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (reverse)
-        shortestPath.reverse();
-
-      if (found)
-        cout << shortestPath << endl;
-      else
-        cout << endl << "No path between those two people could be found." << endl << endl;
+      unidirectionalSearch(db, source, target, sourceCreditsNum, targetCreditsNum);
     }
   }
   
