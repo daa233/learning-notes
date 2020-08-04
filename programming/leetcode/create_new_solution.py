@@ -45,7 +45,8 @@ class Solution(object):
         # Traverse the problems list and get the id-th problem
         found_flag = False
         for problem_item in problems_list:
-            if problem_item['stat']['frontend_question_id'] == self.id:
+            question_id = problem_item['stat']['frontend_question_id']
+            if question_id == self.id or question_id == str(self.id):
                 found_flag = True
                 self.title_slug = problem_item['stat']['question__title_slug']
                 self.title = problem_item['stat']['question__title']
@@ -77,7 +78,7 @@ class Solution(object):
             except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
                 exit('==> ERROR: Time out!')
         else:
-            exit('==> ERROR: Unable to find problem {}'.format(args.id))
+            exit('==> ERROR: Unable to find problem {}'.format(self.id))
 
 
 def get_problems_list_json_file(problems_list_json_filename, problems_list_base_url, category_slug):
@@ -293,6 +294,7 @@ def main():
         create_new_solution(solution, solution_base_path)
 
     else:
+        print(args)
         exit('==> ERROR: Invalid problem id: {}'.format(args.id))
 
 
