@@ -273,7 +273,7 @@ if __name__ == "__main__":
     sys.path.insert(0, "../")
     from util import Runner
 
-    data_list = [
+    data = [
         [
             '["MyLinkedList","addAtHead","addAtTail","deleteAtIndex","addAtTail","addAtIndex","addAtIndex","deleteAtIndex","deleteAtIndex","addAtTail","addAtIndex","addAtTail"]',
             "[[],[7],[0],[1],[5],[1,1],[2,6],[2],[1],[7],[1,7],[6]]",
@@ -284,8 +284,5 @@ if __name__ == "__main__":
         ],
     ]
 
-    for i, data in enumerate(data_list, start=1):
-        print(" Example {} ".format(i).center(80, "#"))
-        methods, params = data
-        runner = Runner(methods, params)
-        results = runner.exec(locals(), verbose=True, hooks=["show"])
+    runner = Runner(env=locals(), data=data, verbose=True, hooks=["show"])
+    runner.exec()
