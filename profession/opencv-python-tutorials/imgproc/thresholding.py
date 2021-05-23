@@ -74,27 +74,67 @@ ret2, th2 = cv.threshold(img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 blur = cv.GaussianBlur(img, (5, 5), 0)
 # blur = img
 ret3, th3 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+
+
+def get_custom_otsu_threshold_value(img):
+    num_of_bins = 256
+    hist = cv.calcHist([img], [0], None, [num_of_bins], [0, num_of_bins])
+    hist_norm = hist.ravel() / hist.sum()
+    q = hist_norm.cumsum()
+    bins = np.arange(num_of_bins)
+    product_bins = hist_norm * bins
+    epsilon = 1e-6
+
+    var_w = np.inf
+    otsu_thresh = -1
+
+    for i in range(1, num_of_bins):
+        q1 = q[i]
+        q2 = q[num_of_bins - 1] - q[i]
+
+        if q1 < epsilon or q2 < epsilon:
+            continue
+
+        mu1 = np.sum(product_bins[:i]) / q1
+        mu2 = np.sum(product_bins[i:]) / q2
+        var1 = np.sum(((bins[:i] - mu1) ** 2) * hist_norm[:i]) / q1
+        var2 = np.sum(((bins[i:] - mu2) ** 2) * hist_norm[i:]) / q2
+        var_temp = var1 * q1 + var2 * q2
+        if var_temp < var_w:
+            var_w = var_temp
+            otsu_thresh = i
+
+    return otsu_thresh
+
+
+otsu_thresh = get_custom_otsu_threshold_value(blur)
+ret4, th4 = cv.threshold(blur, otsu_thresh, 255, cv.THRESH_BINARY)
+
 # plot all the images and their histograms
-images = [img, 0, th1, img, 0, th2, blur, 0, th3]
+images = [img, 0, th1, img, 0, th2, blur, 0, th3, blur, 0, th4]
 titles = [
     "Original Noisy Image",
     "Histogram",
-    "Global Thresholding (v=127)",
+    "Global Thresholding (v={})".format(ret1),
     "Original Noisy Image",
     "Histogram",
-    "Otsu's Thresholding",
+    "Otsu's Thresholding (v={})".format(ret2),
     "Gaussian filtered Image",
     "Histogram",
-    "Otsu's Thresholding",
+    "Otsu's Thresholding (v={})".format(ret3),
+    "Gaussian filtered Image",
+    "Histogram",
+    "My Otsu's Thresholding (v={})".format(ret4),
 ]
 
-for i in range(3):
-    plt.subplot(3, 3, i * 3 + 1), plt.imshow(images[i * 3], "gray")
-    plt.title(titles[i * 3]), plt.xticks([]), plt.yticks([])
-    plt.subplot(3, 3, i * 3 + 2), plt.hist(images[i * 3].ravel(), 256)
-    plt.title(titles[i * 3 + 1]), plt.xticks([]), plt.yticks([])
-    plt.subplot(3, 3, i * 3 + 3), plt.imshow(images[i * 3 + 2], "gray")
-    plt.title(titles[i * 3 + 2]), plt.xticks([]), plt.yticks([])
+group_num = 4
+for i in range(group_num):
+    plt.subplot(group_num, 3, i * 3 + 1), plt.imshow(images[i * 3], "gray")
+    plt.title(titles[i * 3], fontsize=10), plt.xticks([]), plt.yticks([])
+    plt.subplot(group_num, 3, i * 3 + 2), plt.hist(images[i * 3].ravel(), 256)
+    plt.title(titles[i * 3 + 1], fontsize=10), plt.xticks([]), plt.yticks([])
+    plt.subplot(group_num, 3, i * 3 + 3), plt.imshow(images[i * 3 + 2], "gray")
+    plt.title(titles[i * 3 + 2], fontsize=10), plt.xticks([]), plt.yticks([])
 
 
 plt.tight_layout()
