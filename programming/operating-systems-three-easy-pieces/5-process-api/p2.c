@@ -3,8 +3,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     printf("hello world (pid:%d)\n", (int)getpid());
     int rc = fork();
     if (rc < 0) {

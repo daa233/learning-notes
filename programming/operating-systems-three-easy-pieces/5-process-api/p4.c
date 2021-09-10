@@ -5,8 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     int rc = fork();
     if (rc < 0) {
         // fork failed; exit
@@ -16,12 +15,13 @@ int main(int argc, char* argv[])
         // child: redirect standard output to a file
         close(STDOUT_FILENO);
         open("./p4.output", O_CREAT | O_WRONLY | O_TRUNC, S_IRWXG);
+
         // now exec "wc"...
         char* myargs[3];
-        myargs[0] = strdup("wc"); // program: "wc" (word count)
-        myargs[1] = strdup("p4.c"); // argument: file to count
-        myargs[2] = NULL; // marks end of array;
-        execvp(myargs[0], myargs); // runs word count
+        myargs[0] = strdup("wc");    // program: "wc" (word count)
+        myargs[1] = strdup("p4.c");  // argument: file to count
+        myargs[2] = NULL;            // marks end of array;
+        execvp(myargs[0], myargs);   // runs word count
         printf("this shouldn't print out\n");
     } else {
         // parent goes down this path (main)

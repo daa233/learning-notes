@@ -4,8 +4,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     printf("hello world (pid:%d)\n", (int)getpid());
     int rc = fork();
     if (rc < 0) {
@@ -16,10 +15,10 @@ int main(int argc, char* argv[])
         // child (new process)
         printf("hello, I am child (pid:%d)\n", (int)getpid());
         char* myargs[3];
-        myargs[0] = strdup("wc"); // program: "wc" (word count)
-        myargs[1] = strdup("p3.c"); // argument: file to count
-        myargs[2] = NULL; // marks end of array;
-        execvp(myargs[0], myargs); // runs word count
+        myargs[0] = strdup("wc");    // program: "wc" (word count)
+        myargs[1] = strdup("p3.c");  // argument: file to count
+        myargs[2] = NULL;            // marks end of array;
+        execvp(myargs[0], myargs);   // runs word count
         printf("this shouldn't print out\n");
     } else {
         // parent goes down this path (main)
