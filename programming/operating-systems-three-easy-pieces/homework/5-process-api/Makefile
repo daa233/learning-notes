@@ -1,7 +1,7 @@
-all: q1 q2 q3 q4 q5 q6 q7 q8
+all: q1 q2 q3 q4 q5 q6 q7 q8 process_comm
 
 clean:
-	rm -f q1 q2 q2.output q3 q4 q5 q6 q7 q8
+	rm -f q1 q2 q2.output q3 q4 q5 q6 q7 q8 process_comm
 
 q1: q1.c
 	gcc -o q1 q1.c -Wall
@@ -26,3 +26,6 @@ q7: q7.c
 
 q8: q8.c
 	gcc -o q8 q8.c -Wall
+
+process_comm: process_comm.c
+	gcc -o process_comm process_comm.c -Wall
