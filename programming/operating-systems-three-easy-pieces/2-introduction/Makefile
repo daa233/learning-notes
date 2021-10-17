@@ -1,16 +1,18 @@
+INCLUDES = ../include
+
 all: cpu mem threads io
 
 clean:
 	rm -f cpu mem threads io
 
-cpu: cpu.c common.h
-	gcc -o cpu cpu.c -Wall
+cpu: cpu.c
+	gcc -I $(INCLUDES) -o cpu cpu.c -Wall
 
-mem: mem.c common.h
-	gcc -o mem mem.c -Wall
+mem: mem.c
+	gcc -I $(INCLUDES) -o mem mem.c -Wall
 
-threads: threads.c common.h common_threads.h
-	gcc -o threads threads.c -Wall -pthread
+threads: threads.c
+	gcc -I $(INCLUDES) -o threads threads.c -Wall -pthread
 
-io: io.c common.h
-	gcc -o io io.c -Wall
+io: io.c
+	gcc -I $(INCLUDES) -o io io.c -Wall
