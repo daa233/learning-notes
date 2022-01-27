@@ -1,4 +1,5 @@
 import json
+from inspect import signature
 from collections.abc import Iterable
 
 
@@ -7,12 +8,13 @@ class Runner:
     The Runner is used to execute json format examples and get the outputs.
     """
 
-    def __init__(self, env, data, verbose=False, preprocess=[], hooks=[]):
+    def __init__(self, env, data, verbose=False, preprocess=[], postprocess=[], hooks=[]):
         self.env = env
         self.data = data
         self.verbose = verbose
         self.hooks = hooks
         self.preprocess = preprocess
+        self.postprocess = postprocess
         self.class_instance = None
         self.class_method_name = None
 
@@ -62,14 +64,14 @@ class Runner:
                 if self.verbose:
                     print(" Case {} ".format(case_index).center(80, "#"))
 
-                for pre in self.preprocess:
-                    pre_func = self._get_func(pre)
-                    data = pre_func(data)
+                data = self._preprocess(data)
 
                 res = self.exec_step(self.class_method_name, data)
                 outputs.append(res)
 
                 self.exec_hooks()
+
+                res = self._postprocess(res)
 
                 if self.verbose:
                     print()
@@ -98,7 +100,11 @@ class Runner:
 
     def exec_step(self, method, param, i=1):
         func = self._get_func(method)
-        if isinstance(param, Iterable):
+        func_sign = signature(func)
+        exp_param_num = len(func_sign.parameters)
+        if exp_param_num == 1:
+            param = tuple([param])
+        elif isinstance(param, Iterable):
             param = tuple(param)
         else:
             param = tuple([param])
@@ -123,6 +129,18 @@ class Runner:
                 func(*tuple(hook.values()))
             else:
                 raise NotImplementedError("Not implemented hook {}".format(hook))
+
+    def _preprocess(self, data):
+        for pre in self.preprocess:
+            pre_func = self._get_func(pre)
+            data = pre_func(data)
+        return data
+
+    def _postprocess(self, res):
+        for post in self.postprocess:
+            post_func = self._get_func(post)
+            res = post_func(res)
+        return res
 
     def _get_func(self, name, obj=None):
         if obj is not None:
