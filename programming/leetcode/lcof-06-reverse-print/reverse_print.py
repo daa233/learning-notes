@@ -28,6 +28,12 @@ class ListNode:
 
 
 class Solution1:
+    """
+    遍历链表，将所有元素依次存入 list 中，每次从头部插入。
+    时间复杂度：O(n)
+    空间复杂度：O(n)
+    """
+
     def reversePrint(self, head: ListNode) -> List[int]:
         outputs = []
         node = head
@@ -38,6 +44,12 @@ class Solution1:
 
 
 class Solution:
+    """
+    遍历链表，将所有元素依次存入 list 中，然后反转一下。
+    时间复杂度：O(n)
+    空间复杂度：O(n)
+    """
+
     def reversePrint(self, head: ListNode) -> List[int]:
         outputs = []
         node = head
@@ -46,6 +58,25 @@ class Solution:
             node = node.next
         outputs.reverse()
         return outputs
+
+
+class Solution2:
+    """
+    采用递归的方式，每访问到一个节点，先递归输出它后面的节点，再输出该节点自身。
+    当链表非常长的时候，可能会导致函数调用的层级很深，从而有可能导致函数调用栈溢出。
+    因此用栈基于循环实现的代码的鲁棒性要好一些。
+    """
+
+    def reversePrint(self, head: ListNode) -> List[int]:
+        self.outputs = []
+        self._helper(head)
+        return self.outputs
+
+    def _helper(self, head: ListNode) -> ListNode:
+        if head:
+            node = self._helper(head.next)
+            self.outputs.append(head.val)
+            return node
 
 
 def create_linked_list(data: List[int]) -> ListNode:
@@ -70,23 +101,19 @@ def print_linked_list(head: ListNode) -> ListNode:
         vals.append(str(node.val))
         node = node.next
 
-    print("Input LinkedList: " + " -> ".join(vals))
+    print("LinkedList: " + " -> ".join(vals))
 
     return head
 
 
 if __name__ == "__main__":
-    import sys
 
-    sys.path.insert(0, "../")
-    from util import Runner
+    data_list = [[1, 3, 2], [3, 5, 6, 7, 9]]
 
-    data = ["[1,3,2]", "[3,5,6,7,9]"]
+    s = Solution()
 
-    runner = Runner(
-        env=locals(),
-        data=data,
-        verbose=True,
-        preprocess=["create_linked_list", "print_linked_list"],
-    )
-    runner.exec()
+    for data in data_list:
+        linked_list = create_linked_list(data)
+        print_linked_list(linked_list)
+        out = s.reversePrint(linked_list)
+        print(out)
