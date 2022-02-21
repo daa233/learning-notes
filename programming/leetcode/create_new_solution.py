@@ -117,7 +117,10 @@ class Solution(object):
                         self.code = code_json["code"]
                         break
 
-            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+            except (
+                requests.exceptions.ReadTimeout,
+                requests.exceptions.ConnectTimeout,
+            ):
                 raise TimeoutError("Time out!")
         else:
             raise LookupError("Unable to find problem {}".format(self.id))
@@ -258,7 +261,10 @@ def get_problems_list_json_file(problems_list_json_filename, problems_list_base_
         with open(problems_list_json_filename, "w") as f:
             f.write(r.text)
         r.close()
-    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout):
+    except (
+        requests.exceptions.ReadTimeout,
+        requests.exceptions.ConnectTimeout,
+    ):
         raise TimeoutError("Time out!")
 
 
@@ -292,7 +298,12 @@ def main():
     parser = argparse.ArgumentParser(description="Prepare a new solution for LeetCode problem")
 
     parser.add_argument(
-        "-i", "--id", dest="id", default="", type=str, help="specify the problem id"
+        "-i",
+        "--id",
+        dest="id",
+        default="",
+        type=str,
+        help="specify the problem id",
     )
     parser.add_argument(
         "-u" "--update",
@@ -311,13 +322,24 @@ def main():
         help="language option: c, c++, python",
     )
     parser.add_argument(
-        "-p", "--path", default="./", type=str, help="the parent directory to create the solution"
+        "-p",
+        "--path",
+        default="./",
+        type=str,
+        help="the parent directory to create the solution",
     )
     parser.add_argument(
-        "-n", "--name", default="", type=str, help="use the specified solution name"
+        "-n",
+        "--name",
+        default="",
+        type=str,
+        help="use the specified solution name",
     )
     parser.add_argument(
-        "-t", "--translated", action="store_true", help="use the translated title and content"
+        "-t",
+        "--translated",
+        action="store_true",
+        help="use the translated title and content",
     )
 
     # origin_url = 'https://leetcode.com/'
