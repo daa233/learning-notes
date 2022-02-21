@@ -142,6 +142,7 @@ class Solution(object):
 
         chinese_to_english_replace_dict = {
             "剑指 Offer": "lcof",  # 剑指 Offer
+            "剑指 Offer II": "lcof-ii",  # 剑指 Offer II
             "面试题": "lcci",  # 程序员面试金典
         }
 
