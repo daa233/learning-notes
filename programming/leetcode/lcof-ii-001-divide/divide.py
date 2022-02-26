@@ -152,7 +152,7 @@ class Solution:
         while r <= b:
             value = b
             quotient = 1
-            while r <= value + value:
+            while value >= -(2 ** 30) and r <= value + value:
                 value += value
                 quotient += quotient
             r -= value
