@@ -11,8 +11,8 @@
 - 当 n = 1 时， $\text{Fib}(1) = (\varphi^1 − \psi^1 )/\sqrt{5} = 1$ 成立；
 
 假设
-- 当 $n = k（n \geq 1）$ 时， $\text{Fib}(k) = (\varphi^k − \psi^k )/\sqrt{5}$ 成立；
-* 当 $n = k + 1（n \geq 1）$ 时， $\text{Fib}(k+1) = (\varphi^{k+1} − \psi^{k+1})/\sqrt{5}$ 成立；
+- 当 $n = k（k \geq 0）$ 时， $\text{Fib}(k) = (\varphi^k − \psi^k )/\sqrt{5}$ 成立；
+* 当 $n = k + 1（k \geq 0）$ 时， $\text{Fib}(k+1) = (\varphi^{k+1} − \psi^{k+1})/\sqrt{5}$ 成立；
 
 则
 
@@ -27,7 +27,7 @@ $$
 \end{align}
 $$
 
-即当 $n = k + 2（n \geq 1）$ 时也成立。
+即当 $n = k + 2（k \geq 0）$ 时也成立。
 
 综合以上，对于任意的 $n \geq 0$， $\text{Fib}(n) = (\varphi^n − \psi^n )/\sqrt{5}$ 均成立。
 
