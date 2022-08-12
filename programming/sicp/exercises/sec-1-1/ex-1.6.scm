@@ -1,7 +1,7 @@
 ;;; Excercise 1.6: Find square roots by Newton's method with `new-if`
 
 (define (new-if predicate then-clause else-clause)
-    (if (predicate then-clause)
+    (cond (predicate then-clause)
           (else else-clause)))
 
 (define (sqrt x)
