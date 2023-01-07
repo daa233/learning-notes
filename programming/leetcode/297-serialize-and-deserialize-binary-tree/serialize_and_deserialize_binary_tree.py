@@ -135,7 +135,7 @@ class CodecByBFS:
             if val == "null":
                 node_list.append(None)
             else:
-                node_list.append(TreeNode(val))
+                node_list.append(TreeNode(int(val)))
 
         root = node_list.pop(0)
         q = [root]
@@ -143,6 +143,90 @@ class CodecByBFS:
             node = q.pop(0)
             node.left = node_list.pop(0)
             node.right = node_list.pop(0)
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+        return root
+
+
+class CodecLikeLeetCode:
+    """The binary tree codec by BFS, which mocks LeetCode official behavior.
+    Remove the tail dummy 'null's in the serialization result, see
+    https://support.leetcode-cn.com/hc/kb/article/1567641/ for more information.
+    """
+
+    def __init__(self, none_str: str = "[null]") -> None:
+        # NOTE: It seems that the LeetCode evaluation code has requirements
+        # that a None tree should be serialized to '[null]' instead of '[]'.
+        # Here we use 'none_str' to repesent the None tree node str,
+        # default '[null]' to pass the LeetCode evaluation
+        self.none_str = none_str
+
+    def serialize(self, root: TreeNode) -> str:
+        """Encodes a tree to a single string.
+
+        :type root: TreeNode
+        :rtype: str
+        """
+        val_list = []
+        q = [root]
+        while q:
+            node = q.pop(0)
+            if node:
+                val_list.append(node.val)
+                q.append(node.left)
+                q.append(node.right)
+            else:
+                val_list.append("null")
+
+        # strip the tail dummy 'null's
+        while val_list:
+            if val_list[-1] == "null":
+                val_list.pop(-1)
+            else:
+                break
+
+        if val_list:
+            result = "[{}]".format(",".join([str(i) for i in val_list]))
+        else:
+            result = self.none_str
+        return result
+
+    def deserialize(self, data: str) -> TreeNode:
+        """Decodes your encoded data to tree.
+
+        :type data: str
+        :rtype: TreeNode
+        """
+        if not data:
+            return None
+
+        data = data[1:-1]  # stripe the '[' and ']'
+        if len(data) == 0:
+            val_list = []
+        else:
+            val_list = data.split(",")
+
+        if not val_list or (len(val_list) == 1 and val_list[0] == "null"):
+            return None
+
+        node_list = []
+        for val in val_list:
+            if val == "null":
+                node_list.append(None)
+            else:
+                node_list.append(TreeNode(int(val)))
+
+        root = node_list.pop(0)
+        q = [root]
+        while q:
+            node = q.pop(0)
+            if node_list:
+                node.left = node_list.pop(0)
+            if node_list:
+                node.right = node_list.pop(0)
             if node.left:
                 q.append(node.left)
             if node.right:

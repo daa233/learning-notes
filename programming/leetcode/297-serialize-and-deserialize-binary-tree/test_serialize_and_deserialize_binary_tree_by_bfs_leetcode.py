@@ -1,15 +1,17 @@
 import pytest
 
-from serialize_and_deserialize_binary_tree import CodecByBFS
+from serialize_and_deserialize_binary_tree import CodecLikeLeetCode
 
-solution_list = [CodecByBFS()]
+solution_list = [CodecLikeLeetCode()]
 
 # testcases: List[Tuple[inp, out]]
 # use `set` to indicate the expected output may be multiple
 data = [
-    ("[1,2,3,null,null,4,5,null,null,null,null]",),
+    ("[1,2,3,null,null,4,5]",),
+    ("[]",),
     ("[null]",),
-    ("[1,null,null]",),
+    ("[1]",),
+    ("[1,null,2,3]",),
 ]
 
 
