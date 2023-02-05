@@ -15,71 +15,105 @@
 # @author: Du Ang
 # @date: Aug 04, 2020
 
+from typing import List
 
-# Definition for singly-linked list.
+
 class ListNode:
+    """Definition for singly-linked list."""
+
     def __init__(self, x):
         self.val = x
         self.next = None
 
+    @classmethod
+    def from_nums(cls, nums: List[int]) -> "ListNode":
+        head = None
+        prev = None
+        for num in nums:
+            node = ListNode(num)
+            if not head:
+                head = node
+                prev = node
+            else:
+                prev.next = node
+                prev = node
 
-class List:
-    def __init__(self, nums):
-        if not nums:
-            self.head = None
-        self.head = ListNode(nums[0])
-        node = self.head
-        for n in nums[1:]:
-            node.next = ListNode(n)
-            node = node.next
+        return head
 
-    @staticmethod
-    def print(head):
-        vals = []
-        node = head
-
+    def print(self) -> str:
+        node = self
+        result = []
         while node:
-            vals.append(str(node.val))
+            result.append(str(node.val))
             node = node.next
-        print('->'.join(vals))
-
-
-class Solution1:
-    def reverseList(self, head: ListNode) -> ListNode:
-        if not head or not head.next:
-            return head
-        l = []
-        while head:
-            l.append(head)
-            head = head.next
-        rhead = l.pop()
-        node = rhead
-        while l:
-            node.next = l.pop()
-            node = node.next
-        node.next = None
-        return rhead
+        if result:
+            print("->".join(result))
+        else:
+            print("null")
 
 
 class Solution:
-    def reverseList(self, head: ListNode) -> ListNode:
-        if not head or not head.next:
-            return head
-        rhead = node = head
-        head = head.next
-        node.next = None
-        while head:
-            rhead = head
-            head = head.next
-            rhead.next = node
-            node = rhead
+    """迭代法"""
 
-        return rhead
+    def reverseList(self, head: ListNode) -> ListNode:
+        new_head = None
+        while head:
+            left = head.next
+            head.next = new_head
+            new_head = head
+            head = left
+        return new_head
+
+
+class Solution2:
+    """递归法"""
+
+    def reverseList(self, head: ListNode) -> ListNode:
+        if head is None or head.next is None:
+            return head
+
+        new_head = self.reverseList(head.next)
+        if not new_head:
+            return new_head
+
+        # 找到 new_head 的最后一个节点，让其 next 指向 head，
+        # 并且将 head.next 指向 None
+        node = new_head
+        while node.next:
+            node = node.next
+        node.next = head
+        head.next = None
+
+        return new_head
+
+
+class Solution3:
+    """递归法"""
+
+    def reverseList(self, head: ListNode) -> ListNode:
+        if head is None or head.next is None:
+            return head
+
+        new_head = self.reverseList(head.next)
+
+        # 找到 new_head 的最后一个节点，让其 next 指向 head，
+        # 注意：head.next 在翻转后即指向 new_head 的最后一个节点
+        # 并且将 head.next 指向 None
+        head.next.next = head
+        head.next = None
+
+        return new_head
 
 
 if __name__ == "__main__":
-    num_list = [1, 2, 3, 4]
-    l = List(num_list)
-    List.print(l.head)
-    rhead = Solution().reverseList(l.head)
-    List.print(rhead)
+    nums = [1, 2, 3, 4]
+    head = ListNode.from_nums(nums)
+    head.print()
+    new_head = Solution().reverseList(head)
+    new_head.print()
+    head = ListNode.from_nums(nums)
+    new_head2 = Solution2().reverseList(head)
+    new_head2.print()
+    head = ListNode.from_nums(nums)
+    new_head3 = Solution3().reverseList(head)
+    new_head3.print()
