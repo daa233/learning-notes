@@ -163,7 +163,7 @@ class Solution(object):
 
         dirname = "-".join([dirname_prefix, filename])
 
-        dirname = dirname.replace(" ", "-").replace("_", "-").lower()
+        dirname = dirname.replace(" - ", "-").replace(" ", "-").replace("_", "-").lower()
         filename = filename.replace(" ", "_").replace("-", "_").lower()
 
         solution_path = os.path.join(path, dirname)
