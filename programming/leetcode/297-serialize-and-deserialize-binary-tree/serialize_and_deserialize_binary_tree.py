@@ -43,6 +43,15 @@ class TreeNode(object):
         self.left = None
         self.right = None
 
+    def __repr__(self) -> str:
+        return str(CodecLikeLeetCode().serialize(self))
+
+    def __str__(self) -> str:
+        return repr(self)
+
+    def __format__(self, __format_spec: str) -> str:
+        return str(self)
+
 
 class Codec:
     """The binary tree codec by DFS."""
