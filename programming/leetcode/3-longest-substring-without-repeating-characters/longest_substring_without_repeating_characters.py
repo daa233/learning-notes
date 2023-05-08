@@ -86,13 +86,43 @@ class Solution:
         return max_count
 
 
+class Solution2:
+    """动态规划"""
+
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        hash_table = {}
+        cur_len = 0
+        max_len = 0
+
+        for i, ch in enumerate(s):
+            if ch not in hash_table:
+                # f(i) = f(i-1) + 1
+                cur_len += 1
+            else:
+                # ch is already in the hash_table
+                prev_index = hash_table[ch]
+                if i - prev_index > cur_len:
+                    # previous ch not in the f(i-1)'s substring, f(i) = f(i-1) + 1
+                    cur_len += 1
+                else:
+                    # previous ch in the f(i-1)'s substring, f(i) = d
+                    cur_len = i - prev_index
+
+            # update the ch's index in hash_table
+            hash_table[ch] = i
+            if cur_len > max_len:
+                max_len = cur_len
+
+        return max_len
+
+
 def check_result(inp: str, expected: int) -> None:
     out = sln.lengthOfLongestSubstring(inp)
-    assert out == expected, f"out {out} not equal {expected}"
+    assert out == expected, f"inp {inp}, out {out} not equal {expected}"
 
 
 if __name__ == "__main__":
-    sln = Solution()
+    sln = Solution2()
 
     check_result("aab", 2)
     check_result("abcabcbb", 3)
