@@ -73,12 +73,17 @@ class Solution:
     def getKthFromEnd(self, head: ListNode, k: int) -> ListNode:
         node1 = head
         node2 = head
-        i = 0
+
+        for _ in range(k):
+            if node1:
+                node1 = node1.next
+            else:
+                return None
+
         while node1:
-            i += 1
             node1 = node1.next
-            if i > k:
-                node2 = node2.next
+            node2 = node2.next
+
         return node2
 
 
@@ -136,6 +141,8 @@ if __name__ == "__main__":
         "[[1,2,3,4,5], 2]",
         "[[1], 1]",
         "[[1, 2, 3], 3]",
+        "[[1, 2, 3], 0]",
+        "[[1, 2, 3], 5]",
     ]
 
     runner = Runner(
