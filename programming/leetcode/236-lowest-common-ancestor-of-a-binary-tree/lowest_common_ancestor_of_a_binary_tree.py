@@ -1,8 +1,8 @@
 # @problem: 236. Lowest Common Ancestor of a Binary Tree
 # @file: lowest_common_ancestor_of_a_binary_tree.py
 # @url: https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree
-# @description: 
-# 
+# @description:
+#
 # Given a binary tree, find the lowest common ancestor (LCA) of two
 # given nodes in the tree.
 # According to the definition of LCA on Wikipedia: “The lowest common
@@ -10,23 +10,23 @@
 # that has both p and q as descendants (where we allow a node to be a
 # descendant of itself).”
 # Given the following binary tree:  root = [3,5,1,6,2,0,8,null,null,7,4]
-# 
+#
 # Example 1:
 # Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
 # Output: 3
 # Explanation: The LCA of nodes 5 and 1 is 3.
-# 
+#
 # Example 2:
 # Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
 # Output: 5
 # Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a
 # descendant of itself according to the LCA definition.
-# 
+#
 # Note:
-# 
+#
 # All of the nodes' values will be unique.
 # p and q are different and both values will exist in the binary tree.
-# 
+#
 # @author: Du Ang
 # @date: Sep 08, 2019
 
@@ -37,6 +37,7 @@ class TreeNode:
         self.val = x
         self.left = None
         self.right = None
+
 
 class BinaryTree:
     def __init__(self, l):
@@ -49,14 +50,14 @@ class BinaryTree:
         pl = 1
         while pl < n:
             parent = queue.pop(0)
-            if l[pl] != 'null':
+            if l[pl] != "null":
                 left_child = TreeNode(l[pl])
                 queue.append(left_child)
             else:
                 left_child = None
             pl += 1
             if pl < n:
-                if l[pl] != 'null':
+                if l[pl] != "null":
                     right_child = TreeNode(l[pl])
                     queue.append(right_child)
                 else:
@@ -66,7 +67,7 @@ class BinaryTree:
                 right_child = None
             parent.left = left_child
             parent.right = right_child
-            
+
     def get_node(self, node, val):
         if not node:
             return None
@@ -80,13 +81,14 @@ class BinaryTree:
             if right_res:
                 return right_res
         return None
-            
+
     def level_print(self):
         if not self.root:
             return []
         ans = []
         level = [self.root]
         import numpy as np
+
         level_count = int(np.log2(self.count)) + 1
         gap_size = 2
         while level:
@@ -94,21 +96,21 @@ class BinaryTree:
             next_level = []
             next_level_all_null_flag = True
             for node in level:
-                if node is 'null':
-                    cur.append('null'.center(gap_size**level_count*2+2**level_count*2))
+                if node is "null":
+                    cur.append("null".center(gap_size ** level_count * 2 + 2 ** level_count * 2))
                     continue
-                cur.append(str(node.val).center(gap_size**level_count*2+2**level_count*2))
+                cur.append(str(node.val).center(gap_size ** level_count * 2 + 2 ** level_count * 2))
                 # if has left/right child, add to the next level
                 if node.left:
                     next_level.append(node.left)
                     next_level_all_null_flag = False
                 else:
-                    next_level.append('null')
+                    next_level.append("null")
                 if node.right:
                     next_level.append(node.right)
                     next_level_all_null_flag = False
                 else:
-                    next_level.append('null')
+                    next_level.append("null")
             ans.append(cur)
             level_count -= 1
             if next_level_all_null_flag:
@@ -116,14 +118,14 @@ class BinaryTree:
             else:
                 level = next_level
         for nodes in ans:
-            print(''.join(nodes))
+            print("".join(nodes))
 
 
 ##### Solutions #####
 
 # Parent pointers
 class Solution:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestor(self, root: "TreeNode", p: "TreeNode", q: "TreeNode") -> "TreeNode":
         stack = [root]
         # create parent pointers for p and q ancestors
         parent = {root: None}
@@ -146,7 +148,7 @@ class Solution:
 
 # Just like Solution3, a little different
 class Solution4:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestor(self, root: "TreeNode", p: "TreeNode", q: "TreeNode") -> "TreeNode":
         self.ans = None
         self.recurse(root, p, q)
         return self.ans
@@ -154,10 +156,10 @@ class Solution4:
     def recurse(self, node, p, q):
         if not node:
             return False
-        mid = (node.val == p.val or node.val == q.val)
+        mid = node.val == p.val or node.val == q.val
         left = self.recurse(node.left, p, q)
         right = self.recurse(node.right, p, q)
-       
+
         if mid + left + right >= 2:
             self.ans = node
 
@@ -166,7 +168,7 @@ class Solution4:
 
 # Single traversal in bottom-up fashion
 class Solution3:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestor(self, root: "TreeNode", p: "TreeNode", q: "TreeNode") -> "TreeNode":
         if not root:
             return None
         if root.val == p.val or root.val == q.val:
@@ -183,12 +185,12 @@ class Solution3:
         else:
             # p and q are both in the right subtree, and right_res is the lca
             return right_res
-        
-        
+
+
 # Storing root to p and root to q paths.
 # Traverse both paths till the values are the same.
-class Solution2():
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+class Solution2:
+    def lowestCommonAncestor(self, root: "TreeNode", p: "TreeNode", q: "TreeNode") -> "TreeNode":
         self.path_p = []
         self.path_q = []
         self.find_path(root, p, self.path_p)
@@ -203,7 +205,7 @@ class Solution2():
                 break
         return lca
 
-    def find_path(self, root: 'TreeNode', node: 'TreeNode', path: 'List'):
+    def find_path(self, root: "TreeNode", node: "TreeNode", path: "List"):
         if not root:
             return None
         if root.val == node.val:
@@ -224,15 +226,15 @@ class Solution2():
 
 # TLE, brute force
 class Solution1:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestor(self, root: "TreeNode", p: "TreeNode", q: "TreeNode") -> "TreeNode":
         if self.isChild(root.left, p) and self.isChild(root.left, q):
             return self.lowestCommonAncestor(root.left, p, q)
         elif self.isChild(root.right, p) and self.isChild(root.right, q):
             return self.lowestCommonAncestor(root.right, p, q)
         else:
             return root
-        
-    def isChild(self, root: 'TreeNode', node: 'TreeNode') -> bool:
+
+    def isChild(self, root: "TreeNode", node: "TreeNode") -> bool:
         if root is None:
             return False
         elif root == node:
@@ -242,7 +244,7 @@ class Solution1:
 
 
 def test():
-    tree = BinaryTree([3,5,1,6,2,0,8,'null','null',7,4])
+    tree = BinaryTree([3, 5, 1, 6, 2, 0, 8, "null", "null", 7, 4])
     print("Binary Tree:")
     tree.level_print()
     p = tree.get_node(tree.root, 5)
@@ -265,5 +267,5 @@ def test():
     print("lca node (solution 5):", Solution().lowestCommonAncestor(tree.root, p, q).val)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test()
