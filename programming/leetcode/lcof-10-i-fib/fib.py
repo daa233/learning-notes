@@ -66,7 +66,9 @@ class Solution2:
         def quick_power(a: List[List[int]], n: int) -> List[List[int]]:
             ret = [[1, 0], [0, 1]]  # identity matrix for init
             while n > 0:
-                if n & 1:  # n is odd
+                # NOTE: 当 n > 0 时每次都会执行，若 n 为奇数，会比 n 为偶数时多执行一次
+                # 此处利用位运算来巧妙地完成了 n 为奇数时多执行一次的操作
+                if n & 1:
                     ret = matmul(ret, a)
                 n >>= 1  # n *= 2, n is even now
                 a = matmul(a, a)
