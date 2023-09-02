@@ -1,27 +1,29 @@
-# @problem: 剑指 Offer 14- I. 剪绳子
-# @file: cutting_rope.py
-# @url: https://leetcode-cn.com/problems/jian-sheng-zi-lcof
+# @problem: 343. Integer Break
+# @file: integer_break.py
+# @url: https://leetcode-cn.com/problems/integer-break
 # @description:
 #
-# 给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），每段绳子的长度记为
-# k[0],k[1]...k[m-1] 。请问 k[0]*k[1]*...*k[m-1]
-# 可能的最大乘积是多少？例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
-# 示例 1：
-# 输入: 2
-# 输出: 1
-# 解释: 2 = 1 + 1, 1 × 1 = 1
-# 示例 2:
-# 输入: 10
-# 输出: 36
-# 解释: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36
-# 提示：
+# Given an integer n, break it into the sum of k positive integers,
+# where k >= 2, and maximize the product of those integers.
+# Return the maximum product you can get.
+# Example 1:
+#
+# Input: n = 2
+# Output: 1
+# Explanation: 2 = 1 + 1, 1 × 1 = 1.
+#
+# Example 2:
+#
+# Input: n = 10
+# Output: 36
+# Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
+#
+# Constraints:
 #
 # 2 <= n <= 58
 #
-# 注意：本题与主站 343 题相同：https://leetcode-cn.com/problems/integer-break/
-#
 # @author: Du Ang
-# @date: Aug 13, 2023
+# @date: Sep 02, 2023
 
 
 class Solution1:
@@ -53,7 +55,7 @@ class Solution1:
 
         return res
 
-    def cuttingRope(self, n: int) -> int:
+    def integerBreak(self, n: int) -> int:
         self.hash_table = {}
         return self._max_prod(n)
 
@@ -61,7 +63,7 @@ class Solution1:
 class Solution:
     """数学"""
 
-    def cuttingRope(self, n: int) -> int:
+    def integerBreak(self, n: int) -> int:
         if n <= 3:
             # 至少要切为2段，所以当 n <= 3 时，切分为 n-1 和 1 两段
             return n - 1
@@ -92,7 +94,7 @@ class Solution2:
     2. 当剩余长度小于等于 4 时，不再分割
     """
 
-    def cuttingRope(self, n: int) -> int:
+    def integerBreak(self, n: int) -> int:
         if n == 4:
             return 4
         elif n < 4:
@@ -104,8 +106,3 @@ class Solution2:
                 n = n - 3
             prod = prod * n
             return prod
-
-
-if __name__ == "__main__":
-    sln = Solution()
-    print(sln.cuttingRope(4))
