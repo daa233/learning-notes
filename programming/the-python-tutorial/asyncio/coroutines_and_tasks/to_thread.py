@@ -17,6 +17,7 @@ async def main():
 
     other_task = asyncio.sleep(1)
 
+    # Requires Python 3.9+
     await asyncio.gather(
         asyncio.to_thread(blokcing_io),
         other_task,

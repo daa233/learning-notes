@@ -31,7 +31,7 @@ while True:
 **Future** 是一种特殊的 low-level awaitable 对象，用于表示一个异步操作的最终结果。一般情况下，在应用级别的代码中不需要创建 Future 对象。
 
 ## 参考资料
-- [Python 官方文档 - asyncI/O — Asynchronous I/O](https://docs.python.org/3.10/library/asyncI/O.html)
+- [Python 官方文档 - asyncI/O — Asynchronous I/O](https://docs.python.org/3.10/library/asyncio.html)
 - [廖雪峰 Python 教程 - 异步I/O](https://www.liaoxuefeng.com/wiki/1016959663602400/1017959540289152)
 - [Real Python - Async I/O in Python: A Complete Walkthrough](https://realpython.com/async-I/O-python/)
 
