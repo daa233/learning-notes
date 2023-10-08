@@ -273,11 +273,7 @@ fn array_and_for_loops() {
 }
 
 fn transpose(matrix: [[i32; 3]; 3]) -> [[i32; 3]; 3] {
-    let mut transposed: [[i32; 3]; 3] = [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-    ];
+    let mut transposed: [[i32; 3]; 3] = [[0; 3]; 3];
     for i in 0..matrix.len() {
         for j in 0..matrix[i].len() {
             transposed[i][j] = matrix[j][i];
@@ -292,14 +288,7 @@ fn pretty_print(matrix: &[[i32; 3]; 3]) {
         if i != 0 {
             print!(" ");
         }
-        print!("[");
-        for j in 0..matrix[i].len() {
-            if j != 0 {
-                print!(" ");
-            }
-            print!("{}", matrix[i][j]);
-        }
-        print!("]");
+        print!("{:?}", matrix[i]);
         if i != matrix.len() - 1 {
             print!("\n");
         }
