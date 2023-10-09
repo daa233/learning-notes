@@ -1,6 +1,3 @@
-#![allow(unused)]
-use std::env::Args;
-
 // hello world
 fn hello_world() {
     println!("Hello, 🌍!");
@@ -107,10 +104,13 @@ fn references() {
 
 // Slices
 fn slices() {
+    // A slice gives you a view into a larger collection
     let mut a: [i32; 6] = [10, 20, 30, 40, 50, 60];
     a[2] = 35;
     println!("a: {a:?}");
 
+    // NOTE: the type of s (&[i32]) no longer mentions the array length.
+    // This allows us to perform computation on slices of different sizes.
     let s: &[i32] = &a[2..4];
 
     // error[E0506]: cannot assign to `a[_]` because it is borrowed
@@ -620,19 +620,20 @@ fn enum_sizes() {
 
 // if let expressions
 fn if_let_expressions() {
-    // let arg = std::env::args().next();
-    // let arg = foo();
-    // if let Some(value) = arg {
-    //     println!("Program name: {value}");
-    // } else {
-    //     println!("Missing name?");
-    // }
-
-    let test: Option<Args> = None;
-    if let Some(real_val) = test {
-        println!("aaaa");
+    // The if let expression lets you execute different code depending on
+    // whether a value matches a pattern
+    let arg = std::env::args().next();
+    if let Some(value) = arg {
+        println!("Program name: {value}");
     } else {
-        println!("bbbbb");
+        println!("Missing name?");
+    }
+
+    let test: Option<std::env::Args> = None;
+    if let Some(value) = test {
+        println!("value: {value:?}");
+    } else {
+        println!("the value is None");
     }
 
     let dish = ("Ham", "Eggs");
@@ -655,28 +656,109 @@ fn if_let_expressions() {
     }
 }
 
-// TODO: while let expressions
+// while let expressions
+fn while_let_expressions() {
+    let v = vec![10, 20, 30];
+    let mut iter = v.into_iter();
 
-// TODO: match expressions
+    // the iterator returned by v.into_iter() will return a Option<i32> on
+    // every call to next().
+    // It returns Some(x) until it is done, after which it will return None.
+    while let Some(x) = iter.next() {
+        println!("x: {x}");
+    }
+}
 
-// enum Result {
-//     Ok(i32),
-//     Err(String),
-// }
+// match expressions
+fn match_expressions() {
+    // The match keyword is used to match a value against one or more patterns
+    // similarly to 'switch' in C and C++
+    match std::env::args().next().as_deref() {
+        Some("cat") => println!("Will do cat things"),
+        Some("ls") => println!("Will ls some files"),
+        Some("mv") => println!("Let's move some files"),
+        Some("rm") => println!("Uh, dangerous!"),
+        None => println!("Hmm, no program name?"),
+        // The _ pattern is a wildcard pattern which matches any value.
+        _ => println!("Unknown program name!"),
+    }
 
-// fn divide_in_two(n: i32) -> Result {
-//     if n % 2 == 0 {
-//         Result::Ok(n / 2)
-//     } else {
-//         Result::Err(format!("cannot divide {n} into two equal parts"))
-//     }
-// }
+    let input = 'x';
+    match input {
+        'q' => println!("Quitting"),
+        'a' | 's' | 'w' | 'd' => println!("Moving around"),
+        '0'..='9' => println!("Number input"),
+        _ => println!("Something else"),
+    }
+}
 
-// // Destructuring Enums
-// fn destructuring_enums() {
-//     let n = 100;
-//     match divide_in_two(n)
-// }
+enum Result {
+    Ok(i32),
+    Err(String),
+}
+
+fn divide_in_two(n: i32) -> Result {
+    if n % 2 == 0 {
+        Result::Ok(n / 2)
+    } else {
+        Result::Err(format!("cannot divide {n} into two equal parts"))
+    }
+}
+
+// Destructuring Enums
+fn destructuring_enums() {
+    let n = 100;
+    match divide_in_two(n) {
+        Result::Ok(half) => println!("{n} divided in two is {half}"),
+        Result::Err(msg) => println!("sorry, an error happened: {msg}"),
+    }
+}
+
+struct FooStruct {
+    x: (u32, u32),
+    y: u32,
+}
+
+// Destructuring Structs
+#[rustfmt::skip]
+fn destructing_structs() {
+    let foo = FooStruct { x: (1, 2), y: 3 };
+    match foo {
+        FooStruct { x: (1, b), y }  => println!("x.0 = 1, b = {b}, y = {y}"),
+        FooStruct { y: 2, x: i }    => println!("y = 2, x = {i:?}"),
+        FooStruct { y, .. }         => println!("y = {y}, other fields were ignored"),
+    }
+}
+
+#[rustfmt::skip]
+fn inspect_array(slice: &[i32]) {
+    println!("Tell me about {slice:?}");
+    match slice {
+        [0, y, z]   => println!("First is 0, y = {y}, and z = {z}"),
+        [1, ..]     => println!("First is 1 and the rest were ignored"),
+        _           => println!("All elements were ignored"),
+    }
+}
+
+// Destructuring Arrays
+fn destructing_arrays() {
+    inspect_array(&[0, -2, 3]);
+    inspect_array(&[0, -2, 3, 4]);
+}
+
+// Match Guards
+#[rustfmt::skip]
+fn match_guards() {
+    // Use match gurads when you wish to concisely express more complex ideas than patterns alone
+    let pair = (2, -2);
+    println!("Tell me about {pair:?}");
+    match pair {
+        (x, y) if x == y        => println!("There are twins"),
+        (x, y) if x + y == 0    => println!("Antimatter, kaboom"),
+        (x, y) if x % 2 == 1    => println!("The first one is odd"),
+        _                       => println!("No correlation..."),
+    }
+}
 
 fn main() {
     // Program entry point
@@ -761,4 +843,22 @@ fn main() {
 
     println!("\n# if let expressions");
     if_let_expressions();
+
+    println!("\n# while let expressions");
+    while_let_expressions();
+
+    println!("\n# match expressions");
+    match_expressions();
+
+    println!("\n# Destructuring Enums");
+    destructuring_enums();
+
+    println!("\n# Destructuring Structs");
+    destructing_structs();
+
+    println!("\n# Destructuring Arrays");
+    destructing_arrays();
+
+    println!("\n# Match Gurads");
+    match_guards();
 }
