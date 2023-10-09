@@ -1,3 +1,6 @@
+#![allow(unused)]
+use std::env::Args;
+
 // hello world
 fn hello_world() {
     println!("Hello, 🌍!");
@@ -311,6 +314,370 @@ fn print_matrix() {
     pretty_print(&transposed);
 }
 
+fn double(x: i32) -> i32 {
+    // the value of the function body is the return value
+    x + x
+}
+
+// Blocks
+fn blocks() {
+    // A block in Rust contains a sequence of expressions.
+    // Each block has a value and a type, which are those of the last expression of the block
+    let x = {
+        let y = 10;
+        println!("y: {y}");
+        let z = {
+            let w = { 3 + 4 };
+            println!("w: {w}");
+            y * w
+        };
+        println!("z: {z}");
+        z - y
+    };
+    // If the last expression ends with ;, then the resulting value and type is ().
+    println!("x: {x}");
+
+    println!("double: {}", double(7));
+}
+
+// if expressions
+fn if_expressions() {
+    let mut x = 10;
+
+    // use if statements
+    if x % 2 == 0 {
+        x = x / 2;
+    } else {
+        x = 3 * x + 1;
+    }
+    println!("x = {x}");
+
+    // use if as an expression
+    // the last expression of each block becomes the value of the if expression
+    x = 10;
+    x = if x % 2 == 0 {
+        x / 2 // NOTE: there must NOT be a ';' here to return the value
+    } else {
+        3 * x + 1
+    }; // NOTE: there must be a ';' here
+    println!("x = {x}");
+}
+
+// for loops
+fn for_loops() {
+    let v = vec![10, 20, 30];
+
+    // the same as 'for x in v.into_iter()'
+    for x in v {
+        println!("x: {x}");
+    }
+
+    let mut mut_v = vec![10, 20, 30];
+    for x in mut_v.iter_mut() {
+        // the type of x here is '&mut {integer}'
+        *x += 5;
+        println!("x: {x}");
+    }
+    println!("mut_v: {:?}", mut_v);
+
+    // (0..10) is a range that implements an Iterator trait
+    for i in (0..10).step_by(2) {
+        println!("i: {i}");
+    }
+}
+
+// while loops
+fn while_loops() {
+    let mut x = 10;
+    print!("x: {x}");
+    while x != 1 {
+        x = if x % 2 == 0 { x / 2 } else { 3 * x + 1 };
+        print!(" -> {x}");
+    }
+    println!();
+}
+
+// break and continue
+fn break_and_continue() {
+    let x: u32 = 5;
+    let mut i: u32 = 0;
+    while i < 10000 {
+        if i == 0 {
+            i += 1;
+            // use continue to immediately start the next iteration
+            continue;
+        }
+        println!("i: {i}");
+        if i >= x {
+            // use break to exit a loop early
+            break;
+        }
+        i += 1;
+    }
+}
+
+// loop expressions
+fn loop_expressions() {
+    let mut x = 10;
+    print!("x: {x}");
+    // loop == while true, which creates an endless loop
+    // you must either break or return to stop the loop
+    loop {
+        x = if x % 2 == 0 { x / 2 } else { 3 * x + 1 };
+        print!(" -> {x}");
+        if x == 1 {
+            break;
+        }
+    }
+    println!();
+
+    // returning from loops
+    let mut counter = 0;
+    let result = loop {
+        counter += 1;
+
+        if counter == 10 {
+            // put the value after break to return by the loop expression
+            break counter * 2;
+        }
+    };
+    println!("result of loop: {result}");
+}
+
+// Variables
+fn variables() {
+    // Rust provides type safety via static typing.
+    // Variable bindings are immutable by default
+    let x: i32 = 10;
+    println!("x: {x}");
+
+    // error[E0384]: cannot assign twice to immutable variable `x`
+    // x = 20;
+    // println!("x: {x}");
+}
+
+fn takes_u32(x: u32) {
+    println!("u32: {x}");
+}
+
+fn takes_i8(y: i8) {
+    println!("i8: {y}");
+}
+
+// Type Inference
+fn type_inference() {
+    // Here the variables are not dynamic type, the compiler will inference the type
+    let x = 10;
+    let y = 20;
+
+    // Rust will look at how the variable is used to determine the type
+    takes_u32(x);
+    takes_i8(y);
+
+    let mut v = Vec::new();
+    v.push((10, false));
+    v.push((20, true));
+    println!("v: {v:?}");
+
+    // using _ as a placeholder to tell the compiler copy into a certain generic container
+    // without explicitly specifying the container type.
+    let vv = v.iter().collect::<std::collections::HashSet<_>>();
+    println!("vv: {vv:?}");
+}
+
+// Constant Variables
+// Constant variables are evaluated at compile time and their values are inlined wherever they are used
+const DIGEST_SIZE: usize = 3;
+// 'Some' means some value of type T
+const ZERO: Option<u8> = Some(42);
+fn compute_digest(text: &str) -> [u8; DIGEST_SIZE] {
+    // 'unwrap_or' returns the contained Some value or a provided default.
+    let mut digest = [ZERO.unwrap_or(0); DIGEST_SIZE];
+    for (idx, &b) in text.as_bytes().iter().enumerate() {
+        // 'wrapping_add' computes 'self + rhs'
+        digest[idx % DIGEST_SIZE] = digest[idx % DIGEST_SIZE].wrapping_add(b);
+    }
+    digest
+}
+
+fn const_variables() {
+    let s: &str = "Hello";
+    let digest = compute_digest(s);
+    println!("digest: {digest:?}");
+    println!("s.as_bytes(): {:?}", s.as_bytes());
+}
+
+// Static Varaibles
+// Static variables will live during the whole execution of the program, and therefore will not move
+static BANNER: &str = "Welcome to RustOS 3.14";
+fn static_variables() {
+    println!("{BANNER}");
+}
+
+// Scopes and Shadowing
+fn scopes_and_shadowing() {
+    let a = 10;
+    println!("before: {a}");
+
+    {
+        let a = "hello";
+        println!("inner scope: {a}");
+
+        let a = true;
+        println!("shadowed in inner scope: {a}");
+    }
+
+    // after shadowing, both variable's memory location exist at the same time
+    println!("after: {a}");
+
+    let a = 1;
+    let b = &a;
+    let a = a + 1;
+    println!("{a} {b}");
+    // 2 1
+}
+
+// Enums
+#[derive(Debug)]
+enum CoinFlip {
+    Heads,
+    Tails,
+}
+
+fn enums() {
+    println!("You got: {:?}", pick_one(CoinFlip::Heads, CoinFlip::Tails));
+}
+
+#[rustfmt::skip]
+// define richer enums where the variants carry data
+enum WebEvent {
+    PageLoad,                   // Variant without payload
+    KeyPress(char),             // Tuple struct variant
+    Click { x: i64, y: i64 },   // Full struct variant
+}
+
+#[rustfmt::skip]
+fn inspect(event: WebEvent) {
+    // use the match statement to extract the data from each variant
+    match event {
+        WebEvent::PageLoad          => println!("page loaded"),
+        WebEvent::KeyPress(c)       => println!("pressed '{c}'"),
+        WebEvent::Click { x, y }    => println!("clicked at x={x}, y={y}"),
+    }
+}
+
+// Variant Payloads
+fn variant_payloads() {
+    let load = WebEvent::PageLoad;
+    let press = WebEvent::KeyPress('x');
+    let click = WebEvent::Click { x: 20, y: 80 };
+
+    inspect(load);
+    inspect(press);
+    inspect(click);
+}
+
+use std::any::type_name;
+use std::mem::{ align_of, size_of };
+
+fn dbg_size<T>() {
+    println!(
+        "{}: size {} bytes, align: {} bytes",
+        type_name::<T>(),
+        size_of::<T>(),
+        align_of::<T>()
+    );
+}
+
+enum Foo {
+    A,
+    B,
+}
+
+enum Bar {
+    A, // 0
+    B = 10000, // e.g., you can control the discriminant if needed
+    C, // 10001
+}
+
+// Enum Sizes
+fn enum_sizes() {
+    // Rust enums are packed tightly, taking constraints due to alignment into account
+    // You can control the discriminant if needed.
+    dbg_size::<Foo>(); // size 1 bytes, align: 1 bytes
+    println!("Foo::A: {}", Foo::A as u32);
+    println!("Foo::B: {}", Foo::B as u32);
+    dbg_size::<Bar>(); // size 2 bytes, align: 2 bytes
+    println!("Bar::A: {}", Bar::A as u32);
+    println!("Bar::B: {}", Bar::B as u32);
+    println!("Bar::C: {}", Bar::C as u32);
+
+    dbg_size::<bool>(); // size 1 bytes, align: 1 bytes
+    dbg_size::<Option<bool>>(); // size 1 bytes, align: 1 bytes
+    dbg_size::<&i32>(); // size 8 bytes, align: 8 bytes
+    dbg_size::<Option<&i32>>(); // size 8 bytes, align: 8 bytes
+}
+
+// if let expressions
+fn if_let_expressions() {
+    // let arg = std::env::args().next();
+    // let arg = foo();
+    // if let Some(value) = arg {
+    //     println!("Program name: {value}");
+    // } else {
+    //     println!("Missing name?");
+    // }
+
+    let test: Option<Args> = None;
+    if let Some(real_val) = test {
+        println!("aaaa");
+    } else {
+        println!("bbbbb");
+    }
+
+    let dish = ("Ham", "Eggs");
+
+    // this body will be skipped because the pattern is refuted
+    if let ("Bacon", b) = dish {
+        println!("Bacon is served with {}", b);
+    } else {
+        // This block is evaluated instead.
+        println!("No bacon will be served");
+    }
+
+    // this body will execute
+    if let ("Ham", b) = dish {
+        println!("Ham is served with {}", b);
+    }
+
+    if let _ = 5 {
+        println!("Irrefutable patterns are always true");
+    }
+}
+
+// TODO: while let expressions
+
+// TODO: match expressions
+
+// enum Result {
+//     Ok(i32),
+//     Err(String),
+// }
+
+// fn divide_in_two(n: i32) -> Result {
+//     if n % 2 == 0 {
+//         Result::Ok(n / 2)
+//     } else {
+//         Result::Err(format!("cannot divide {n} into two equal parts"))
+//     }
+// }
+
+// // Destructuring Enums
+// fn destructuring_enums() {
+//     let n = 100;
+//     match divide_in_two(n)
+// }
+
 fn main() {
     // Program entry point
     println!("\n# Hello World");
@@ -349,4 +716,49 @@ fn main() {
     println!("\n# Arrays and for Loops");
     array_and_for_loops();
     print_matrix();
+
+    println!("\n# Blocks");
+    blocks();
+
+    println!("\n# if expressions");
+    if_expressions();
+
+    println!("\n# for loops");
+    for_loops();
+
+    println!("\n# while loops");
+    while_loops();
+
+    println!("\n# break and continue");
+    break_and_continue();
+
+    println!("\n# loop expressions");
+    loop_expressions();
+
+    println!("\n# Variables");
+    variables();
+
+    println!("\n# Type Inference");
+    type_inference();
+
+    println!("\n# Constant Variables");
+    const_variables();
+
+    println!("\n# Static Variables");
+    static_variables();
+
+    println!("\n# Scopes and Shadowing");
+    scopes_and_shadowing();
+
+    println!("\n# Enums");
+    enums();
+
+    println!("\n# Variant Payloads");
+    variant_payloads();
+
+    println!("\n# Enum Sizes");
+    enum_sizes();
+
+    println!("\n# if let expressions");
+    if_let_expressions();
 }

@@ -85,5 +85,10 @@ Rust 一些独特的卖点：
 TODO
 
 
-## 
+## 基本语法
 
+
+### Structs vs. Enums
+- In both, you can have a simple version without fields (unit struct) or one with different types of fields (variant payloads).
+- In both, associated functions are defined within an impl block.
+- You could even implement the different variants of an enum with separate structs but then they wouldn’t be the same type as they would if they were all defined in an enum.
