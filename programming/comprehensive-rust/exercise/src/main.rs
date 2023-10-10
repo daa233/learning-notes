@@ -975,6 +975,140 @@ fn test_error() {
     );
 }
 
+// Creating a String puts fixed-sized metadata on the stack and dynamically sized data,
+// the actual string, on the heap
+// ```bob
+// Stack                             Heap
+// .- - - - - - - - - - - - - -.     .- - - - - - - - - - - - - - - -.
+// :                           :     :                               :
+// :    s1                     :     :                               :
+// :   +-----------+-------+   :     :   +----+----+----+----+----+  :
+// :   | ptr       |   o---+---+-----+-->| H  | e  | l  | l  | o  |  :
+// :   | len       |     5 |   :     :   +----+----+----+----+----+  :
+// :   | capacity  |     5 |   :     :                               :
+// :   +-----------+-------+   :     :                               :
+// :                           :     `- - - - - - - - - - - - - - - -'
+// `- - - - - - - - - - - - - -'
+// ```
+fn stack_and_heap() {
+    let s1 = String::from("Hello");
+    println!("s1: {s1}");
+}
+
+// Ownership
+fn ownership() {
+    struct Point(i32, i32);
+
+    {
+        let p = Point(3, 4);
+        println!("x: {}", p.0);
+    }
+
+    // it is an error to use a variable outside its scope
+    // error[E0425]: cannot find value `p` in this scope
+    // println!("y: {}", p.1);
+}
+
+// Move Semantics
+fn move_semantics() {
+    let s1: String = String::from("Hello!");
+
+    // An assignment will transfer ownership between variables
+    // There is always *exactly* one variable binding which owns a value.
+    let s2: String = s1;
+    println!("s2: {s2}");
+
+    // error[E0382]: borrow of moved value: `s1`
+    // println!("s1: {s1}");
+
+    let s3: String = s2.clone();
+    println!("s2: {s2}"); // since s3 is copied from s2, not transfers the ownership
+    println!("s3: {s3}");
+}
+
+fn say_hello(name: String) {
+    println!("Hello {name}");
+}
+
+// Moves in Function Calls
+fn moves_in_function_calls() {
+    let name = String::from("Alice");
+
+    // With the first call to 'say_hello', the current function gives up
+    // onwership of 'name'. Afterwards, 'name' cannot be used anymore within
+    // the current function.
+    say_hello(name);
+
+    // error[E0382]: use of moved value: `name`
+    // say_hello(name);
+}
+
+// Copying and Cloning
+fn copying_and_cloning() {
+    // Certian types (which implement the 'Copy' trait) are copied by default.
+    let x = 42;
+    let y = x;
+    println!("x: {x}");
+    println!("y: {y}");
+
+    // opt-in your own types to use copy semantics
+    #[derive(Copy, Clone, Debug)]
+    struct Point(i32, i32);
+
+    let p1 = Point(3, 4);
+    let p2 = p1;
+    println!("p1: {p1:?}");
+    println!("p2: {p2:?}");
+}
+
+// Borrowing
+fn borrowing() {
+    #[derive(Debug)]
+    struct Point(i32, i32);
+
+    fn add(p1: &Point, p2: &Point) -> Point {
+        // The add function borrows two points and returns a new point.
+        Point(p1.0 + p2.0, p1.1 + p2.1)
+    }
+
+    let p1 = Point(3, 4);
+    let p2 = Point(10, 20);
+    // the caller retains onwership of the inputs
+    let p3 = add(&p1, &p2);
+    println!("{p1:?} + {p2:?} = {p3:?}");
+
+    // Rust puts constraints on the ways you can borrow values:
+    // - You can have one or more &T values at any given time, or
+    // - You can have exactly one &mut T value.
+    let mut a: i32 = 10;
+    let b: &i32 = &a;
+    let d: &i32 = &a;
+
+    // error[E0502]: cannot borrow `a` as mutable because it is also borrowed as immutable
+    // {
+    //     let c: &mut i32 = &mut a;
+    //     *c = 20;
+    // }
+
+    println!("a: {a}");
+    println!("b: {b}");
+    println!("d: {d}");
+}
+
+fn lifetimes() {
+    #[derive(Debug)]
+    struct Point(i32, i32);
+
+    fn left_most<'a>(p1: &'a Point, p2: &'a Point) -> &'a Point {
+        if p1.0 < p2.0 { p1 } else { p2 }
+    }
+
+    let p1 = Point(10, 10);
+    let p2 = Point(20, 20);
+    let p3: &Point = left_most(&p1, &p2);
+    println!("p3: {p3:?}");
+}
+
 fn main() {
     // Program entry point
     println!("\n# Hello World");
@@ -1082,4 +1216,25 @@ fn main() {
 
     println!("\n# Expression Evaluation");
     run_eval();
+
+    println!("\n# Stack and Heap");
+    stack_and_heap();
+
+    println!("\n# Ownership");
+    ownership();
+
+    println!("\n# Move Semantics");
+    move_semantics();
+
+    println!("\n# Moves in Function Calls");
+    moves_in_function_calls();
+
+    println!("\n# Copying and Cloning");
+    copying_and_cloning();
+
+    println!("\n# Borrowing");
+    borrowing();
+
+    println!("\n# Lifetimes");
+    lifetimes();
 }
