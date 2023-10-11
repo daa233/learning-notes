@@ -11,6 +11,7 @@ mod enums;
 mod expression_evaluation;
 mod for_loops;
 mod functions;
+mod generics;
 mod hash_map;
 mod health_statistics;
 mod hello_world;
@@ -56,6 +57,7 @@ use enums::{enum_sizes, enums, variant_payloads};
 use expression_evaluation::run_eval;
 use for_loops::for_loops;
 use functions::functions;
+use generics::{generic_data_types, generic_methods};
 use hash_map::hash_map;
 use health_statistics::health_statistics;
 use hello_world::hello_world;
@@ -248,4 +250,10 @@ fn main() {
 
     println!("\n# Modules");
     modules();
+
+    println!("\n# Generic Data Types");
+    generic_data_types();
+
+    println!("\n# Generic Methods");
+    generic_methods();
 }
