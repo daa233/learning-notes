@@ -264,3 +264,74 @@ fn main() {
 - 模块中的项目默认是私有的（隐藏了实现细节）
 - 父级别和兄弟级别的项目总是可见的。
 - 如果某个项对于 `foo` 是可见的，则对于 `foo` 的所有派生物来说，该项都是可见的。
+
+### 路径（Paths）
+
+路径通过以下方式进行解析：
+1. 作为一个相对路径进行解析：
+    - `foo` 或者 `self::foo` 指向当前模块中的 `foo`
+    - `super::foo` 指向父模块中的 `foo`
+2. 作为一个绝对路径进行解析：
+    - `crate:foo` 指向当前单元包（crate）的根目录中的 `foo`
+    - `bar::foo` 指向名为 `bar` 的单元包（crate）中的 `foo`
+
+### 文件系统层次结构
+
+```rust
+mod garden;
+```
+
+上面的代码会告诉 Rust 在 `src/garden.rs` 中寻找 `garden` 这个模块。类似地，Rust 会在 `src/garden/vegetables.rs` 中寻找 `garden::vegetables` 模块。
+
+单元包（crate）的 `crate` 根目录在：
+- `src/lib.rs`：对于库单元包（library crate）
+- `src/main.rs`：对于二进制单元包（binary crate）
+
+**注意**：
+- 在 Rust 2018 之前，模块需要位于 `module/mod.rs` 中，而不是 `module.rs` 中，而且在 Rust 2018 之后，这依然是一个可用的替代方案。
+- 之所以引入 `filename.rs` 来替代 `filename/mod.rs` 是因为 IDE 很难区分大量的 `mod.rs` 文件。
+
+也可以指定如下的配置，来修改 Rust 编译器寻找模块的路径：
+```rust
+#[path = "some/path.rs"]
+mod some_module;
+```
+
+### [Re-exports](https://doc.rust-lang.org/nightly/rustdoc/write-documentation/re-exports.html)
+
+假设我们正在编写名为 `lib` 的一个库，其中涉及了一些类型（`Foo`、`AnotherFoo`）定义在下面两个子模块中：
+```rust
+pub mod sub_module1 {
+    pub struct Foo;
+}
+pub mod sub_module2 {
+    pub struct AntoherFoo;
+}
+```
+
+用户可以通过下面的方式使用：
+```rust
+use lib::sub_module1::Foo;
+use lib::sub_module2::AnotherFoo;
+```
+
+假如我们希望这两个类型在单元包根目录可用，但是又不希望这两个模块对用户是可见的，该怎么办呢？可以通过 re-exports 实现：
+```rust
+// `sub_module1` and `sub_module2` are not visible outside.
+mod sub_module1 {
+    pub struct Foo;
+}
+mod sub_module2 {
+    pub struct AnotherFoo;
+}
+// We re-export both types
+pub use crate::sub_module1::Foo;
+pub use crate::sub_module2::AnotherFoo;
+```
+
+现在用户可以这样使用它们：
+```rust
+use lib::{Foo, AnotherFoo}
+```
+
+并且因为 `sub_module1` 和 `sub_module2` 是私有的，用户并没有导入它们。
