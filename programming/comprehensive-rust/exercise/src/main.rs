@@ -38,6 +38,7 @@ mod stack_and_heap;
 mod storing_books;
 mod string_demo;
 mod structs_and_methods;
+mod traits;
 mod type_inference;
 mod variables;
 mod vec;
@@ -86,6 +87,10 @@ use stack_and_heap::stack_and_heap;
 use storing_books::storing_books;
 use string_demo::string;
 use structs_and_methods::structs_and_methods;
+use traits::{
+    blanket_implementation, default_methods, deriving_traits, trait_bounds, trait_objects,
+    traits_example,
+};
 use type_inference::type_inference;
 use variables::variables;
 use vec::vec;
@@ -256,4 +261,22 @@ fn main() {
 
     println!("\n# Generic Methods");
     generic_methods();
+
+    println!("\n# Traits");
+    traits_example();
+
+    println!("\n# Trait Objects");
+    trait_objects();
+
+    println!("\n# Deriving Traits");
+    deriving_traits();
+
+    println!("\n# Default Methods");
+    default_methods();
+
+    println!("\n# Blanket Implementation");
+    blanket_implementation();
+
+    println!("\n# Trait Bounds");
+    trait_bounds();
 }
