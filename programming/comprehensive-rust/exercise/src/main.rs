@@ -127,12 +127,25 @@ fn string() {
 
     // String: a mutable string buffer
     let mut s2: String = String::from("Hello ");
-    println!("s2: {s2}");
+    println!("s2: {s2}, len = {}, number of chars = {}", s2.len(), s2.chars().count());
     s2.push_str(s1);
     println!("s2: {s2}");
 
     let s3: &str = &s2[6..];
     println!("s3: {s3}");
+
+    let mut s4 = String::new(); // String::new() returns a new empty string
+    s4.push_str("Hello");
+    println!("s4: len = {}, capacity = {}", s4.len(), s4.capacity());
+
+    let mut s5 = String::with_capacity(s4.len() + 1);
+    s5.push_str(&s4);
+    s5.push('!');
+    println!("s5: len = {}, capacity = {}", s5.len(), s5.capacity());
+    // s5: len = 6, capacity = 6
+    s5.push('#'); // the capacity of string increases automatically
+    println!("s5: len = {}, capacity = {}", s5.len(), s5.capacity());
+    // s5: len = 7, capacity = 12
 }
 
 // Functions
@@ -692,16 +705,16 @@ fn match_expressions() {
     }
 }
 
-enum Result {
+enum MyResult {
     Ok(i32),
     Err(String),
 }
 
-fn divide_in_two(n: i32) -> Result {
+fn divide_in_two(n: i32) -> MyResult {
     if n % 2 == 0 {
-        Result::Ok(n / 2)
+        MyResult::Ok(n / 2)
     } else {
-        Result::Err(format!("cannot divide {n} into two equal parts"))
+        MyResult::Err(format!("cannot divide {n} into two equal parts"))
     }
 }
 
@@ -709,8 +722,8 @@ fn divide_in_two(n: i32) -> Result {
 fn destructuring_enums() {
     let n = 100;
     match divide_in_two(n) {
-        Result::Ok(half) => println!("{n} divided in two is {half}"),
-        Result::Err(msg) => println!("sorry, an error happened: {msg}"),
+        MyResult::Ok(half) => println!("{n} divided in two is {half}"),
+        MyResult::Err(msg) => println!("sorry, an error happened: {msg}"),
     }
 }
 
@@ -1429,6 +1442,164 @@ fn test_visit() {
     assert_eq!(report.blood_pressure_change, Some((-5, -4)));
 }
 
+// Option and Result
+fn option_and_result() {
+    let numbers = vec![10, 20, 30];
+    let first: Option<&i8> = numbers.first();
+    println!("first: {first:?}");
+
+    // Result is the standard type to implement error handling
+    // - If the vector has the right size, Result::Ok is returned with the array.
+    // - Otherwise, Result::Err is returned with the original vector.
+    let arr: Result<[i8; 3], Vec<i8>> = numbers.try_into();
+    println!("arr: {arr:?}");
+}
+
+// Vec
+fn vec() {
+    // the data is stored on the heap and the amount of data grow or shrink at runtime
+    let mut v1 = Vec::new();
+    v1.push(42);
+    println!("v1: len = {}, capacity = {}", v1.len(), v1.capacity());
+
+    let mut v2 = Vec::with_capacity(v1.len() + 1);
+    v2.extend(v1.iter());
+    v2.push(9999);
+    println!("v2: len = {}, capacity = {}", v2.len(), v2.capacity());
+
+    // Canonical macro to initialize a vector with elements.
+    let mut v3 = vec![0, 0, 1, 2, 3, 4];
+
+    // Retain only the even elements
+    v3.retain(|x| x % 2 == 0);
+    println!("{v3:?}");
+
+    // Remove constructive duplicates
+    v3.dedup();
+    println!("{v3:?}");
+}
+
+// HashMap
+fn hash_map() {
+    use std::collections::HashMap;
+
+    let mut page_counts = HashMap::new();
+    page_counts.insert("Adventures of Huckleberry Finn".to_string(), 207);
+    page_counts.insert("Grimms' Fairy Tales".to_string(), 751);
+    page_counts.insert("Pride and Prejudice".to_string(), 303);
+
+    let target_book_title = "Les Misérables";
+    if !page_counts.contains_key(target_book_title) {
+        println!("We know about {} books, but not {}.", page_counts.len(), target_book_title);
+    }
+
+    for book in ["Pride and Prejudice", "Alice's Adventure in Wonderland"] {
+        match page_counts.get(book) {
+            Some(count) => println!("{book}: {count} pages"),
+            None => println!("{book} is unknown."),
+        }
+    }
+
+    // Use the .entry() method to insert a value if nothing is found.
+    for book in ["Pride and Prejudice", "Alice's Adventure in Wonderland"] {
+        let page_count: &mut i32 = page_counts.entry(book.to_string()).or_insert(0);
+        *page_count += 1;
+    }
+
+    println!("{page_counts:#?}");
+}
+
+// Box
+fn box_demo() {
+    // `Box` is an owned pointer to data on the heap
+    // `Box` is like `std::unique_ptr` in C++, except that it's guaranteed to be not null
+    let five = Box::new(5);
+    println!("five: {}", *five);
+
+    // Box with recursive data structures
+    // If `Box` was not used and we attempted to embed a `List` directly into the `List`,
+    // the compiler would not compute a fixed size of the struct in memory (`List` would
+    // be infinite size).
+    #[derive(Debug)]
+    enum List<T> {
+        Cons(T, Box<List<T>>),
+        Nil,
+    }
+
+    let list: List<i32> = List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));
+    println!("{list:?}");
+}
+
+// Rc
+fn rc() {
+    use std::rc::Rc;
+
+    // `Rc` is a reference-counted shared pointer. It is like `std::shared_pts`
+    // Use this when you need to refer to the same data from multiple places
+    let mut a = Rc::new(10);
+    let mut b = Rc::clone(&a);
+
+    println!("a: {a}");
+    println!("b: {b}");
+}
+
+// Modules
+// `mod` let us namespace types and functions
+mod foo {
+    pub fn do_something() {
+        println!("In the foo module");
+    }
+}
+
+mod bar {
+    pub fn do_something() {
+        println!("In the bar module");
+    }
+}
+
+mod outer {
+    fn private() {
+        println!("outer::private");
+    }
+
+    pub fn public() {
+        println!("outer::public");
+    }
+
+    mod private_inner {
+        fn private() {
+            println!("outer::private_inner::private");
+        }
+
+        pub fn public() {
+            println!("outer::private_inner::public");
+            super::private();
+        }
+    }
+
+    pub mod public_inner {
+        fn private() {
+            println!("outer::public_inner::private");
+        }
+
+        pub fn public() {
+            println!("outer::public_inner::public");
+            super::private();
+        }
+    }
+}
+
+fn modules() {
+    foo::do_something();
+    bar::do_something();
+
+    outer::public();
+    outer::public_inner::public();
+
+    // error[E0603]: module `private_inner` is private
+    // outer::private_inner::public();
+}
+
 fn main() {
     // Program entry point
     println!("\n# Hello World");
@@ -1569,4 +1740,22 @@ fn main() {
 
     println!("\n# Exercise: Health Statistics");
     health_statistics();
+
+    println!("\n# Option and Result");
+    option_and_result();
+
+    println!("\n# Vec");
+    vec();
+
+    println!("\n# HashMap");
+    hash_map();
+
+    println!("\n# Box");
+    box_demo();
+
+    println!("\n# Rc");
+    rc();
+
+    println!("\n# Modules");
+    modules();
 }
