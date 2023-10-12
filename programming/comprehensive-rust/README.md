@@ -335,3 +335,190 @@ use lib::{Foo, AnotherFoo}
 ```
 
 并且因为 `sub_module1` 和 `sub_module2` 是私有的，用户并没有导入它们。
+
+## trait：定义共享行为
+
+> Rust 中的 trait 被用来向编译器描述某些特定类型拥有的且能够被其他类型共享的功能，它使我们以一种抽象的方式来定义共享行为。我们还可以使用 trait 约束来将泛型参数指定为实现了某些特定行为的类型。
+
+**注意**：trait 与其他语言中的接口（interface）功能类似，但是也不完全相同。
+
+```rust
+struct Dog {
+    name: String,
+    age: i8,
+}
+struct Cat {
+    lives: i8,
+} // No name needed, cats won't respond anyway
+
+trait Pet {
+    fn talk(&self) -> String;
+}
+
+impl Pet for Dog {
+    fn talk(&self) -> String {
+        format!("Woof, my name is {}!", self.name)
+    }
+}
+
+impl Pet for Cat {
+    fn talk(&self) -> String {
+        String::from("Miau!")
+    }
+}
+```
+
+例如对于上面的代码，我们通过 `trait Pet` 来定义了所有宠物都共享的行为（方法），这里对应的是 `talk`。
+
+然后我们可以通过 `impl <Trait>` 来为每个类型实现对应的 trait，实现之后，对应的类型就可以调用对应 trait 中的方法了。
+
+### 默认方法
+
+在定义 trait 时，如果没有默认实现某个方法，则该方法是 required methods，某个类型实现该 trait 时，就必须对 required methods 进行实现；如果某个方法有默认实现，则该方法是 provided methods 或 optional methods，某个类型实现该 trait 时，可以选择使用它默认实现的方法或者重写。
+
+可以基于某一个 trait 作为 super trait，来实现另一个 trait：
+```rust
+trait Equals {
+    fn equals(&self, other: &Self) -> bool;
+}
+
+// 基于 `Equals` 将其作为 super trait，来实现 `NotEquals`
+trait NotEquals: Equals {
+    fn not_equals(&self, other: &Self) -> bool {
+        !self.equals(other)
+    }
+}
+```
+
+### 覆盖实现（blanket implementation）
+可以为实现了某个 trait 的类型有条件地实现另一个 trait。对满足 trait 约束的所有类型实现 trait 也被称作覆盖实现（blanket implementation），这一机制被广泛地应用于 Rust 标准库中。例如，标准库对所有满足 `Display` trait 约束的类型实现了 `ToString` trait，对应代码如下所示：
+```rust
+impl <T: Display> ToString for T {
+    ...
+}
+```
+上面的语句也可以用 `where` 语句表示，如：
+```rust
+impl <T> ToString for T
+where
+    T: Display
+{
+    ...
+}
+```
+
+### trait 约束（bounds）
+trait 也可以用作函数参数、返回值的类型约束，如：
+```rust
+// 约束参数 `x` 必须实现了 `Into<i32>` trait
+fn add_42_millions(x: impl Into<i32>) -> i32 {
+    x.into() + 42_000_000
+}
+
+// 约束类型 `T` 必须实现了 `Clone` trait
+fn duplicate<T: Clone>(a: T) -> (T, T) {
+    (a.clone(), a.clone())
+}
+```
+
+### [在 trait 的定义中使用关联类型（associated types）指定占位类型（placeholder types）类型](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#specifying-placeholder-types-in-trait-definitions-with-associated-types)
+
+关联类型（associated type）是 trait 中的类型占位符，它可以被用于 trait 的方法签名中。
+
+trait 的实现者需要根据特定的场景来为关联类型指定具体的类型。通过这一技术，我们可以定义出包含某些类型的 trait，而无须在实现前确定它们的具体类型。
+
+标准库中的 `Iterator` 是一个带有关联类型的 trait 示例：
+```rust
+// 代码示例 19-12
+pub trait Iterator {
+    type Item;
+
+    fn next(&mut self) -> Option<Self::Item>;
+}
+```
+
+`Iterator` 中包含一个名为 `Item` 的关联类型，并使用该类型来替代迭代中出现的值类型。`Iterator` trait 的实现者需要为 `Item` 指定具体的类型，并在实现的 `next` 方法中返回一个包含该类型值的 `Option`。
+
+**看上去 trait 中的关联类型与泛型的概念有些类似，泛型允许我们在不指定具体类型的前提下定义函数。那么我们为什么需要使用关联类型呢？**
+
+为了说明它们的差别，我们来看这样一个例子：假设我们需要给泛型参数为 `u32` 的 `Counter` 类型 实现 `Iterator` trait，代码可以如下：
+```rust
+impl Iterator for Counter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // --snip--
+```
+
+如果 `Iterator` trait 按照泛型去定义，将是下面这样：
+```rust
+// 代码示例 19-13
+pub trait Iterator<T> {
+    fn next(&mut self) -> Option<T>;
+}
+```
+
+如果使用代码示例 19-13 这种泛型的方式去定义 `Iterator` trait，我们就必须在每次实现 trait 的时候都注明类型，如 `impl Iterator<u32> for Counter`，或者 `impl Iterator<String> for Counter`，或者其他任意类型。也就是说，我们会对 `Counter` 实现多份 `Iterator`，每个具体的类型一份；在调用 `Counter` 的 `next` 方法时，也需要指定具体的类型注解，这样才能知道调用的是哪一份 `Iterator` 实现。
+
+而通过关联类型实现 trait 的话，我们不需要额外指定类型注解，因为每个类型的对应 trait 实现只有一种，只能有一种 `impl Iterator for Counter` 的实现，`Counter` 也只拥有一个特定的 `Item` 类型；在调用 `Counter` 的 `next` 方法时，也不需要指定 `u32` 这样的类型注解。
+
+关联类型也是 trait 规范用法的一部分，trait 的实现者需要将对关联类型的名称、描述写到 API 文档里。
+
+### 默认泛型参数和运算符重载
+
+我们可以在使用泛型参数时为泛型（generic type）指定一个默认的具体类型（default concrete type）。当使用默认类型就能工作时，该 trait 的实现者可以不用再指定另外的具体类型。可以在定义泛型时通过语法 `<PlaceholderType=ConcreteType>` 来为泛型指定默认类型。
+
+这个技术常常被用在运算符重载中：
+```rust
+#[derive(Debug, Copy, Clone)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+// use default type parameter: `Self`, which will be the type we’re implementing `Add` on.
+// See the `Add` trait definition: `pub trait Add<Rhs = Self> {...}`
+impl std::ops::Add for Point {
+    // the associated type name is 'Output', which is defined by the 'Add' trait
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+// Set the `Rhs` type parameter to `(i32, i32)` instead of using the default of `Self`.
+impl std::ops::Add<(i32, i32)> for Point {
+    type Output = Point;
+
+    fn add(self, rhs: (i32, i32)) -> Point {
+        Point {
+            x: self.x + rhs.0,
+            y: self.y + rhs.1,
+        }
+    }
+}
+
+// Operator overloading
+pub fn operator_overloading() {
+    let p1 = Point { x: 10, y: 20 };
+    let p2 = Point { x: 100, y: 200 };
+    println!("{:?} + {:?} = {:?}", p1, p2, p1 + p2);
+
+    let p3 = (5, 5);
+    println!("{:?} + {:?} = {:?}", p1, p3, p1 + p3);
+}
+```
+
+如上所示，`Add` trait 的定义 `pub trait Add<Rhs = Self> {...}` 中，默认类型参数为 `Self`，表示就是对某个类型实现 `Add` 时的那个类型；如果我们希望 `Point` 能和一个 Tuple `(i32, i32)` 做运算，可以通过指定 `Add` 的类型参数 `impl std::ops::Add<(i32, i32)> for Point` 来实现。
+
+### 闭包（closures）的 trait
+
+闭包或者 lambda 表达式没有可以被命名的类型，但是它们实现了 `Fn`、`FnMut`、`FnOnce` 等 traits。
+
+- `Fn`：既不消耗也不修改捕获到的值，甚至有可能不捕获值。它可以被并发地调用多次。`Fn` 是 `FnMut` 和 `FnOnce` 的子类型。
+- `FnMut`：可能会修改捕获到的值（如 `accumulate`）。它可以被调用多次，但是无法并发地调用。`FnMut` 是 `FnOnce` 的子类型。
+- `FnOnce`：只能调用一次，它可能会消耗捕获到的值。

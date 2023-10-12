@@ -18,6 +18,7 @@ mod hello_world;
 mod if_expressions;
 mod if_let_expressions;
 mod implicit_conversions;
+mod important_traits;
 mod lifetimes;
 mod loop_expressions;
 mod luhn_algorithm;
@@ -65,6 +66,10 @@ use hello_world::hello_world;
 use if_expressions::if_expressions;
 use if_let_expressions::if_let_expressions;
 use implicit_conversions::implicit_conversions;
+use important_traits::{
+    closure_traits, default_trait, drop_trait, from_and_into_trait, from_iterator_trait,
+    iterator_trait, operator_overloading, read_example, write_example,
+};
 use lifetimes::lifetimes;
 use loop_expressions::loop_expressions;
 use luhn_algorithm::run_luhn_algirithm;
@@ -279,4 +284,33 @@ fn main() {
 
     println!("\n# Trait Bounds");
     trait_bounds();
+
+    println!("\n# Iterator Trait");
+    iterator_trait();
+
+    println!("\n# FromIterator Trait");
+    from_iterator_trait();
+
+    println!("\n# From and Into Trait");
+    from_and_into_trait();
+
+    println!("\n# Read and Write");
+    if let Err(why) = read_example() {
+        panic!("Error when execute the read example: {}", why);
+    };
+    if let Err(why) = write_example() {
+        panic!("Error when execute the write example: {}", why);
+    };
+
+    println!("\n# Drop Trait");
+    drop_trait();
+
+    println!("\n# Default Trait");
+    default_trait();
+
+    println!("\n# Operator Overloading");
+    operator_overloading();
+
+    println!("\n# Closures");
+    closure_traits();
 }
