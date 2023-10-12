@@ -8,6 +8,7 @@ mod compound_types;
 mod const_and_static;
 mod copying_and_cloning;
 mod enums;
+mod error_handling;
 mod expression_evaluation;
 mod for_loops;
 mod functions;
@@ -56,6 +57,7 @@ use crate::compound_types::compound_types;
 use crate::const_and_static::{const_variables, static_variables};
 use crate::copying_and_cloning::copying_and_cloning;
 use crate::enums::{enum_sizes, enums, variant_payloads};
+use crate::error_handling::{catch_stack_unwinding, structred_error_handling};
 use crate::expression_evaluation::run_eval;
 use crate::for_loops::for_loops;
 use crate::functions::functions;
@@ -314,4 +316,10 @@ fn main() {
 
     println!("\n# Closures");
     closure_traits();
+
+    println!("\n# Catch the Stack Unwinding");
+    catch_stack_unwinding();
+
+    println!("\n# Structured Error Handling with Result");
+    structred_error_handling();
 }

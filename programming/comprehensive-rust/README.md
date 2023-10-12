@@ -522,3 +522,130 @@ pub fn operator_overloading() {
 - `Fn`：既不消耗也不修改捕获到的值，甚至有可能不捕获值。它可以被并发地调用多次。`Fn` 是 `FnMut` 和 `FnOnce` 的子类型。
 - `FnMut`：可能会修改捕获到的值（如 `accumulate`）。它可以被调用多次，但是无法并发地调用。`FnMut` 是 `FnOnce` 的子类型。
 - `FnOnce`：只能调用一次，它可能会消耗捕获到的值。
+
+## 错误处理（Error Handling）
+
+在 Rust 中，错误处理遵循以下流程：
+- 可能发生错误的函数，在返回值中列出错误处理
+- 没有例外
+
+根据[官方文档](https://doc.rust-lang.org/book/ch09-00-error-handling.html)，Rust 将错误分为两大类：
+- 可恢复的错误（recoverable errors）：一般希望将错误报告给用户并且重试操作等，如 `file not found error`
+- 不可恢复的错误（unrecoverable errors）：通常是程序中的 bug 导致的，一般希望立即终止程序运行，如数组访问越界
+
+### Panics
+
+如果运行时发生错误，Rust 会触发一个 panic。
+
+如以下的代码：
+```rust
+fn main() {
+    let v = vec![10, 20, 30];
+    println!("v[100]: {}", v[100]);
+}
+```
+
+运行时报错：
+```log
+thread 'main' panicked at src/error_handling.rs:3:29:
+index out of bounds: the len is 3 but the index is 100
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+Panic 是专门用来描述不可恢复的（unrecoverable）和不符合预期的（unexpected）错误。
+
+可以使用 `panic::catch_unwind` 来捕获 panic 错误，一般不推荐使用，也不一定能捕捉所有的 panic 错误：
+```rust
+use std::panic;
+
+fn main() {
+    let result = panic::catch_unwind(|| {
+        println!("hello!");
+    });
+    assert!(result.is_ok());
+    
+    let result = panic::catch_unwind(|| {
+        panic!("oh no!");
+    });
+    assert!(result.is_err());
+}
+```
+
+请教了身边 Rust 经验最丰富的同事，他是这样理解的，私以为通俗易懂：
+> Rust 的错误处理原则是，尽可能通过错误码(也就是Result)传递错误，因为这种会在编译时提示错误处理，符合显式api的设计原则，性能也是最优的。catch_unwind这个相当于开了个后门， 给那种出现任何错误都不想重启的场景提供个方案。
+
+[To `panic!` or Not to `panic!`, that is a question.](https://doc.rust-lang.org/book/ch09-03-to-panic-or-not-to-panic.html)
+
+### Backtrace
+
+> A backtrace is a list of all the functions that have been called to get to this point. Backtraces in Rust work as they do in other languages: the key to reading the backtrace is to start from the top and read until you see files you wrote.
+
+```log
+$ RUST_BACKTRACE=1 cargo run
+thread 'main' panicked at 'index out of bounds: the len is 3 but the index is 99', src/main.rs:4:5
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/std/src/panicking.rs:584:5
+   1: core::panicking::panic_fmt
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/core/src/panicking.rs:142:14
+   2: core::panicking::panic_bounds_check
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/core/src/panicking.rs:84:5
+   3: <usize as core::slice::index::SliceIndex<[T]>>::index
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/core/src/slice/index.rs:242:10
+   4: core::slice::index::<impl core::ops::index::Index<I> for [T]>::index
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/core/src/slice/index.rs:18:9
+   5: <alloc::vec::Vec<T,A> as core::ops::index::Index<I>>::index
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/alloc/src/vec/mod.rs:2591:9
+   6: panic::main
+             at ./src/main.rs:4:5
+   7: core::ops::function::FnOnce::call_once
+             at /rustc/e092d0b6b43f2de967af0887873151bb1c0b18d3/library/core/src/ops/function.rs:248:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+```
+
+### 结构化的错误处理
+
+Rust 推荐使用 `Result` 处理各种异常错误。
+
+`Result` 必须被使用，`Result` 被标记为了 `#[must_use]` 属性，如果忽略了 `Result` 的处理，编译器会报告警告。
+
+处理 `Result` 的代码样例：
+```rust
+#[derive(Debug)]
+enum Version { Version1, Version2 }
+fn parse_version(header: &[u8]) -> Result<Version, &'static str> {
+    match header.get(0) {
+        None => Err("invalid header length"),
+        Some(&1) => Ok(Version::Version1),
+        Some(&2) => Ok(Version::Version2),
+        Some(_) => Err("invalid version"),
+    }
+}
+
+let version = parse_version(&[1, 2, 3, 4]);
+match version {
+    Ok(v) => println!("working with version: {v:?}"),
+    Err(e) => println!("error parsing header: {e:?}"),
+}
+```
+
+如果你不想处理错误，可以在最后使用 `expect` 进行断言，如果运行正常，就返回 `Ok` 中的值；如果出现错误，就会触发一个 panic：
+```rust
+let x: Result<u32, &str> = Err("emergency failure");
+x.expect("Testing expect"); // panics with `Testing expect: emergency failure`
+```
+
+`unwrap` 与 `expect` 类似，会把 `Ok` 或者 `Err` 中的值解出来，如果是 `Err`，会触发 panic，错误信息来自 Err。`expect` 的 panic 错误信息是通过参数指定的。
+
+因为 `Result` 的处理代码比较范荣，Rust 也提供了一个 `?` 来简化写法，如：
+```rust
+// expression?
+match expression {
+    Ok(value) => value,
+    Err(err)  => return Err(From::from(err)),
+}
+```
+
+如果在一个返回 `Result` 的表达式末尾使用 `?`，则相当于使用了一个 match 表达式
+- 如果发生了错误，则相当于进入 match 表达式的 `Err(err)` 分支，并提前 `return Err(From::from(err))`。
+- 如果运行成功，则相当于进入 match 表达式的 `Ok(ok)` 分支。
