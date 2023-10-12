@@ -46,61 +46,62 @@ mod vec;
 mod while_let_expressions;
 mod while_loops;
 
-use array_and_for_loops::{array_and_for_loops, print_matrix};
-use blocks::blocks;
-use borrowing::borrowing;
-use box_demo::box_demo;
-use break_and_continue::break_and_continue;
-use collatz_conjecture::collatz_conjecture;
-use compound_types::compound_types;
-use const_and_static::{const_variables, static_variables};
-use copying_and_cloning::copying_and_cloning;
-use enums::{enum_sizes, enums, variant_payloads};
-use expression_evaluation::run_eval;
-use for_loops::for_loops;
-use functions::functions;
-use generics::{generic_data_types, generic_methods};
-use hash_map::hash_map;
-use health_statistics::health_statistics;
-use hello_world::hello_world;
-use if_expressions::if_expressions;
-use if_let_expressions::if_let_expressions;
-use implicit_conversions::implicit_conversions;
-use important_traits::{
+use crate::array_and_for_loops::{array_and_for_loops, print_matrix};
+use crate::blocks::blocks;
+use crate::borrowing::borrowing;
+use crate::box_demo::box_demo;
+use crate::break_and_continue::break_and_continue;
+use crate::collatz_conjecture::collatz_conjecture;
+use crate::compound_types::compound_types;
+use crate::const_and_static::{const_variables, static_variables};
+use crate::copying_and_cloning::copying_and_cloning;
+use crate::enums::{enum_sizes, enums, variant_payloads};
+use crate::expression_evaluation::run_eval;
+use crate::for_loops::for_loops;
+use crate::functions::functions;
+use crate::generics::{generic_data_types, generic_methods};
+use crate::hash_map::hash_map;
+use crate::health_statistics::health_statistics;
+use crate::hello_world::hello_world;
+use crate::if_expressions::if_expressions;
+use crate::if_let_expressions::if_let_expressions;
+use crate::implicit_conversions::implicit_conversions;
+use crate::important_traits::{
     closure_traits, default_trait, drop_trait, from_and_into_trait, from_iterator_trait,
     iterator_trait, operator_overloading, read_example, write_example,
 };
-use lifetimes::lifetimes;
-use loop_expressions::loop_expressions;
-use luhn_algorithm::run_luhn_algirithm;
-use match_expressions::match_expressions;
-use methods_example1::{methods, overloading};
-use methods_example2::methods_example;
-use modules::modules;
-use move_semantics::{move_semantics, moves_in_function_calls};
-use option_and_result::option_and_result;
-use ownership::ownership;
-use pattern_matching::{
+use crate::lifetimes::lifetimes;
+use crate::loop_expressions::loop_expressions;
+use crate::luhn_algorithm::run_luhn_algirithm;
+use crate::match_expressions::match_expressions;
+use crate::methods_example1::{methods, overloading};
+use crate::methods_example2::methods_example;
+use crate::modules::modules;
+use crate::move_semantics::{move_semantics, moves_in_function_calls};
+use crate::option_and_result::option_and_result;
+use crate::ownership::ownership;
+use crate::pattern_matching::{
     destructing_arrays, destructing_structs, destructuring_enums, match_guards,
 };
-use rc::rc;
-use reference::references;
-use scalar_types::scalar_types;
-use scopes_and_shadowing::scopes_and_shadowing;
-use slices::slices;
-use stack_and_heap::stack_and_heap;
-use storing_books::storing_books;
-use string_demo::string;
-use structs_and_methods::structs_and_methods;
-use traits::{
+use crate::rc::rc;
+use crate::reference::references;
+use crate::scalar_types::scalar_types;
+use crate::scopes_and_shadowing::scopes_and_shadowing;
+use crate::slices::slices;
+use crate::stack_and_heap::stack_and_heap;
+use crate::storing_books::storing_books;
+use crate::string_demo::string;
+use crate::structs_and_methods::structs_and_methods;
+use crate::traits::{
     blanket_implementation, default_methods, deriving_traits, trait_bounds, trait_objects,
     traits_example,
 };
-use type_inference::type_inference;
-use variables::variables;
-use vec::vec;
-use while_let_expressions::while_let_expressions;
-use while_loops::while_loops;
+use crate::type_inference::type_inference;
+use crate::variables::variables;
+use crate::vec::vec;
+use crate::while_let_expressions::while_let_expressions;
+
+use crate::while_loops::while_loops;
 
 fn main() {
     // Program entry point
