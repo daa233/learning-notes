@@ -125,6 +125,11 @@ TODO
 
 在作用域的最后，变量会被弃用（dropped）并且对应的数据会被释放（freed），可以在此时调用析构（destructor）来实现。
 
+总结：
+- Rust中的每一个值都有一个对应的变量作为它的所有者。
+- 在同一时间内，值有且仅有一个所有者。
+- 当所有者离开自己的作用域时，它持有的值就会被释放掉。
+
 ### Move Semantics
 
 > There is always *exactly* one variable binding which owns a value.
@@ -372,6 +377,20 @@ impl Pet for Cat {
 
 然后我们可以通过 `impl <Trait>` 来为每个类型实现对应的 trait，实现之后，对应的类型就可以调用对应 trait 中的方法了。
 
+### trait 约束（bounds）
+trait 也可以用作函数参数、返回值的类型约束，如：
+```rust
+// 约束参数 `x` 必须实现了 `Into<i32>` trait
+fn add_42_millions(x: impl Into<i32>) -> i32 {
+    x.into() + 42_000_000
+}
+
+// 约束类型 `T` 必须实现了 `Clone` trait
+fn duplicate<T: Clone>(a: T) -> (T, T) {
+    (a.clone(), a.clone())
+}
+```
+
 ### 默认方法
 
 在定义 trait 时，如果没有默认实现某个方法，则该方法是 required methods，某个类型实现该 trait 时，就必须对 required methods 进行实现；如果某个方法有默认实现，则该方法是 provided methods 或 optional methods，某个类型实现该 trait 时，可以选择使用它默认实现的方法或者重写。
@@ -407,19 +426,23 @@ where
 }
 ```
 
-### trait 约束（bounds）
-trait 也可以用作函数参数、返回值的类型约束，如：
-```rust
-// 约束参数 `x` 必须实现了 `Into<i32>` trait
-fn add_42_millions(x: impl Into<i32>) -> i32 {
-    x.into() + 42_000_000
-}
+### 一些重要的 trait
 
-// 约束类型 `T` 必须实现了 `Clone` trait
-fn duplicate<T: Clone>(a: T) -> (T, T) {
-    (a.clone(), a.clone())
-}
-```
+- `Iterator`：迭代器相关的处理。需要实现 `next` 方法，提供了 `count`、`last`、`nth`、`step_by`、`map`、`enumerate`、`collect` 等方法。
+    - `IntoIterator`：将一个类型转换为 `Iterator`。需要实现 `into_iter` 方法。`for` 循环语法是基于 `IntoIterator` 实现的。
+    - 参考 [What is the difference between iter and into_iter?](https://stackoverflow.com/questions/34733811/what-is-the-difference-between-iter-and-into-iter)，`iter`、`into_iter` 和 `iter_mut` 的区别：
+        - `iter`：按照惯例，返回 `&T`。当希望只读地看一下数据时，使用 `iter`。
+        - `iter_mut`：按照惯例，返回 `&mut T`。当希望修改数据时，使用 `iter_mut`。
+        - `into_iter`：根据不同的上下文，可能返回 `T`、`&T` 或者 `&mut T`。当希望给元素一个新的所有者时，使用 `into_iter`。
+- `FromIterator`：用于描述如何从一个迭代器创建对应的（容器）类型。`Iterator::collect()` 的底层就是通过 `FromIterator` 实现的。
+- `From`、`Into`：用于类型转换，定义了 A 类型的 `From` B 之后，就自动实现了 B 类型的 `Into` A。
+- `Read`, `Write`：读写相关的处理。
+    - `Read`：需要实现 `read` 方法。提供了 `read_to_end`、`read_to_string` 等方法。
+    - `Write`：需要实现 `write`、`flush` 方法。提供了 `write_all` 等方法。
+- `Drop`：此处指 `std::ops::Drop`，当所有者离开作用域后时调用。需要实现 `drop` 方法。
+- `Default`：用于给一个类型指定默认值。需要实现 `default` 方法。可以通过 `#[derive(Default)]` 直接派生。
+- `std::ops`：如 `Add`、`Mul` 等，可以对类型实现这些 trait，从而实现 `+`、`*` 等运算符的重载。
+- Closures: 函数或 lambda 表达式没有具体名称的类型，但是它们实现了 `Fn`, `FnMut`, `FnOnce` 这些 traits。
 
 ### [在 trait 的定义中使用关联类型（associated types）指定占位类型（placeholder types）类型](https://doc.rust-lang.org/book/ch19-03-advanced-traits.html#specifying-placeholder-types-in-trait-definitions-with-associated-types)
 

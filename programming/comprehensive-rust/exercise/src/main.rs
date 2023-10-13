@@ -20,6 +20,7 @@ mod if_expressions;
 mod if_let_expressions;
 mod implicit_conversions;
 mod important_traits;
+mod iterator_and_ownership;
 mod lifetimes;
 mod loop_expressions;
 mod luhn_algorithm;
@@ -31,6 +32,7 @@ mod move_semantics;
 mod option_and_result;
 mod ownership;
 mod pattern_matching;
+mod prefix_matches;
 mod rc;
 mod reference;
 mod scalar_types;
@@ -72,6 +74,7 @@ use crate::important_traits::{
     closure_traits, default_trait, drop_trait, from_and_into_trait, from_iterator_trait,
     iterator_trait, operator_overloading, read_example, write_example,
 };
+use crate::iterator_and_ownership::iterator_and_ownership;
 use crate::lifetimes::lifetimes;
 use crate::loop_expressions::loop_expressions;
 use crate::luhn_algorithm::run_luhn_algirithm;
@@ -85,6 +88,7 @@ use crate::ownership::ownership;
 use crate::pattern_matching::{
     destructing_arrays, destructing_structs, destructuring_enums, match_guards,
 };
+use crate::prefix_matches::run_prefix_matches;
 use crate::rc::rc;
 use crate::reference::references;
 use crate::scalar_types::scalar_types;
@@ -102,7 +106,6 @@ use crate::type_inference::type_inference;
 use crate::variables::variables;
 use crate::vec::vec;
 use crate::while_let_expressions::while_let_expressions;
-
 use crate::while_loops::while_loops;
 
 fn main() {
@@ -263,6 +266,12 @@ fn main() {
 
     println!("\n# Modules");
     modules();
+
+    println!("\n# Exercise: Iterators and Onwership");
+    iterator_and_ownership();
+
+    println!("\n# Exercise: String and Iterators");
+    run_prefix_matches();
 
     println!("\n# Generic Data Types");
     generic_data_types();

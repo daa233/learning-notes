@@ -56,11 +56,13 @@ pub fn from_and_into_trait() {
     println!("{s}, {addr}, {one}, {bigger}");
 }
 
+// `R: Read` is a trait bound to require that the parameter type `R` implements the `Read` trait
 fn count_lines<R: Read>(reader: R) -> usize {
     let buf_reader = BufReader::new(reader);
     buf_reader.lines().count()
 }
 
+// `W: Write` is a trait bound to require that the parameter type `W` implements the `Write` trait
 fn log<W: Write>(writer: &mut W, msg: &str) -> Result<()> {
     writer.write_all(msg.as_bytes())?;
     writer.write_all("\n".as_bytes())
