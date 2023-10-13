@@ -8,21 +8,23 @@
 pub fn prefix_matches(prefix: &str, request_path: &str) -> bool {
     let prefix_parts = prefix.split("/").collect::<Vec<_>>();
     let req_path_parts = request_path.split("/").collect::<Vec<_>>();
-    let prefix_parts_iter = prefix_parts.iter();
-    let req_path_parts_iter = req_path_parts.iter();
+    let mut prefix_parts_iter = prefix_parts.into_iter();
+    let mut req_path_parts_iter = req_path_parts.into_iter();
     loop {
         match (prefix_parts_iter.next(), req_path_parts_iter.next()) {
-            (Some(&prefix), Some(&req_path)) => {
-                if &prefix == &prefix {
+            (Some(prefix), Some(req_path)) => {
+                if prefix == req_path {
+                    continue;
+                } else if prefix == "*" {
                     continue;
                 } else {
                     break false;
                 }
             }
-            (Some(&prefix), None) => {
+            (Some(prefix), None) => {
                 break false;
             }
-            (None, Some(&prefix)) => {
+            (None, Some(req_path)) => {
                 break true;
             }
             (None, None) => {

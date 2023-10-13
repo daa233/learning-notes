@@ -96,15 +96,15 @@ pub fn write_example() -> Result<()> {
 
     // Create a path to the desired file
     let path = std::path::Path::new("hello.txt");
+    let mut file = std::fs::File::create(&path)?;
+
+    file.write_all("Hello, World!".as_bytes())?;
     let abs_path = match std::fs::canonicalize(&path) {
         Ok(v) => v,
         Err(msg) => {
             return Err(msg);
         }
     };
-    let mut file = std::fs::File::create(&path)?;
-
-    file.write_all("Hello, World!".as_bytes())?;
     println!("Already write to the file '{:?}'", abs_path);
 
     Ok(())
