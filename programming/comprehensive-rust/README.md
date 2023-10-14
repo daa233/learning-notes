@@ -93,6 +93,13 @@ TODO
 - In both, associated functions are defined within an impl block.
 - You could even implement the different variants of an enum with separate structs but then they wouldn’t be the same type as they would if they were all defined in an enum.
 
+## 方法（methods）
+方法与函数十分相似：它们都使用 `fn` 关键字及一个名称来进行声明；它们都可以拥有参数和返回值；另外，它们都包含了一段在调用时执行的代码。但是，方法与函数依然是两个不同的概念，因为方法总是被定义在某个结构体（或者枚举类型、trait对象）的上下文中，并且它们的第一个参数永远都是self，用于指代调用该方法的结构体实例。
+
+选择方法的 self 参数签名类型：
+- `&self`：既不用获得数据的所有权也不需要写入数据，而只需要读取数据即可
+- `&mut self`：想要在调用方法时改变实例的某些数据
+- `self`：在调用过程中取得实例的所有权，这种用法并不常见。可能会被用于那些需要将 self 转换为其他类型，且在转换后想要阻止调用者访问原始实例的场景。
 
 ## 内存管理
 

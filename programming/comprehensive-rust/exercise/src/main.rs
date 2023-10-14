@@ -32,11 +32,13 @@ mod move_semantics;
 mod option_and_result;
 mod ownership;
 mod pattern_matching;
+mod polygon_struct;
 mod prefix_matches;
 mod rc;
 mod reference;
 mod scalar_types;
 mod scopes_and_shadowing;
+mod simple_gui;
 mod slices;
 mod stack_and_heap;
 mod storing_books;
@@ -88,11 +90,13 @@ use crate::ownership::ownership;
 use crate::pattern_matching::{
     destructing_arrays, destructing_structs, destructuring_enums, match_guards,
 };
+use crate::polygon_struct::polygon_struct;
 use crate::prefix_matches::run_prefix_matches;
 use crate::rc::rc;
 use crate::reference::references;
 use crate::scalar_types::scalar_types;
 use crate::scopes_and_shadowing::scopes_and_shadowing;
+use crate::simple_gui::simple_gui;
 use crate::slices::slices;
 use crate::stack_and_heap::stack_and_heap;
 use crate::storing_books::storing_books;
@@ -309,10 +313,10 @@ fn main() {
     println!("\n# Read and Write");
     if let Err(why) = read_example() {
         panic!("Error when execute the read example: {}", why);
-    };
+    }
     if let Err(why) = write_example() {
         panic!("Error when execute the write example: {}", why);
-    };
+    }
 
     println!("\n# Drop Trait");
     drop_trait();
@@ -325,6 +329,12 @@ fn main() {
 
     println!("\n# Closures");
     closure_traits();
+
+    println!("\n# Exercise: Simple GUI");
+    simple_gui();
+
+    println!("\n# Exercise: Polygon Struct");
+    polygon_struct();
 
     println!("\n# Catch the Stack Unwinding");
     catch_stack_unwinding();
