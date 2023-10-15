@@ -3,6 +3,7 @@ mod blocks;
 mod borrowing;
 mod box_demo;
 mod break_and_continue;
+mod channels;
 mod collatz_conjecture;
 mod compound_types;
 mod const_and_static;
@@ -45,6 +46,7 @@ mod stack_and_heap;
 mod storing_books;
 mod string_demo;
 mod structs_and_methods;
+mod threads_example;
 mod traits;
 mod type_inference;
 mod unsafe_rust;
@@ -58,6 +60,7 @@ use crate::blocks::blocks;
 use crate::borrowing::borrowing;
 use crate::box_demo::box_demo;
 use crate::break_and_continue::break_and_continue;
+use crate::channels::{bounded_channels, channels_example, unbounded_channels};
 use crate::collatz_conjecture::collatz_conjecture;
 use crate::compound_types::compound_types;
 use crate::const_and_static::{const_variables, static_variables};
@@ -107,6 +110,7 @@ use crate::stack_and_heap::stack_and_heap;
 use crate::storing_books::storing_books;
 use crate::string_demo::string;
 use crate::structs_and_methods::structs_and_methods;
+use crate::threads_example::{scoped_threads, threads_example};
 use crate::traits::{
     blanket_implementation, default_methods, deriving_traits, trait_bounds, trait_objects,
     traits_example,
@@ -379,4 +383,19 @@ fn main() {
     if let Err(why) = safe_ffi_wrapper() {
         panic!("Error when execute the safe ffi wrapper: {}", why);
     }
+
+    println!("\n# Threads");
+    threads_example();
+
+    println!("\n# Scoped Threads");
+    scoped_threads();
+
+    println!("\n# Channels");
+    channels_example();
+
+    println!("\n# Unbounded Channels");
+    unbounded_channels();
+
+    println!("\n# Bounded Channels");
+    bounded_channels();
 }
