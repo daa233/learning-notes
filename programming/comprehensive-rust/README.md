@@ -82,16 +82,51 @@ Rust 一些独特的卖点：
 - 运行时不会有未定义行为
 - 具有现代语言的一些特性
 
-TODO
-
 
 ## 基本语法
 
+### 结构体（Structs）
+
+关键字 `struct` 被用来定义并命名结构体，一个良好的结构体名称应当能够反映出自身数据组合的意义。除此之外，我们还需要在随后的花括号中声明所有数据的名字及类型，这些数据也被称作字段。
+
+```rust
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+```
+
+### 枚举（Enums）
+
+Rust 中的枚举允许我们直接将其关联的数据嵌入枚举变体内。我们可以使用枚举来更简捷地表达出上述概念，而不用将枚举集成至结构体中。并且每个变体可以拥有不同类型和数量的关联数据。
+
+```rust
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+let home = IpAddr::V4(127, 0, 0, 1);
+
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+`Option<T>` 是一个很常用的枚举类型，Rust 用来标识一个值有效或缺失：
+```rust
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+由于 `Option<T>` 枚举非常常见且很有用，所以它也被包含在了预导入模块中，这意味着我们不需要显式地将它引入作用域。另外，它的变体也是这样的：我们可以在不加 `Option::` 前缀的情况下直接使用`Some` 或 `None`。但 `Option<T>` 枚举依然只是一个普通的枚举类型，`Some(T)` 和 `None` 也依然只是 `Option<T>` 类型的变体。
 
 ### Structs vs. Enums
-- In both, you can have a simple version without fields (unit struct) or one with different types of fields (variant payloads).
-- In both, associated functions are defined within an impl block.
-- You could even implement the different variants of an enum with separate structs but then they wouldn’t be the same type as they would if they were all defined in an enum.
+- 都可以定义没有字段的简单版本，或者定义有不同字段的类型
+- 都可以通过 `impl` 顶一个关联的函数（方法）
+- 枚举中的每个字段都可以独立地定义为任意类型，但是又可以定义一个函数来统一处理这些同属于同一个枚举类型的数据；而如果分散地定义为不同结构体，则每个结构体都有自己的类型，无法轻易定义一个能够统一处理这些类型数据的函数。
 
 ## 方法（methods）
 方法与函数十分相似：它们都使用 `fn` 关键字及一个名称来进行声明；它们都可以拥有参数和返回值；另外，它们都包含了一段在调用时执行的代码。但是，方法与函数依然是两个不同的概念，因为方法总是被定义在某个结构体（或者枚举类型、trait对象）的上下文中，并且它们的第一个参数永远都是self，用于指代调用该方法的结构体实例。
