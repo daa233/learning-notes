@@ -679,3 +679,104 @@ match expression {
 如果在一个返回 `Result` 的表达式末尾使用 `?`，则相当于使用了一个 match 表达式
 - 如果发生了错误，则相当于进入 match 表达式的 `Err(err)` 分支，并提前 `return Err(From::from(err))`。
 - 如果运行成功，则相当于进入 match 表达式的 `Ok(ok)` 分支。
+
+## 测试（Testing）
+
+Rust 和 Cargo 提供了简单的单元测试框架：
+- 开发代码中直接支持写单元测试（unit test）
+- 可以将集成测试（integration test）放在  `tests/` 目录下
+
+### 单元测试（unit test）
+
+可以通过 `#[test]` 来支持单元测试：
+```rust
+fn first_word(text: &str) -> &str {
+    match text.find(' ') {
+        Some(idx) => &text[..idx],
+        None => &text,
+    }
+}
+
+#[test]
+fn test_empty() {
+    assert_eq!(first_word(""), "");
+}
+
+#[test]
+fn test_single_word() {
+    assert_eq!(first_word("Hello"), "Hello");
+}
+
+#[test]
+fn test_multiple_words() {
+    assert_eq!(first_word("Hello World"), "Hello");
+}
+```
+
+然后运行 `cargo test` 即可找到并执行上面的测试代码。
+
+### 测试模块
+
+单元测试代码也嵌入到一个模块中，如：
+```rust
+fn helper(a: &str, b: &str) -> String {
+    format!("{a} {b}")
+}
+
+pub fn main() {
+    println!("{}", helper("Hello", "World"));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_helper() {
+        assert_eq!(helper("foo", "bar"), "foo bar");
+    }
+}
+```
+
+这种方式可以用来测试私有的函数，如上面的 `helper`。
+
+`#[cfg(test)]` 属性表示只有运行 `cargo test` 时，对应的模块才是激活的。
+
+### 文档测试（documentation tests）
+
+Rust 内置支持了文档测试：
+
+```rust
+/// Shortens a string to the given length.
+///
+/// ```
+/// # use playground::shorten_string;
+/// assert_eq!(shorten_string("Hello World", 5), "Hello");
+/// assert_eq!(shorten_string("Hello World", 20), "Hello World");
+/// ```
+pub fn shorten_string(s: &str, length: usize) -> &str {
+    &s[..std::cmp::min(length, s.len())]
+}
+```
+
+`///` 注释中的代码块会被编译器认为是 Rust 代码，会在 `cargo test` 时执行。
+
+使用 [Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=3ce2ad13ea1302f6572cb15cd96becf0) 可以测试成功，但是本地运行 `cargo test` 暂时没有验证成功。
+
+
+### 集成测试（integration tests）
+
+如果你希望作为一个客户端来测试你写的库，可以使用集成测试：
+
+可以在 `tests/` 下创建 `.rs` 文件，如：
+
+```rust
+use my_library::init;
+
+#[test]
+fn test_init() {
+    assert!(init().is_ok());
+}
+```
+
+这些测试只能访问单元包中的公开 API。
