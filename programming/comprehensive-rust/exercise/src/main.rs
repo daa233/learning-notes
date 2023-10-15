@@ -36,6 +36,7 @@ mod polygon_struct;
 mod prefix_matches;
 mod rc;
 mod reference;
+mod safe_ffi_wrapper;
 mod scalar_types;
 mod scopes_and_shadowing;
 mod simple_gui;
@@ -97,6 +98,7 @@ use crate::polygon_struct::polygon_struct;
 use crate::prefix_matches::run_prefix_matches;
 use crate::rc::rc;
 use crate::reference::references;
+use crate::safe_ffi_wrapper::safe_ffi_wrapper;
 use crate::scalar_types::scalar_types;
 use crate::scopes_and_shadowing::scopes_and_shadowing;
 use crate::simple_gui::simple_gui;
@@ -372,4 +374,9 @@ fn main() {
 
     println!("\n# Implementing Unsafe Traits");
     implementing_unsafe_traits();
+
+    println!("\n# Exercise: Safe FFI Wrapper");
+    if let Err(why) = safe_ffi_wrapper() {
+        panic!("Error when execute the safe ffi wrapper: {}", why);
+    }
 }
