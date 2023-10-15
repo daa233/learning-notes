@@ -46,6 +46,7 @@ mod string_demo;
 mod structs_and_methods;
 mod traits;
 mod type_inference;
+mod unsafe_rust;
 mod variables;
 mod vec;
 mod while_let_expressions;
@@ -109,6 +110,10 @@ use crate::traits::{
     traits_example,
 };
 use crate::type_inference::type_inference;
+use crate::unsafe_rust::{
+    calling_external_code, calling_unsafe_functions, dereference_raw_pointers,
+    implementing_unsafe_traits, mutable_static_variables, union_example, writing_unsafe_functions,
+};
 use crate::variables::variables;
 use crate::vec::vec;
 use crate::while_let_expressions::while_let_expressions;
@@ -346,4 +351,25 @@ fn main() {
 
     println!("\n# Converting Error Types");
     converting_error_types();
+
+    println!("\n# Dereferencing Raw Pointers");
+    dereference_raw_pointers();
+
+    println!("\n# Mutable Static Variables");
+    mutable_static_variables();
+
+    println!("\n# Unions");
+    union_example();
+
+    println!("\n# Calling Unsafe Functions");
+    calling_unsafe_functions();
+
+    println!("\n# Writing Unsafe Functions");
+    writing_unsafe_functions();
+
+    println!("\n# Calling External Code");
+    calling_external_code();
+
+    println!("\n# Implementing Unsafe Traits");
+    implementing_unsafe_traits();
 }
