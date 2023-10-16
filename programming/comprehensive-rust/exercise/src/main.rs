@@ -30,6 +30,7 @@ mod methods_example1;
 mod methods_example2;
 mod modules;
 mod move_semantics;
+mod moving_ownership;
 mod option_and_result;
 mod ownership;
 mod pattern_matching;
@@ -92,6 +93,7 @@ use crate::methods_example1::{methods, overloading};
 use crate::methods_example2::methods_example;
 use crate::modules::modules;
 use crate::move_semantics::{move_semantics, moves_in_function_calls};
+use crate::moving_ownership::{closure_example, moving_ownership};
 use crate::option_and_result::option_and_result;
 use crate::ownership::ownership;
 use crate::pattern_matching::{
@@ -383,6 +385,12 @@ fn main() {
     if let Err(why) = safe_ffi_wrapper() {
         panic!("Error when execute the safe ffi wrapper: {}", why);
     }
+
+    println!("\n# Closures");
+    closure_example();
+
+    println!("\n# Moving Onwership");
+    moving_ownership();
 
     println!("\n# Threads");
     threads_example();
