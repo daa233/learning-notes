@@ -40,6 +40,8 @@ pub fn unbounded_channels() {
     });
     thread::sleep(Duration::from_millis(100));
 
+    // `tx` has been moved to the thread and will be dropped after the thread
+    // finishes so the `rx.iter()` here will not block.
     // the main thread may receive message before the sub-thread finishes
     for msg in rx.iter() {
         println!("Main: got {msg}");

@@ -8,6 +8,7 @@ mod collatz_conjecture;
 mod compound_types;
 mod const_and_static;
 mod copying_and_cloning;
+mod dining_philosophers;
 mod enums;
 mod error_handling;
 mod expression_evaluation;
@@ -128,6 +129,7 @@ use crate::variables::variables;
 use crate::vec::vec;
 use crate::while_let_expressions::while_let_expressions;
 use crate::while_loops::while_loops;
+use dining_philosophers::dining_philosophers;
 
 fn main() {
     // Program entry point
@@ -414,4 +416,7 @@ fn main() {
 
     println!("\n# Arc");
     arc_example();
+
+    println!("\n# Exercise: Dining Philosophers");
+    dining_philosophers();
 }
