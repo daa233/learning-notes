@@ -1,6 +1,5 @@
 use futures::executor::block_on;
 
-
 async fn count_to(count: i32) {
     for i in 1..=count {
         println!("Count is {i}!");
@@ -17,7 +16,6 @@ pub fn async_await_example() {
 }
 
 use tokio::time;
-
 
 async fn tokio_count_to(count: i32) {
     for i in 1..=count {

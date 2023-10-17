@@ -9,4 +9,3 @@ fn main() {
     println!("\n# Tokio example");
     tokio_example();
 }
-
