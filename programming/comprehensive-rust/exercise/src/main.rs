@@ -41,6 +41,7 @@ mod reference;
 mod safe_ffi_wrapper;
 mod scalar_types;
 mod scopes_and_shadowing;
+mod shared_state;
 mod simple_gui;
 mod slices;
 mod stack_and_heap;
@@ -106,6 +107,7 @@ use crate::reference::references;
 use crate::safe_ffi_wrapper::safe_ffi_wrapper;
 use crate::scalar_types::scalar_types;
 use crate::scopes_and_shadowing::scopes_and_shadowing;
+use crate::shared_state::{arc_example, mutex_example};
 use crate::simple_gui::simple_gui;
 use crate::slices::slices;
 use crate::stack_and_heap::stack_and_heap;
@@ -406,4 +408,10 @@ fn main() {
 
     println!("\n# Bounded Channels");
     bounded_channels();
+
+    println!("\n# Mutex");
+    mutex_example();
+
+    println!("\n# Arc");
+    arc_example();
 }
