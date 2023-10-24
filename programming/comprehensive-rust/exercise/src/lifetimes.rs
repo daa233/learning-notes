@@ -55,7 +55,16 @@ impl Owner {
 // A type `Borrowed` which houses a reference to an
 // `i32`. The reference to `i32` must outlive `Borrowed`.
 #[derive(Debug)]
-struct Borrowed<'a>(&'a i32);
+struct Borrowed<'a> {
+    x: &'a i32,
+}
+
+// Annotate lifetimes to impl.
+impl<'a> Default for Borrowed<'a> {
+    fn default() -> Self {
+        Self { x: &10 }
+    }
+}
 
 // Similarly, both references here must outlive this structure.
 #[derive(Debug)]
@@ -70,6 +79,13 @@ enum Either<'a> {
     Num(i32),
     Ref(&'a i32),
 }
+
+#[derive(Debug)]
+struct Ref<'a, T: 'a>(&'a T);
+// `Ref` contains a reference to a generic type `T` that has
+// an unknown lifetime `'a`. `T` is bounded such that any
+// *references* in `T` must outlive `'a`. Additionally, the lifetime
+// of `Ref` may not exceed `'a`.
 
 pub fn lifetimes() {
     let (four, nine) = (4, 9);
@@ -105,5 +121,18 @@ pub fn lifetimes() {
     owner.print();
 
     // Structs
-    let single = Borrowed(&four);
+    let x = 18;
+    let y = 15;
+    let single = Borrowed { x: &x };
+    let double = NamedBorrowed { x: &x, y: &y };
+    let reference = Either::Ref(&x);
+    let number = Either::Num(y);
+    println!("x is borrowed in {:?}", single);
+    println!("x and y are borrowed in {:?}", double);
+    println!("x is borrowed in {:?}", reference);
+    println!("y is *not* borrowed in {:?}", number);
+
+    // Traits
+    let b: Borrowed = Default::default();
+    println!("b is {:?}", b);
 }
