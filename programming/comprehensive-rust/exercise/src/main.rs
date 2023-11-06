@@ -45,6 +45,7 @@ mod scopes_and_shadowing;
 mod shared_state;
 mod simple_gui;
 mod slices;
+mod smart_pointers;
 mod stack_and_heap;
 mod storing_books;
 mod string_demo;
@@ -68,6 +69,7 @@ use crate::collatz_conjecture::collatz_conjecture;
 use crate::compound_types::compound_types;
 use crate::const_and_static::{const_variables, static_variables};
 use crate::copying_and_cloning::copying_and_cloning;
+use crate::dining_philosophers::dining_philosophers;
 use crate::enums::{enum_sizes, enums, variant_payloads};
 use crate::error_handling::{
     catch_stack_unwinding, converting_error_types, structred_error_handling,
@@ -111,6 +113,9 @@ use crate::scopes_and_shadowing::scopes_and_shadowing;
 use crate::shared_state::{arc_example, mutex_example};
 use crate::simple_gui::simple_gui;
 use crate::slices::slices;
+use crate::smart_pointers::{
+    box_list_example, my_box_example, rc_list_example, rc_ref_list_example,
+};
 use crate::stack_and_heap::stack_and_heap;
 use crate::storing_books::storing_books;
 use crate::string_demo::string;
@@ -129,7 +134,6 @@ use crate::variables::variables;
 use crate::vec::vec;
 use crate::while_let_expressions::while_let_expressions;
 use crate::while_loops::while_loops;
-use dining_philosophers::dining_philosophers;
 
 fn main() {
     // Program entry point
@@ -419,4 +423,10 @@ fn main() {
 
     println!("\n# Exercise: Dining Philosophers");
     dining_philosophers();
+
+    println!("\n# Smart Pointers");
+    box_list_example();
+    rc_list_example();
+    rc_ref_list_example();
+    my_box_example();
 }
