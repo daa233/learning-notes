@@ -27,6 +27,7 @@ mod lifetimes;
 mod loop_expressions;
 mod luhn_algorithm;
 mod match_expressions;
+mod memory_leakage;
 mod methods_example1;
 mod methods_example2;
 mod modules;
@@ -93,6 +94,7 @@ use crate::lifetimes::lifetimes;
 use crate::loop_expressions::loop_expressions;
 use crate::luhn_algorithm::run_luhn_algirithm;
 use crate::match_expressions::match_expressions;
+use crate::memory_leakage::cyclic_ref;
 use crate::methods_example1::{methods, overloading};
 use crate::methods_example2::methods_example;
 use crate::modules::modules;
@@ -429,4 +431,7 @@ fn main() {
     rc_list_example();
     rc_ref_list_example();
     my_box_example();
+
+    println!("\n# Memory Leakage");
+    cyclic_ref();
 }
