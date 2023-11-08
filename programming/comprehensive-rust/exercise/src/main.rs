@@ -94,7 +94,7 @@ use crate::lifetimes::lifetimes;
 use crate::loop_expressions::loop_expressions;
 use crate::luhn_algorithm::run_luhn_algirithm;
 use crate::match_expressions::match_expressions;
-use crate::memory_leakage::cyclic_ref;
+use crate::memory_leakage::{cyclic_ref, tree_node_example};
 use crate::methods_example1::{methods, overloading};
 use crate::methods_example2::methods_example;
 use crate::modules::modules;
@@ -434,4 +434,7 @@ fn main() {
 
     println!("\n# Memory Leakage");
     cyclic_ref();
+
+    println!("\n# Weak Reference");
+    tree_node_example();
 }
