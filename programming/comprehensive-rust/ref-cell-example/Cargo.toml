@@ -1,5 +1,5 @@
 [package]
-name = "ref_cell_example"
+name = "ref-cell-example"
 version = "0.1.0"
 edition = "2021"
 
