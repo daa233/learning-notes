@@ -259,9 +259,10 @@ def get_problems_list_json_file(problems_list_json_filename, problems_list_base_
     """
     try:
         r = requests.get(url=problems_list_base_url + category_slug)
+        data = json.loads(r.text)
         # Write to json file 'problems_list.json'
         with open(problems_list_json_filename, "w") as f:
-            f.write(r.text)
+            json.dump(data, f, ensure_ascii=False, indent=4)
         r.close()
     except (
         requests.exceptions.ReadTimeout,
