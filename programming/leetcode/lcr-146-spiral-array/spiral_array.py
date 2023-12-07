@@ -28,7 +28,7 @@
 from typing import List, Tuple
 
 
-class Solution:
+class Solution1:
 
     def spiralArray(self, array: List[List[int]]) -> List[int]:
         if not array:
@@ -72,6 +72,42 @@ class Solution:
                 dj = 0
 
         return result
+
+
+class Solution:
+
+    def spiralArray(self, array: List[List[int]]) -> List[int]:
+        if not array:
+            return []
+        min_i, max_i, min_j, max_j =  0, len(array) - 1, 0, len(array[0]) - 1
+        result = []
+        while True:
+            # from left to right
+            for j in range(min_j, max_j + 1):
+                result.append(array[min_i][j])
+            min_i += 1
+            if min_i > max_i:
+                break
+            # from top to bottom
+            for i in range(min_i, max_i + 1):
+                result.append(array[i][max_j])
+            max_j -= 1
+            if min_j > max_j:
+                break
+            # from right to left
+            for j in range(max_j, min_j - 1, -1):
+                result.append(array[max_i][j])
+            max_i -= 1
+            if min_i > max_i:
+                break
+            # from bottom to top
+            for i in range(max_i, min_i - 1, -1):
+                result.append(array[i][min_j])
+            min_j += 1
+            if min_j > max_j:
+                break
+        return result
+
 
 
 if __name__ == "__main__":
