@@ -30,6 +30,10 @@ lang_map_dict = {
     "py3": "python3",
     "python3": "python3",
     "Python3": "python3",
+    # Rust
+    "rs": "rust",
+    "rust": "rust",
+    "Rust": "rust",
 }
 
 lang_info_dict = {
@@ -37,6 +41,7 @@ lang_info_dict = {
     "cpp": {"name": "cpp", "file_ext": "cpp", "comment_mark": "*"},
     "python": {"name": "python", "file_ext": "py", "comment_mark": "#"},
     "python3": {"name": "python3", "file_ext": "py", "comment_mark": "#"},
+    "rust": {"name": "rust", "file_ext": "rs", "comment_mark": "//"},
 }
 
 
@@ -240,6 +245,10 @@ class Solution(object):
             head_content = self._process_file_head()
             file_content += head_content
             file_content.append("\n")
+        elif lang in ["rust"]:
+            head_content = self._process_file_head()
+            file_content += head_content
+            file_content.append("\n")
         else:
             raise NotImplementedError(
                 "Unsupported source file type: {}".format(self.lang_info["file_ext"])
@@ -322,7 +331,7 @@ def main():
         dest="lang",
         default="c++",
         type=str,
-        help="language option: c, c++, python",
+        help="language option: c, c++, python, rust",
     )
     parser.add_argument(
         "-p",
