@@ -16,10 +16,70 @@
 // @author: Du Ang
 // @date: Dec 11, 2023
 
+struct Solution1 {}
+struct Solution {}
+
 // 直接生成，不考虑大数越界
-impl Solution {
+impl Solution1 {
     pub fn count_numbers(cnt: i32) -> Vec<i32> {
         let result: Vec<_> = (1..(10_i32).pow(cnt as u32)).collect();
         return result;
     }
+}
+
+// 考虑大数越界，全排列，优化去掉开头0的方法
+impl Solution {
+    fn vec_to_large_int(nums: &Vec<char>, start: usize) -> i32 {
+        let mut sum: i32 = 0;
+        for i in start..nums.len() {
+            sum = sum * 10 + nums[i].to_digit(10).unwrap() as i32;
+        }
+        return sum;
+    }
+
+    pub fn count_numbers(cnt: i32) -> Vec<i32> {
+        let mut result: Vec<i32> = vec![];
+        let mut nums: Vec<char> = vec!['0'; cnt as usize];
+        let start: Option<usize> = None;
+
+        fn dfs(
+            i: usize,
+            start: Option<usize>,
+            cnt: i32,
+            nums: &mut Vec<char>,
+            result: &mut Vec<i32>,
+        ) {
+            if i == cnt as usize {
+                if let Some(start_v) = start {
+                    let sum = Solution::vec_to_large_int(nums, start_v);
+                    result.push(sum as i32);
+                }
+                return;
+            }
+
+            for j in 0..10 {
+                let vi = match start {
+                    Some(start_v) => Some(start_v),
+                    None => {
+                        if j == 0 {
+                            None
+                        } else {
+                            Some(i)
+                        }
+                    }
+                };
+                nums[i] = char::from_digit(j, 10).unwrap();
+                dfs(i + 1, vi, cnt, nums, result);
+            }
+        }
+
+        dfs(0, start, cnt, &mut nums, &mut result);
+        return result;
+    }
+}
+
+fn main() {
+    let cnt = 2;
+    let result = Solution::count_numbers(2);
+    println!("input: {cnt}, ouptut: {:?}", result);
 }

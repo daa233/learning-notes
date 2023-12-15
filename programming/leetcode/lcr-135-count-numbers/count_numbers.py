@@ -27,7 +27,7 @@ class Solution1:
 
 
 class Solution2:
-    """考虑大数越界"""
+    """考虑大数越界，全排列"""
 
     def countNumbers(self, cnt: int) -> List[int]:
         result = []
@@ -58,7 +58,7 @@ from typing import Optional
 
 
 class Solution:
-    """考虑大数越界，优化去掉开头0的方法"""
+    """考虑大数越界，全排列，优化去掉开头0的方法"""
 
     def countNumbers(self, cnt: int) -> List[int]:
         result = []
