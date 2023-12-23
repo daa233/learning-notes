@@ -113,7 +113,12 @@ class Solution3:
 
 
 class Solution:
-    """动态规划"""
+    """
+    动态规划
+    dp[i] = min {dp[a] * 2, dp[b] * 3, dp[c] * 5}
+    a, b, c 会依次遍历每一个丑数的位置，它们位于分别乘2、3、5后的结果会
+    超过当前最大丑数的位置
+    """
 
     def nthUglyNumber(self, n: int) -> int:
         dp = [1]
