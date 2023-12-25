@@ -109,7 +109,7 @@ class Solution:
 
 if __name__ == "__main__":
     sln = Solution()
-    # assert sln.articleMatch("aa", "a") == False
+    assert sln.articleMatch("aa", "a") == False
     assert sln.articleMatch("aa", "a.") == True
     assert sln.articleMatch("aa", "a*") == True
     assert sln.articleMatch("aab", "a*b") == True
