@@ -8,6 +8,7 @@ from __future__ import print_function
 import requests
 import json
 from bs4 import BeautifulSoup as bs
+from loguru import logger
 import textwrap
 import os
 import datetime
@@ -46,7 +47,6 @@ lang_info_dict = {
 
 
 def get_lang_and_file_ext(lang_str):
-
     if lang_str in lang_map_dict.keys():
         lang_slug = lang_map_dict[lang_str]
         return lang_info_dict[lang_slug]
@@ -102,15 +102,22 @@ class Solution(object):
 
             try:
                 # Send requests and get the specific problem description
-                self.problem_json = post_to_get_problem_description(self.urls, self.title_slug)
+                self.problem_json = post_to_get_problem_description(
+                    self.urls, self.title_slug
+                )
 
                 switch_to_chinese_flag = (
-                    "switch to Chinese" in self.problem_json["data"]["question"]["content"]
+                    "switch to Chinese"
+                    in self.problem_json["data"]["question"]["content"]
                 )
 
                 if self.use_translated or switch_to_chinese_flag:
-                    problem_desc_raw = self.problem_json["data"]["question"]["translatedContent"]
-                    self.title = self.problem_json["data"]["question"]["translatedTitle"]
+                    problem_desc_raw = self.problem_json["data"]["question"][
+                        "translatedContent"
+                    ]
+                    self.title = self.problem_json["data"]["question"][
+                        "translatedTitle"
+                    ]
                 else:
                     problem_desc_raw = self.problem_json["data"]["question"]["content"]
                 problem_desc_bs = bs(problem_desc_raw, "html.parser")
@@ -139,7 +146,9 @@ class Solution(object):
         file_content = self._get_solution_file_content()
         with open(solution_filepath, "w") as f:
             f.writelines(file_content)
-        print("==> The solution file have been created at '{}'".format(solution_filepath))
+        print(
+            "==> The solution file have been created at '{}'".format(solution_filepath)
+        )
         print("==> All is ready! Enjoy programming!")
 
     def _prepare_filepath(self, path, name=""):
@@ -159,7 +168,9 @@ class Solution(object):
                 if self.title_slug.endswith(val):
                     self.title_slug = self.title_slug.replace("-" + val, "")
 
-        assert dirname_prefix.isascii(), "the dirname_prefix {} contains non-ASCII characters!"
+        assert (
+            dirname_prefix.isascii()
+        ), "the dirname_prefix {} contains non-ASCII characters!"
 
         if not name:
             filename = self.title_slug
@@ -186,7 +197,9 @@ class Solution(object):
             os.makedirs(solution_path)
         if os.path.exists(solution_file):
             raise FileExistsError(
-                "A solution file '{}' already exists. Nothing changed.".format(solution_file)
+                "A solution file '{}' already exists. Nothing changed.".format(
+                    solution_file
+                )
             )
 
         return solution_file
@@ -196,7 +209,9 @@ class Solution(object):
         new_sec_text_list = []
         for sec_text in sec_text_list:
             subsec_text_list = sec_text.split("\n")
-            subsec_text_list = [textwrap.wrap(text, width=70) for text in subsec_text_list]
+            subsec_text_list = [
+                textwrap.wrap(text, width=70) for text in subsec_text_list
+            ]
             new_subsec_text_list = []
             for subsec_text in subsec_text_list:
                 if isinstance(subsec_text, list):
@@ -215,7 +230,9 @@ class Solution(object):
         comment_mark = self.lang_info["comment_mark"]
         self.description = self._format_description(self.description, comment_mark)
         # Prepare the head comments of the file
-        head_comment.append(comment_mark + " @problem: " + str(self.id) + ". " + self.title + "\n")
+        head_comment.append(
+            comment_mark + " @problem: " + str(self.id) + ". " + self.title + "\n"
+        )
         head_comment.append(comment_mark + " @file: " + self.filename + "\n")
         head_comment.append(comment_mark + " @url: " + self.problem_url + "\n")
         head_comment.append(comment_mark + " @description: \n")
@@ -240,7 +257,9 @@ class Solution(object):
             elif lang == "cpp":
                 file_content.append("#include <iostream>\n\n")
                 file_content.append("using namespace std;\n\n")
-            main_code_body.append("int main (int argc, char *argv[])\n{\n    return 0;\n}")
+            main_code_body.append(
+                "int main (int argc, char *argv[])\n{\n    return 0;\n}"
+            )
         elif lang in ["python", "python3"]:
             head_content = self._process_file_head()
             file_content += head_content
@@ -261,7 +280,9 @@ class Solution(object):
         return file_content
 
 
-def get_problems_list_json_file(problems_list_json_filename, problems_list_base_url, category_slug):
+def get_problems_list_json_file(
+    problems_list_json_filename, problems_list_base_url, category_slug
+):
     """
     Get the problems list json file.
     If problems list json file does not exist, send requests, get responses and save it.
@@ -293,21 +314,34 @@ def post_to_get_problem_description(urls, problem_title_slug):
 
     headers = {
         "accept": "*/*",
-        "Referer": urls["problem_post"] + problem_title_slug + "/description /",
-        "Origin": urls["origin"],
-        "User-Agent": "Mozilla/5.0",
+        "referer": urls["problem_post"] + problem_title_slug + "/description /",
+        "origin": urls["origin"],
+        "user-agent": "mozilla/5.0",
         "content-type": "application/json",
         "cache-control": "no-cache",
     }
 
-    problem_response = requests.request("POST", urls["problem_post"], data=payload, headers=headers)
-    problem_json = json.loads(problem_response.text)
-    problem_response.close()
-    return problem_json
+    problem_response = requests.request(
+        "post", urls["problem_post"], data=payload, headers=headers
+    )
+    import ipdb
+
+    ipdb.set_trace()
+    if problem_response.status_code == 200:
+        # import ipdb; ipdb.set_trace()
+        problem_json = json.loads(problem_response.text)
+        problem_response.close()
+        return problem_json
+    else:
+        msg = f"error: {problem_response.text}"
+        logger.error(msg)
+        raise valueerror(msg)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Prepare a new solution for LeetCode problem")
+    parser = argparse.ArgumentParser(
+        description="Prepare a new solution for LeetCode problem"
+    )
 
     parser.add_argument(
         "-i",
@@ -355,7 +389,8 @@ def main():
     )
 
     # origin_url = 'https://leetcode.com/'
-    origin_url = "https://leetcode-cn.com/"
+    # origin_url = "https://leetcode-cn.com/"
+    origin_url = "https://leetcode.cn/"
     urls = {
         "origin": origin_url,
         "problem_list": origin_url + "api/problems/",
@@ -386,7 +421,9 @@ def main():
             print("==> Problems list json file has been updated.")
 
     if args.id:
-        solution = Solution(args.id, args.lang, urls, author_name, date, args.translated)
+        solution = Solution(
+            args.id, args.lang, urls, author_name, date, args.translated
+        )
         solution.get_stat(problems_list_json_filename)
         # Prepare a new solution for LeetCode problem
         solution.create(args.path, args.name)
