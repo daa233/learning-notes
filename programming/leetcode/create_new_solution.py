@@ -326,14 +326,13 @@ def post_to_get_problem_description(urls, problem_title_slug):
     )
 
     if problem_response.status_code == 200:
-        # import ipdb; ipdb.set_trace()
         problem_json = json.loads(problem_response.text)
         problem_response.close()
         return problem_json
     else:
         msg = f"error: {problem_response.text}"
         logger.error(msg)
-        raise valueerror(msg)
+        raise ValueError(msg)
 
 
 def main():
