@@ -324,9 +324,7 @@ def post_to_get_problem_description(urls, problem_title_slug):
     problem_response = requests.request(
         "post", urls["problem_post"], data=payload, headers=headers
     )
-    import ipdb
 
-    ipdb.set_trace()
     if problem_response.status_code == 200:
         # import ipdb; ipdb.set_trace()
         problem_json = json.loads(problem_response.text)
