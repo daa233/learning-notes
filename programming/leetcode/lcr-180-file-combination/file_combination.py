@@ -57,7 +57,7 @@ class Solution1:
         return res
 
 
-class Solution:
+class Solution2:
     """
     等差数列求和公式
     $s = a_1 n + d \cdot \frac{n(n-1)}{2}$，公差 $d = 1$
@@ -75,7 +75,26 @@ class Solution:
         return res
 
 
+class Solution:
+    """
+    等差数列求和公式
+    $s = a_1 n + d \cdot \frac{n(n-1)}{2}$，公差 $d = 1$
+
+    数列左边界 i，数列总和 s，则右边界 j 为
+    $j = i + n - 1 = -\frac{1}{2} + \sqrt{(i - \frac{1}{2})^2 + 2s}$
+    """
+
+    def fileCombination(self, target: int) -> List[List[int]]:
+        res = []
+        for i in range(1, target // 2 + 1):
+            j = -0.5 + ((i - 0.5) ** 2 + 2 * target) ** 0.5
+            if i < j and j == int(j):
+                res.append([k for k in range(i, int(j) + 1)])
+
+        return res
+
+
 if __name__ == "__main__":
     sln = Solution()
     for target in [12, 18, 93, 87760]:
-        print(f"{target}: {sln.fileCombination(target)}")
+        print(f"{target}: {sln.fileCmbination(target)}")
