@@ -75,7 +75,7 @@ class Solution2:
         return res
 
 
-class Solution:
+class Solution3:
     """
     等差数列求和公式
     $s = a_1 n + d \cdot \frac{n(n-1)}{2}$，公差 $d = 1$
@@ -94,7 +94,30 @@ class Solution:
         return res
 
 
+class Solution:
+    """
+    滑动窗口法（双指针法）
+    """
+
+    def fileCombination(self, target: int) -> List[List[int]]:
+        left, right = 1, 1
+        s = 1
+        res = []
+        while left <= target // 2 + 1:
+            if s < target:
+                right += 1
+                s += right
+            elif s > target:
+                s -= left
+                left += 1
+            else:
+                res.append([i for i in range(left, right + 1)])
+                s -= left
+                left += 1
+        return res
+
+
 if __name__ == "__main__":
     sln = Solution()
     for target in [12, 18, 93, 87760]:
-        print(f"{target}: {sln.fileCmbination(target)}")
+        print(f"{target}: {sln.fileCombination(target)}")
