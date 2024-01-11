@@ -54,6 +54,7 @@ impl Solution1 {
 }
 
 impl Solution {
+    // 滑动窗口法（双指针法）
     pub fn file_combination(target: i32) -> Vec<Vec<i32>> {
         let mut left = 1;
         let mut right = 1;
