@@ -42,6 +42,20 @@ class Solution:
         return nums[0]
 
 
+class Solution:
+    """
+    动态规划
+    dp[i] = (dp[i - 1] + m) \mod i
+    """
+    
+    def iceBreakingGame(self, num: int, target: int) -> int:
+        dp = 0
+        for i in range(1, num + 1):
+            dp = (dp + target) % i
+        return dp
+
+
+
 if __name__ == "__main__":
     sln = Solution()
     for data in [(7, 4), (12, 5), (5, 1), (9, 13), (70866, 116922)]:
