@@ -17,10 +17,6 @@ from common import get_query, get_corpus
 
 class TfidfModel:
     def __init__(self) -> None:
-        """
-        - documents_list: 分词后的文档列表
-        """
-        # 文档总个数
         self.tf = []  # 每个文档中每个词的词频
         self.idf = {}  # 每个词汇的逆文档频率
         self.feature = None
