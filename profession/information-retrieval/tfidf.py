@@ -13,13 +13,15 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing import List
 from collections import defaultdict
 from common import get_query, get_corpus
+from util import l2_norm
 
 
 class TfidfModel:
-    def __init__(self) -> None:
+    def __init__(self, norm: bool = True) -> None:
         self.tf = []  # 每个文档中每个词的词频
         self.idf = {}  # 每个词汇的逆文档频率
         self.feature = None
+        self.norm = norm  # if norm is Ture, do l2 norm
 
     def clean_up(self) -> None:
         self.tf.clear()
@@ -58,6 +60,9 @@ class TfidfModel:
                 word = feature_names[j]
                 feature[i][j] = self.tf[i][word] * self.idf[word]
 
+        if self.norm:
+            feature = l2_norm(feature)
+
         self.feature = feature
 
         return feature
@@ -74,6 +79,10 @@ class TfidfModel:
             for j, word in enumerate(feature_names):
                 if word in q:
                     score[i][j] += 1 / len(q) * self.idf[word]
+
+        if self.norm:
+            score = l2_norm(score)
+
         return score
 
 
@@ -97,8 +106,9 @@ def main():
     # 获取最匹配的文档内容
     most_similar_document = corpus[most_similar_index]
 
-    print(most_similar_document)
+    print("The most similar document:", most_similar_document)
 
 
 if __name__ == "__main__":
     main()
+
