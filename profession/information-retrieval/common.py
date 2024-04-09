@@ -14,5 +14,5 @@ def get_corpus() -> List:
 
 
 def get_query() -> List:
-    query = input("Please input your query: ").strip()
+    query = input(">>> Please input your query: ").strip()
     return [query]

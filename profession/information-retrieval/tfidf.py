@@ -101,14 +101,25 @@ def main():
     similarities = cosine_similarity(query_vector, tfidf_matrix)
 
     # 找到最匹配的文档索引
-    most_similar_index = similarities.argmax()
+    for i, q in enumerate(query):
+        per_query_similarities = similarities[i]
+        similar_indices = per_query_similarities.argsort()[::-1]
+        most_similar_index = similar_indices[i]
 
-    # 获取最匹配的文档内容
-    most_similar_document = corpus[most_similar_index]
+        # 获取最匹配的文档内容
+        most_similar_document = corpus[most_similar_index]
+        most_similarity = per_query_similarities[most_similar_index]
 
-    print("The most similar document:", most_similar_document)
+        print(f">>> For the query: {q}\nRanked documents:")
+        for idx, sim_idx in enumerate(similar_indices, start=1):
+            print(
+                f"  Rank {idx} (score: {per_query_similarities[sim_idx]:.2f}): {corpus[sim_idx]}"
+            )
+
+        print(
+            f">>> The most similar document (score: {most_similarity:.2f}): {most_similar_document}"
+        )
 
 
 if __name__ == "__main__":
     main()
-
