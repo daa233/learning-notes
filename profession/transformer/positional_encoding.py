@@ -3,6 +3,7 @@ import torch.nn as nn
 import pandas as pd
 import math
 import altair as alt
+import matplotlib.pyplot as plt
 
 
 class PositionalEncoding(nn.Module):
@@ -30,8 +31,15 @@ class PositionalEncoding(nn.Module):
 
 
 def example_positional_encoding():
-    pe = PositionalEncoding(20, 0)
-    y = pe.forward(torch.zeros(1, 100, 20))
+    seq_len = 100
+    dim = 128
+
+    pe = PositionalEncoding(dim, 0)
+    y = pe.forward(torch.zeros(1, seq_len, dim))
+    plt.imshow(y[0])
+    plt.xlabel("dim")
+    plt.ylabel("L")
+    plt.show()
 
     data = pd.concat(
         [
@@ -39,7 +47,7 @@ def example_positional_encoding():
                 {
                     "embedding": y[0, :, dim],
                     "dimension": dim,
-                    "position": list(range(100)),
+                    "position": list(range(seq_len)),
                 }
             )
             for dim in [4, 5, 6, 7]
