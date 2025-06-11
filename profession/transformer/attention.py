@@ -54,3 +54,39 @@ class MultiHeadAttention(nn.Module):
         del key
         del value
         return self.linears[-1](x)
+    
+### MQA实现
+#和MHA的不同点在于, MQA只对query做multi-head, K,V为单头
+# 减少了K,V的参数量
+class MultiQueryAttention(nn.Module):
+    def __init__(self, h, d_model):
+        super().__init__()
+        self.h = h
+        self.d_k = d_model // h
+        assert d_model % h == 0
+        self.q_linear = nn.Linear(d_model, d_model)
+
+        ### k, v输出为单头
+        self.k_linear = nn.Linear(d_model, self.d_k)
+        self.v_linear = nn.Linear(d_model, self.d_k)
+
+        self.o_linear = nn.Linear(d_model, d_model)
+        
+    def forward(self, q, k, v, mask, dropout):
+        q = self.q_linear(q)
+        k = self.k_linear(k)
+        v = self.v_linear(v)
+        batch_size = q.size()[0]
+
+        q = q.view(batch_size, -1, self.h, self.d_k).transpose(1, 2)
+        k = k.view(batch_size, -1, 1, self.d_k).transpose(1,2)
+        v = v.view(batch_size, -1, 1, self.d_k).transpose(1,2)
+        ## q --> batch_size, self.h, q_len, self.d_k
+        ## k,v --> batch_size, 1, q_len, self.d_k
+
+        ## q*k转置 -> batch_size, self.h, q_len, q_len(k被广播为, batch_size, self.h, q_len, self.d_k)
+        ##  --> *v --> batch_size, self.h, q_len, self.d_k
+        output = attention(q, k, v)
+        output = output.transpose(1, 2).view(batch_size, -1, self.h*self.d_k)
+        output = self.o_linear(output)
+        return output
